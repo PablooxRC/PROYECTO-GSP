@@ -1,6 +1,6 @@
 import express from 'express';
 import morgan from 'morgan'
-import taskRoutes from './routes/task.routes.js'
+import taskRoutes from './routes/scout.routes.js'
 import authRoutes from './routes/auth.routes.js' 
 const app = express();
 
