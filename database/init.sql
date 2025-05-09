@@ -1,0 +1,6 @@
+CREATE TABLE scout(
+    ci PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    unidad VARCHAR(255) NOT NULL,
+    etapa VARCHAR(255) NOT NULL
+);
