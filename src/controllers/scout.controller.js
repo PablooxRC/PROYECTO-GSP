@@ -41,7 +41,21 @@ export const createScout = async (req, res, next) => {
     }
 }
 
-export const updateScout = (req, res) => res.send ('actualizando scout')
+//Actualizando scout
+export const updateScout = async (req, res) => {
+  const ci = req.params.ci 
+  const {nombre, unidad, rama, etapa} = req.body;
+
+  const result = await pool.query('UPDATE scouts SET nombre = $1, unidad = $2, rama = $3, etapa = $4 WHERE ci = $5 RETURNING *', [
+      nombre, unidad, rama, etapa, ci
+    ])
+  if (result.rowCount == 0){
+    return res.status(404).json({
+      message:"No existe un scout con ese ci"
+    })
+  }
+  return res.json(result.rows[0])
+} 
 
 //Eliminar Scout
 export const deleteScout = async (req, res) => {
