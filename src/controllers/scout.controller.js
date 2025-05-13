@@ -1,10 +1,11 @@
 import {pool} from '../db.js'
 //Seleccionar todos los scouts
 export const getScouts = async (req, res,next) => {
-  console.log(req.userCI)
-  const result = await pool.query('SELECT * FROM scouts');
+  console.log(req.userUnidad)
+  const result = await pool.query('SELECT * FROM scouts WHERE dirigente_ci = $1', [
+    req.userCI,
+  ]);
   return res.json(result.rows);
-  
 };
 
 //Seleccionar Scout especifico
@@ -25,8 +26,8 @@ export const createScout = async (req, res, next) => {
     const{ci,nombre,unidad,rama,etapa} = req.body;
     try{
         console.log(req.body)
-        const result = await pool.query('INSERT INTO scouts (ci, nombre, unidad, rama, etapa) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [ci, nombre, unidad,rama, etapa])
+        const result = await pool.query('INSERT INTO scouts (ci, nombre, unidad, rama, etapa, dirigente_ci) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [ci, nombre, unidad,rama, etapa, req.userCI])
         
         res.json(result.rows[0])
 

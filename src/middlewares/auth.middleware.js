@@ -14,6 +14,7 @@ export const isAuth = (req, res, next) => {
             message: 'No estas autorizado'
         });
         req.userCI = decoded.ci;
+        req.userUnidad = decoded.unidad;
         console.log(decoded)
         next();
     });

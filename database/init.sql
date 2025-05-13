@@ -1,9 +1,11 @@
-CREATE TABLE scout(
+CREATE TABLE scouts(
     ci PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
+    rama VARCHAR(255) NOT NULL,
     unidad VARCHAR(255) NOT NULL,
     etapa VARCHAR(255) NOT NULL
 )
+ALTER TABLE scout ADD COLUMN dirigente_ci  REFERENCES dirigente(ci);
 
 CREATE TABLE dirigente (
     ci INTEGER PRIMARY KEY,
@@ -15,3 +17,5 @@ CREATE TABLE dirigente (
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     upadate_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE dirigente ADD COLUMN gravatar VARCHAR(250);
