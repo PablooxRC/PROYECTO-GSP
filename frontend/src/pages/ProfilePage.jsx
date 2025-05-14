@@ -1,8 +1,10 @@
 import React from 'react'
-
+import {useAuth} from '../context/AuthContext'
 function ProfilePage(){
+
+  const {user} = useAuth()
   return (
-    <div>Home Page</div>
+    <div>{JSON.stringify(user, null, 2)}</div>
   )
 }
 

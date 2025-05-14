@@ -2,13 +2,15 @@ import Router from 'express-promise-router'
 import {createScout, deleteScout, getScouts, getScout, updateScout}  from '../controllers/scout.controller.js'
 
 import { isAuth } from '../middlewares/auth.middleware.js';
+import { validateSchema } from '../middlewares/validate.middleware.js';
+import { createScoutSchema, updateScoutSchema} from '../schemas/scout.schema.js';
 const router = Router();
 
 router.get('/scouts', isAuth, getScouts)
 
 router.get('/scout/:ci',isAuth, getScout)
 
-router.post('/scout',isAuth, createScout )
+router.post('/scout',isAuth, validateSchema(createScoutSchema), createScout )
 
 /*router.post('/scout/castores',isAuth, createScout )
 
@@ -16,7 +18,7 @@ router.post('/scout/halcones',isAuth, createScout )
 
 router.post('/scout/tiburones',isAuth, createScout )*/
 
-router.put('/scout/:ci',isAuth, updateScout)
+router.put('/scout/:ci',isAuth, validateSchema(updateScoutSchema), updateScout)
 
 router.delete('/scout/:ci',isAuth, deleteScout)
 

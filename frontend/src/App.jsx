@@ -7,6 +7,8 @@ import RegisterPage from './pages/RegisterPage'
 import ScoutsPage from './pages/ScoutsPage'
 import ScoutFormPage from './pages/ScoutFormPage'
 import ProfilePage from './pages/ProfilePage'
+import NotFound from './pages/NotFound'
+
 
 function App(){
   return (
@@ -19,7 +21,7 @@ function App(){
       <Route path="/scouts/new" element={<ScoutFormPage/>} />
       <Route path="/scouts/1/edit" element={<ScoutFormPage/>} />
       <Route path="/profile" element={<ProfilePage/>} />
-
+      <Route path="*" element={<NotFound/>}/>
     </Routes>
   )
 }

@@ -25,11 +25,19 @@ export const signin = async (req, res) => {
 
    const token = await createAccessToken({ci: result.rows[0].ci})
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000
-    })
+    /*res.cookie('token', token, {
+        httpOnly: false,
+        //sameSite: 'lax',   // o incluso omitelo
+        maxAge:   24 * 60 * 60 * 1000,
+        path:     '/',
+    });*/
+
+    res.cookie("token", token, {
+            // httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
     return res.json(result.rows[0]);
 }
 
@@ -54,10 +62,18 @@ export const signup = async (req, res, next) => {
         
         const token = await createAccessToken({ci: result.rows[0].ci});
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            sameSite: 'none',
-            maxAge: 24 * 60 * 60 * 1000
+        /*res.cookie('token', token, {
+           httpOnly: false,
+            //sameSite: 'lax',   // o incluso omitelo
+            maxAge:   24 * 60 * 60 * 1000,
+            path:     '/',
+        });*/
+
+        res.cookie("token", token, {
+            // httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
 
         return res.json(result.rows[0]);
