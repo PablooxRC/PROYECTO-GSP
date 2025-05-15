@@ -1,5 +1,28 @@
 @import "tailwindcss";
 body {
-  background-color: black;
+  position: relative;
+  margin: 0;
   color: white;
+  background-color: black;
+  min-height: 100vh;
+  z-index: 0;
+  overflow-x: hidden;
 }
+
+/* Pseudo elemento para imagen de fondo difuminada */
+body::before {
+  content: "";
+  position: fixed;       /* fijo para que cubra toda la ventana */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://i.ibb.co/DHGv7pwp/imagen-2025-05-15-015912690.png');
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px);
+  opacity: 0.5;          /* puedes ajustar la opacidad */
+  z-index: -1;           /* detrás del contenido */
+  pointer-events: none;  /* que no interfiera con clicks */
+}
+
