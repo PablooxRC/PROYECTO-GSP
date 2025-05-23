@@ -1,9 +1,9 @@
-import {useAuth} from '../context/AuthContext'
+import { useAuth } from '../context/AuthContext'; // ajusta la ruta según tu estructura
+
 function HomePage(){
   const data = useAuth()
-  console.log(data);
   return (
-    <div>Home Page</div>
+    <h1>hola</h1>
   )
 }
 

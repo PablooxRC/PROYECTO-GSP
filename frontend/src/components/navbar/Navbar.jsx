@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { navigation } from './navigation';
+import { publicRoutes, privateRoutes } from './navigation';
+import { useAuth } from '../../context/AuthContext';
 
 function Navbar(){
     const location = useLocation();
-    console.log(location);
-
+    const {isAuth, signout} = useAuth()
     return(
         <nav className="bg-white border-gray-200 dark:bg-gray-900">
           <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
@@ -25,19 +25,49 @@ function Navbar(){
             {/* Menú */}
             <div className="hidden w-full md:flex md:w-auto" id="navbar-default">
                 <ul className="font-medium flex-nowrap flex overflow-x-auto space-x-4 md:space-x-6 p-0 m-0">
-                    {navigation.map(({path, name}) => (
-                        <li className = {
-                            `${location.pathname === path &&  "bg-blue-600 px-3 py-1"}`
-                        }key={path}>
-                            <Link 
-                              to={path} 
-                              className="block whitespace-nowrap py-2 px-3 text-blue-100 rounded-sm md:bg-transparent md:text-blue-100 md:p-0 dark:text-white md:dark:text-blue-100"
+                {
+                    isAuth
+                    ? privateRoutes.map(({ path, name }) => (
+                        <li
+                            className={`${location.pathname === path ? "bg-blue-600 px-3 py-1" : ""}`}
+                            key={path}
+                        >
+                            <Link
+                            to={path}
+                            className="block whitespace-nowrap py-2 px-3 text-blue-100 rounded-sm md:bg-transparent md:text-blue-100 md:p-0 dark:text-white md:dark:text-blue-100"
                             >
-                              {name}
+                            {name}
                             </Link>
                         </li>
-                    ))}
+                        ))
+                    : publicRoutes.map(({ path, name }) => (
+                        <li
+                            className={`${location.pathname === path ? "bg-blue-600 px-3 py-1" : ""}`}
+                            key={path}
+                        >
+                            <Link
+                            to={path}
+                            className="block whitespace-nowrap py-2 px-3 text-blue-100 rounded-sm md:bg-transparent md:text-blue-100 md:p-0 dark:text-white md:dark:text-blue-100"
+                            >
+                            {name}
+                            </Link>
+                        </li>
+                        ))
+                }
+                {isAuth && (
+                    <li
+                    onClick={signout}
+                    >
+                    <a
+                        href="#"
+                        className="block whitespace-nowrap py-2 px-3 text-blue-100 rounded-sm md:bg-transparent md:text-blue-100 md:p-0 dark:text-white md:dark:text-blue-100"
+                    >
+                        Salir
+                    </a>
+                    </li>
+                )}
                 </ul>
+
             </div>
           </div>
         </nav>

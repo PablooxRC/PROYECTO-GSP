@@ -8,7 +8,7 @@ function LoginPage(){
   const {signin, errors, isAuth} = useAuth()
   const navigate = useNavigate()
   const onSubmit = handleSubmit(async (data) =>{
-    const user = await await signin(data)
+    const user = await signin(data)
     if (user){
       navigate('/profile')
     }

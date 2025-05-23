@@ -3,9 +3,14 @@ CREATE TABLE scouts(
     nombre VARCHAR(255) NOT NULL,
     rama VARCHAR(255) NOT NULL,
     unidad VARCHAR(255) NOT NULL,
-    etapa VARCHAR(255) NOT NULL
+    etapa VARCHAR(255) NOT NULL,
+    nivel actual VARCHAR(255),
+    logros INTEGER
 )
 ALTER TABLE scout ADD COLUMN dirigente_ci  REFERENCES dirigente(ci);
+
+ALTER TABLE "scouts"
+ADD COLUMN apellido VARCHAR(255);
 
 CREATE TABLE dirigente (
     ci INTEGER PRIMARY KEY,

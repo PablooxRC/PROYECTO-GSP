@@ -23,11 +23,11 @@ export const getScout = async (req, res) => {
 
 //Creación de scouts
 export const createScout = async (req, res, next) => {
-    const{ci,nombre,unidad,rama,etapa} = req.body;
+    const{ci,nombre,apellido,unidad,rama,etapa} = req.body;
     try{
         console.log(req.body)
-        const result = await pool.query('INSERT INTO scouts (ci, nombre, unidad, rama, etapa, dirigente_ci) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [ci, nombre, unidad,rama, etapa, req.userCI])
+        const result = await pool.query('INSERT INTO scouts (ci, nombre, unidad, rama, etapa, dirigente_ci, apellido) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [ci, nombre, unidad,rama, etapa, req.userCI, apellido])
         
         res.json(result.rows[0])
 

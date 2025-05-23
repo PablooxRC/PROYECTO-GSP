@@ -12,12 +12,6 @@ router.get('/scout/:ci',isAuth, getScout)
 
 router.post('/scout',isAuth, validateSchema(createScoutSchema), createScout )
 
-/*router.post('/scout/castores',isAuth, createScout )
-
-router.post('/scout/halcones',isAuth, createScout )
-
-router.post('/scout/tiburones',isAuth, createScout )*/
-
 router.put('/scout/:ci',isAuth, validateSchema(updateScoutSchema), updateScout)
 
 router.delete('/scout/:ci',isAuth, deleteScout)

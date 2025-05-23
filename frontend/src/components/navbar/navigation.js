@@ -1,4 +1,4 @@
-export const navigation = [
+export const publicRoutes = [
     {
         name: 'Inicio',
         path: '/'
@@ -8,17 +8,22 @@ export const navigation = [
         path: '/login'
     },
     {
+        name: 'Registrarse',
+        path: '/register'
+    },
+    {
         name: 'Más información',
         path: '/about'
-    },
+    }
+]
+
+export const privateRoutes = [
+   
     {
         name: 'Scouts',
         path: '/scouts'
     },
-    {
-        name: 'Registrarse',
-        path: '/register'
-    },
+   
     {
         name: 'Nuevo Scout',
         path: '/scouts/new'

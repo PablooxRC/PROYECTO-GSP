@@ -25,13 +25,6 @@ export const signin = async (req, res) => {
 
    const token = await createAccessToken({ci: result.rows[0].ci})
 
-    /*res.cookie('token', token, {
-        httpOnly: false,
-        //sameSite: 'lax',   // o incluso omitelo
-        maxAge:   24 * 60 * 60 * 1000,
-        path:     '/',
-    });*/
-
     res.cookie("token", token, {
             // httpOnly: true,
             secure: true,
@@ -61,14 +54,6 @@ export const signup = async (req, res, next) => {
         );
         
         const token = await createAccessToken({ci: result.rows[0].ci});
-
-        /*res.cookie('token', token, {
-           httpOnly: false,
-            //sameSite: 'lax',   // o incluso omitelo
-            maxAge:   24 * 60 * 60 * 1000,
-            path:     '/',
-        });*/
-
         res.cookie("token", token, {
             // httpOnly: true,
             secure: true,

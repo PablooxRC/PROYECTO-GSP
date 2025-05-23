@@ -2,7 +2,7 @@ import React from 'react'
 
 function AbaoutPage(){
   return (
-    <div>Home Page</div>
+    <h1>Hola</h1>
   )
 }
 

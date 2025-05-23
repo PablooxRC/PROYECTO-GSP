@@ -27,7 +27,7 @@ function RegisterPage(){
         }
         <h3 className='text-2xl font-bold'> Registrarse</h3>
         <form onSubmit={onSubmit}>
-          <Label htmlFor="email">
+          <Label htmlFor="id">
             Carnet de identidad
           </Label>
           <Input placeholder="Ingresa tu CI"
@@ -39,7 +39,7 @@ function RegisterPage(){
           {
             errors.ci && <p className = "text-red-500"> El ci es requerido</p>
           }
-          <Label htmlFor="email">
+          <Label htmlFor="name">
             Nombre
           </Label>
           <Input placeholder="Ingresa tu nombre"
@@ -50,7 +50,7 @@ function RegisterPage(){
           {
             errors.nombre && <p className = "text-red-500"> El nombre es requerido</p>
           }
-          <Label htmlFor="email">
+          <Label htmlFor="lastname">
             Apellido
           </Label>
           <Input placeholder="Ingresa tu apellido"
@@ -72,7 +72,7 @@ function RegisterPage(){
           {
             errors.email && <p className = "text-red-500"> El email es requerido</p>
           }
-          <Label htmlFor="email">
+          <Label htmlFor="unidad">
             Unidad
           </Label>
           <Input placeholder="Ingresa tu unidad"
@@ -83,7 +83,7 @@ function RegisterPage(){
           {
             errors.unidad && <p className = "text-red-500"> La unidad es requerida</p>
           }
-          <Label htmlFor="email">
+          <Label htmlFor="password">
             Contraseña
           </Label>
           <Input type ="password" placeholder="Ingresa tu contraseña"

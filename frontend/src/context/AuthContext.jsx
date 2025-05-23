@@ -70,12 +70,17 @@ export function AuthProvider ({children}){
             }
        }
     }
+
+    const signout = async () => {
+        const res = await axios.post("/signout")
+        setUser(null);
+        setIsAuth(false);
+    }
+
     useEffect(() => {
-        console.log('js-cookie get all:', Cookie.get('token'));   
         if(Cookie.get('token')){
             //obtener datos del usuario
             axios.get('/profile').then(res => {
-                console.log(res.data)
                 setUser(res.data);
                 setIsAuth(true)
             }).catch(err => {
@@ -90,7 +95,8 @@ export function AuthProvider ({children}){
         isAuth,
         errors, 
         signup, 
-        signin
+        signin,
+        signout
     }}>
         {children}
     </AuthContext.Provider>

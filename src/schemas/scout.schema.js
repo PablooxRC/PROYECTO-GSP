@@ -9,6 +9,10 @@ export const createScoutSchema = z.object({
         required_error: "El nombre es requerido",
         invalid_type_error: "El nombre debe ser un texto"
      }).min(1),
+    apellido: z.string({ 
+        required_error: "El apellido es requerido",
+        invalid_type_error: "El nombre debe ser un texto"
+     }).min(1),
     rama: z.string({ 
         required_error: "La rama es requerida",
          invalid_type_error: "La rama debe ser un texto"
