@@ -1,11 +1,11 @@
 import React from 'react'
-import {Routes, Route} from 'react-router-dom'
+import {Routes, Route, Outlet} from 'react-router-dom'
 import  { useAuth }  from './context/AuthContext.jsx'
+import { ScoutProvides } from './context/scoutContex.jsx'
 import Navbar from './components/navbar/Navbar.jsx'
 import { ProtectedRoute }  from './components/ProtecttedRoute.jsx'
 
 import HomePage from './pages/HomePage'
-import AboutPage from './pages/AboutPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ScoutsPage from './pages/ScoutsPage'
@@ -16,8 +16,9 @@ import NotFound from './pages/NotFound'
 
 function App(){
 
-  const {isAuth} = useAuth()
-  console.log(isAuth)
+  const {isAuth, loading} = useAuth()
+  console.log(loading)
+  if(loading) return <h1>cargando.....</h1>
   return (
    <>
     <Navbar/>
@@ -25,7 +26,6 @@ function App(){
       <Routes>
        <Route element ={<ProtectedRoute isAllowed={!isAuth} redirectTo="/scouts"/>}>
           <Route path="/" element={<HomePage/>} />
-          <Route path="/about" element={<AboutPage/>} />
           <Route path="/login" element={<LoginPage/>} />
           <Route path="/register" element={<RegisterPage/>} />
        </Route>
@@ -36,9 +36,17 @@ function App(){
           redirectTo="/login"
         />}
        >
+        <Route element={
+          <ScoutProvides>
+            <Outlet/>
+          </ScoutProvides>
+        }>
           <Route path="/scouts" element={<ScoutsPage/>} />
           <Route path="/scouts/new" element={<ScoutFormPage/>} />
-          <Route path="/scouts/1/edit" element={<ScoutFormPage/>} />
+          <Route path="/scouts/:ci/edit" element={<ScoutFormPage/>} />
+        </Route>
+
+
           <Route path="/profile" element={<ProfilePage/>} />
        </Route>
 

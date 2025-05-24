@@ -44,19 +44,23 @@ export const createScout = async (req, res, next) => {
 
 //Actualizando scout
 export const updateScout = async (req, res) => {
-  const ci = req.params.ci 
-  const {nombre, unidad, rama, etapa} = req.body;
+  const ciViejo = req.params.ci;
+  const { ci: ciNuevo, nombre, apellido, unidad, rama, etapa } = req.body;
+  const result = await pool.query(
+    'UPDATE scouts SET ci = $1, nombre = $2, apellido = $3, unidad = $4, rama = $5, etapa = $6 WHERE ci = $7 RETURNING *',
+    [ciNuevo, nombre, apellido, unidad, rama, etapa, ciViejo]
+  );
 
-  const result = await pool.query('UPDATE scouts SET nombre = $1, unidad = $2, rama = $3, etapa = $4 WHERE ci = $5 RETURNING *', [
-      nombre, unidad, rama, etapa, ci
-    ])
-  if (result.rowCount == 0){
+
+  if (result.rowCount == 0) {
     return res.status(404).json({
-      message:"No existe un scout con ese ci"
-    })
+      message: "No existe un scout con ese CI"
+    });
   }
-  return res.json(result.rows[0])
-} 
+
+  return res.json(result.rows[0]);
+}
+
 
 //Eliminar Scout
 export const deleteScout = async (req, res) => {

@@ -11,10 +11,6 @@ export const publicRoutes = [
         name: 'Registrarse',
         path: '/register'
     },
-    {
-        name: 'Más información',
-        path: '/about'
-    }
 ]
 
 export const privateRoutes = [
@@ -27,10 +23,6 @@ export const privateRoutes = [
     {
         name: 'Nuevo Scout',
         path: '/scouts/new'
-    },
-    {
-        name: 'Editar Scout',
-        path: '/scouts/1/edit'
     },
     {
         name: 'Perfil del dirigente',

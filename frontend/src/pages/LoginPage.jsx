@@ -4,8 +4,8 @@ import {Link, useNavigate} from 'react-router-dom'
 import {useForm} from 'react-hook-form'
 import { useAuth } from '../context/AuthContext.jsx'
 function LoginPage(){
-  const {register, handleSubmit} = useForm()
-  const {signin, errors, isAuth} = useAuth()
+  const {register, handleSubmit, formState: {errors}} = useForm()
+  const {signin, errors: loginErrors, isAuth} = useAuth()
   const navigate = useNavigate()
   const onSubmit = handleSubmit(async (data) =>{
     const user = await signin(data)
@@ -17,7 +17,7 @@ function LoginPage(){
   return (
     <div className='h-[calc(100vh-64px)] flex justify-center items-center'>
       <Card>
-        {errors && errors.length > 0 && (
+        {loginErrors && loginErrors.length > 0 && (
           <div className="bg-red-600 text-white p-3 rounded mb-4">
             {errors.map((err, index) => (
               <p key={index} className="mb-1">{err}</p>
@@ -29,9 +29,13 @@ function LoginPage(){
         <h1 className='text-4xl font-bold my-2 text-center'> Ingresar</h1>
         
         <form onSubmit={onSubmit}>
+          
           <Label htmlFor="email">
             Email
           </Label>
+          {errors.email && (
+            <p className='text-red-500'>El email es requerido</p>
+          )}
           <Input type='email' placeholder='Email'
             {...register('email', {
                 required: true
@@ -41,6 +45,9 @@ function LoginPage(){
           <Label htmlFor="contraseña">
             Contraseña
           </Label>
+          {errors.password && (
+            <p className='text-red-500'>La contraseña es requerida</p>
+          )}
           <Input type='password' placeholder='Password'
             {...register('password', {
                 required: true
