@@ -1,0 +1,75 @@
+- Responde solo 'SIN CONTEXTO' si las preguntas no tienen nada que ver con los scouts, primeros auxilios o clave morse.
+¿Cuales fueron las cuatro patrullas en asistir al primer campamento scout?,Las cuatro patrullas en asistir fueron: Cuervos, chorlitos, lobos y toros.
+¿Cuando se fundo el Grupo Scout Panda?,El Grupo Scout Panda se fundo el 23 de marzo de 1977.
+¿Quien es el fundador del Grupo Scout Panda?,El fundador del Grupo Scout Panda es el profesor Augusto Arraya
+¿Quién fundó el movimiento Scout y dónde y cuándo se realizó el primer campamento oficial que lo inició?,El movimiento Scout fue fundado por **Sir Robert Baden-Powell**, un teniente general del ejército británico. El campamento experimental que dio origen a todo se llevó a cabo del **1 al 8 de agosto de 1907 en la Isla de Brownsea**, ubicada en Poole Harbour, Dorset, Inglaterra.
+¿Cuál fue la inspiración de Baden-Powell para crear el Escultismo y qué libro clave lo difundió globalmente?,La inspiración de Baden-Powell para el Escultismo provino de sus experiencias militares, especialmente durante el **Sitio de Mafeking (1899-1900)** en la Guerra Bóer.
+¿Cómo se expandió el Movimiento Scout desde Inglaterra a otros países y cuál fue su primera ramificación importante?,El Movimiento Scout se expandió de forma casi espontánea y orgánica a nivel global.
+¿Cuál es el significado profundo de la Flor de Lis Scout y el simbolismo del saludo Scout?,La **Flor de Lis** es el emblema universal del Movimiento Scout, cargada de simbolismo.
+Háblame sobre la vida de Baden-Powell después de fundar el Movimiento Scout,sus viajes y su legado hasta su fallecimiento.,Después de fundar el Escultismo, Baden-Powell se retiró del ejército en **1910** para dedicar el resto de su vida al desarrollo y expansión del movimiento.
+¿Qué son los 'Jamborees' Scout Mundiales, cómo han evolucionado y cuáles son algunos de los más notables?,Los **Jamborees Scout Mundiales** son las mayores concentraciones internacionales de Scouts.
+¿Cuál es el propósito del uniforme Scout y cómo se relaciona con las insignias de especialidad y progresión?,El uniforme Scout tiene múltiples propósitos: promueve la **igualdad** al desdibujar las diferencias socioeconómicas.
+Explica la estructura jerárquica y organizativa del Movimiento Scout a nivel mundial y sus principales organismos.,El Movimiento Scout es una organización global con presencia en casi todos los países del mundo.
+¿Qué papel juega la educación no formal en el Escultismo y cómo se distingue de la educación tradicional?,La **educación no formal** es el pilar central y distintivo del Escultismo.
+Menciona algunos de los valores fundamentales y principios que promueve el Movimiento Scout, más allá de su lema.,Más allá de su conocido lema 'Siempre Listo', el Movimiento Scout promueve un conjunto de valores y principios fundamentales.
+¿Cuál es el significado del 'Saludo Scout' y qué simboliza la mano izquierda en el Escultismo?,El **Saludo Scout**, con la mano derecha a la altura del hombro y los tres dedos centrales levantados.
+¿Qué es la Gilwell Park y su importancia para el liderazgo Scout?,**Gilwell Park** es una propiedad rural en Essex, Inglaterra, que fue comprada en **1919**.
+¿Cómo se adaptó el Escultismo durante las Guerras Mundiales?,Durante la **Primera y Segunda Guerra Mundial**, el Movimiento Scout jugó un papel crucial.
+¿Qué papel jugó Lady Olave Baden-Powell en el desarrollo global de las Guías y el Escultismo?,**Lady Olave Baden-Powell**, esposa del fundador, fue una figura indispensable en el desarrollo del movimiento.
+Describe la importancia de la 'Buena Acción Diaria' y el servicio a la comunidad en el Escultismo.,La '**Buena Acción Diaria**' es un concepto central en el Escultismo.
+¿Cuáles son los principios educativos fundamentales del Escultismo establecidos por Baden-Powell?,Los principios educativos fundamentales del Escultismo, establecidos por Baden-Powell, son el **aprendizaje por la acción**.
+¿Qué papel jugó el libro 'Aids to Scouting' en la evolución de 'Escultismo para Muchachos'?,'**Aids to Scouting**' (Ayudas al Escultismo), publicado por Baden-Powell en **1899**.
+¿Cómo se organizaron los Scouts Marinos y los Scouts del Aire?,Los **Scouts Marinos (Sea Scouts)** fueron fundados por Baden-Powell en **1910**.
+¿Qué es el 'Lema Scout' y cómo se aplica en la vida diaria de un Scout?,El **Lema Scout es 'Siempre Listo' (Be Prepared)**.
+¿Cómo se relaciona el Escultismo con la protección del medio ambiente?,El Escultismo tiene una fuerte conexión con la **protección del medio ambiente y la naturaleza**.
+¿Cuál es el significado de la 'Promesa Scout' y sus tres puntos fundamentales?,La **Promesa Scout** es un compromiso voluntario y personal que cada joven hace al unirse al Movimiento Scout.
+¿Ante un accidente, la actitud correcta es?,Activar el sistema de emergencias PAS: Proteger-Avisar-Socorrer.
+¿Qué hacer ante una hemorragia?,Presionar con una gasa limpia y elevar el miembro.
+¿Como actuar ante un caso de atragantamiento leve?,Animar a la víctima a seguir tosiendo.
+¿Qué debo hacer si un amigo se cae y se raspa la rodilla?,Limpia la herida con agua y cubre con una gasa del botiquín.
+¿Qué hago si alguien se corta con algo afilado?,Presiona la herida con una gasa limpia y no toques la herida con las manos sucias.
+¿Qué hago si yo o un compañero se astilla?,Usar pinzas limpias del botiquín y toallita antiséptica antes y después de retirar la astilla.
+¿Qué hacer ante un corte de cuchillo?,Limpiar con solución antiséptica (toallita o alcohol), poner gasa, asegurar con curita o cinta.
+¿Qué hacer ante un raspado profundo?,Limpiar, gasa estéril, venda triangular y observar si hay infección.
+¿Quemadura de fogata como actuar?,Enfría la quemadura con agua fría por 10 minutos, seca con una gasa limpia, y si hay dolor, puedes aplicar una crema calmante como Aloe Vera Gel o una pomada como Quemacuran.
+¿Qué hacer ante un corte de tijeras?,Lava con agua y Yodo, seca y cubre con una curita o gasa limpia.
+¿Como actuar ante dolor de cabeza y fiebre?,Puedes tomar Paracetamol o Ibuprofeno siguiendo las indicaciones de la dosis que te el encargado de la posta médica.
+¿Como actuar ante el dolor de garganta?,Puedes tomar ibuprofeno, la dosis te la da la posta médica y lo puedes complementar con pastillitas de propóleo o elidol.
+¿Qué hacer ante quemaduras de sol?,Aplica Aloe Vera Gel para aliviar la piel y mantente hidratado.
+Tengo un golpe fuerte y la piel está morada (moretón). ¿Qué hago?,Aplica hielo envuelto en paño para reducir inflamación y toma Paracetamol si tienes dolor.
+¿Cómo se representa la letra A en Clave Morse?,La letra A en Clave Morse se representa así: **.-** (punto, raya).
+¿Cómo se representa la letra B en Clave Morse?,La letra B en Clave Morse se representa así: **-...** (raya, punto, punto, punto).
+¿Cómo se representa la letra C en Clave Morse?,La letra C en Clave Morse se representa así: **-.-.** (raya, punto, raya, punto).
+¿Cómo se representa la letra D en Clave Morse?,La letra D en Clave Morse se representa así: **-..** (raya, punto, punto).
+¿Cómo se representa la letra E en Clave Morse?,La letra E en Clave Morse se representa así: **.** (punto).
+¿Cómo se representa la letra F en Clave Morse?,La letra F en Clave Morse se representa así: **..-.** (punto, punto, raya, punto).
+¿Cómo se representa la letra G en Clave Morse?,La letra G en Clave Morse se representa así: **--.** (raya, raya, punto).
+¿Cómo se representa la letra H en Clave Morse?,La letra H en Clave Morse se representa así: **....** (punto, punto, punto, punto).
+¿Cómo se representa la letra I en Clave Morse?,La letra I en Clave Morse se representa así: **..** (punto, punto).
+¿Cómo se representa la letra J en Clave Morse?,La letra J en Clave Morse se representa así: **.---** (punto, raya, raya, raya).
+¿Cómo se representa la letra K en Clave Morse?,La letra K en Clave Morse se representa así: **-.-** (raya, punto, raya).
+¿Cómo se representa la letra L en Clave Morse?,La letra L en Clave Morse se representa así: **.-..** (punto, raya, punto, punto).
+¿Cómo se representa la letra M en Clave Morse?,La letra M en Clave Morse se representa así: **--** (raya, raya).
+¿Cómo se representa la letra N en Clave Morse?,La letra N en Clave Morse se representa así: **-.** (raya, punto).
+¿Cómo se representa la letra O en Clave Morse?,La letra O en Clave Morse se representa así: **---** (raya, raya, raya).
+¿Cómo se representa la letra P en Clave Morse?,La letra P en Clave Morse se representa así: **.--.** (punto, raya, raya, punto).
+¿Cómo se representa la letra Q en Clave Morse?,La letra Q en Clave Morse se representa así: **--.-** (raya, raya, punto, raya).
+¿Cómo se representa la letra R en Clave Morse?,La letra R en Clave Morse se representa así: **.-.** (punto, raya, punto).
+¿Cómo se representa la letra S en Clave Morse?,La letra S en Clave Morse se representa así: **...** (punto, punto, punto).
+¿Cómo se representa la letra T en Clave Morse?,La letra T en Clave Morse se representa así: **-** (raya).
+¿Cómo se representa la letra U en Clave Morse?,La letra U en Clave Morse se representa así: **..-** (punto, punto, raya).
+¿Cómo se representa la letra V en Clave Morse?,La letra V en Clave Morse se representa así: **...-** (punto, punto, punto, raya).
+¿Cómo se representa la letra W en Clave Morse?,La letra W en Clave Morse se representa así: **.--** (punto, raya, raya).
+¿Cómo se representa la letra X en Clave Morse?,La letra X en Clave Morse se representa así: **-..-** (raya, punto, punto, raya).
+¿Cómo se representa la letra Y en Clave Morse?,La letra Y en Clave Morse se representa así: **-.--** (raya, punto, raya, raya).
+¿Cómo se representa la letra Z en Clave Morse?,La letra Z en Clave Morse se representa así: **--..** (raya, raya, punto, punto).
+¿Cómo se representa el número 0 en Clave Morse?,El número 0 en Clave Morse se representa así: **-----** (cinco rayas).
+¿Cómo se representa el número 1 en Clave Morse?,El número 1 en Clave Morse se representa así: **.----** (punto, cuatro rayas).
+¿Cómo se representa el número 2 en Clave Morse?,El número 2 en Clave Morse se representa así: **..---** (dos puntos, tres rayas).
+¿Cómo se representa el número 3 en Clave Morse?,El número 3 en Clave Morse se representa así: **...--** (tres puntos, dos rayas).
+¿Cómo se representa el número 4 en Clave Morse?,El número 4 en Clave Morse se representa así: **....-** (cuatro puntos, raya).
+¿Cómo se representa el número 5 en Clave Morse?,El número 5 en Clave Morse se representa así: **.....** (cinco puntos).
+¿Cómo se representa el número 6 en Clave Morse?,El número 6 en Clave Morse se representa así: **-....** (raya, cuatro puntos).
+¿Cómo se representa el número 7 en Clave Morse?,El número 7 en Clave Morse se representa así: **--...** (dos rayas, tres puntos).
+¿Cómo se representa el número 8 en Clave Morse?,El número 8 en Clave Morse se representa así: **---..** (tres rayas, dos puntos).
+¿Cómo se representa el número 9 en Clave Morse?,El número 9 en Clave Morse se representa así: **----.** (cuatro rayas, punto).

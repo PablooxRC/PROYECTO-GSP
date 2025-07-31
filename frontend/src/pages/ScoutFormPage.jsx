@@ -39,6 +39,7 @@ function ScoutFormPage() {
         setValue("unidad", scout.unidad);
         setValue("rama", scout.rama);
         setValue("etapa", scout.etapa);
+        
       });
     }
   }, []);
