@@ -5,6 +5,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const https = require('https'); 
 
 const app = express();
 app.use(cors());
@@ -17,6 +18,7 @@ const pool = new Pool({
     database: 'Scouts',
     password: '12345678',
     port: 5432,
+    max: 50,
     ssl: false
 });
 
@@ -65,8 +67,11 @@ app.post('/login', async (req, res) => {
                 unidad: user.unidad,
                 rama: user.rama,
                 etapa: user.etapa,
-                dirigente_ci: user.dirigente_ci
+                dirigente_ci: user.dirigente_ci,
+                puntaje: user.puntaje,  // agregar puntaje
+                preguntas_mal_contestadas: user.preguntas_mal_contestadas  // agregar preguntas mal contestadas
             });
+
         } else {
             res.json({ success: false, message: 'CI no encontrado' });
         }
@@ -122,7 +127,6 @@ app.post('/ollama', async (req, res) => {
 
         const respuestas = [];
 
-        // Suponiendo que preguntas_mal_contestadas es un array de strings (preguntas)
         for (const pregunta of preguntasMal) {
             const respuesta = await queryOllama(pregunta);
             respuestas.push({ pregunta, respuesta });
@@ -135,6 +139,24 @@ app.post('/ollama', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error al consultar el modelo', error: err.message });
     }
 });
+
+
+app.post('/ollama-free', async (req, res) => {
+    const { pregunta } = req.body;
+
+    if (!pregunta) {
+        return res.status(400).json({ success: false, message: 'La pregunta es requerida' });
+    }
+
+    try {
+        const respuesta = await queryOllama(pregunta);
+        res.json({ success: true, pregunta, respuesta });
+    } catch (err) {
+        console.error('Error en /ollama-free:', err);
+        res.status(500).json({ success: false, message: 'Error al consultar el modelo', error: err.message });
+    }
+});
+
 
 
 app.post('/update-score', async (req, res) => {
@@ -150,8 +172,12 @@ app.post('/update-score', async (req, res) => {
     }
 });
 
+const privateKey = fs.readFileSync('ssl_key.pem', 'utf8');
+const certificate = fs.readFileSync('ssl_cert.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
 
-// Iniciar servidor HTTP
-app.listen(4000, () => {
-    console.log('Servidor HTTP corriendo en http://localhost:4000');
+const httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(4000, '0.0.0.0', () => {
+    console.log('Servidor HTTPS corriendo en https://0.0.0.0:4000');
 });

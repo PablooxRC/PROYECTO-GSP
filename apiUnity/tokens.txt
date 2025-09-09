@@ -1,4 +1,4 @@
-- Responde solo 'SIN CONTEXTO' si las preguntas no tienen nada que ver con los scouts, primeros auxilios o clave morse.
+- Responde solo 'NO PUEDO AYUDARTE CON ESO' si las preguntas no tienen nada que ver con los scouts, primeros auxilios o clave morse.
 ¿Cuales fueron las cuatro patrullas en asistir al primer campamento scout?,Las cuatro patrullas en asistir fueron: Cuervos, chorlitos, lobos y toros.
 ¿Cuando se fundo el Grupo Scout Panda?,El Grupo Scout Panda se fundo el 23 de marzo de 1977.
 ¿Quien es el fundador del Grupo Scout Panda?,El fundador del Grupo Scout Panda es el profesor Augusto Arraya

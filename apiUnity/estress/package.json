@@ -1,0 +1,13 @@
+{
+  "name": "stress-test",
+  "type": "module",
+  "scripts": {
+    "start": "node runner.js"
+  },
+  "devDependencies": {
+    "autocannon": "^8.0.0"
+  },
+  "dependencies": {
+    "systeminformation": "^5.27.7"
+  }
+}
