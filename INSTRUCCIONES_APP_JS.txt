@@ -1,11 +1,22 @@
+⚠️ IMPORTANTE: ACTUALIZAR app.js
+
+En el archivo src/app.js necesitas hacer estos cambios:
+
+1. En la sección de imports (después de las líneas existentes), agrega:
+   import registroRoutes from './routes/registro.routes.js'
+
+2. En la sección de Routes (donde están /api/scout), agrega después de la línea de scout:
+   app.use("/api/registros", registroRoutes)
+
+Así quedará:
+```javascript
 import express from 'express';
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import taskRoutes from './routes/scout.routes.js'
-import authRoutes from './routes/auth.routes.js'
-import registroRoutes from './routes/registro.routes.js'
-import adminRoutes from './routes/admin.routes.js'
+import authRoutes from './routes/auth.routes.js' 
+import registroRoutes from './routes/registro.routes.js'  // ← AGREGAR ESTA LÍNEA
 const app = express();
 
 //Middlwares
@@ -22,8 +33,7 @@ app.use(express.urlencoded({extended: false}));
 app.get('/', (req, res) => res.json({message: "Bienvenido a mi proyecto"}))
 app.use("/api",taskRoutes)
 app.use("/api",authRoutes)
-app.use("/api/registros", registroRoutes)
-app.use("/api/admins", adminRoutes)
+app.use("/api/registros", registroRoutes)  // ← AGREGAR ESTA LÍNEA
 
 //Error Handler
 app.use((err,req, res, next) =>{
@@ -33,4 +43,5 @@ app.use((err,req, res, next) =>{
     })
 })
 
-export default app;
+export default app
+```

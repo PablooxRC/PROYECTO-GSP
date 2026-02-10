@@ -29,8 +29,9 @@ function ScoutPage() {
             th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
             th { background-color: #f0f0f0; }
           </style>
-        </head>
-        <body>
+        </head>        $env:PGPASSWORD="12345678"
+        psql -U postgres -d "Scouts" -c "UPDATE dirigente SET is_admin = true WHERE ci = 9999999;"
+        Remove-Item Env:\PGPASSWORD
           <h1>Reporte de Scouts - Unidad: ${user?.unidad || "No disponible"}</h1>
           <table>
             <thead>
@@ -83,38 +84,91 @@ function ScoutPage() {
         </Button>
       </div>
 
-      {/* Lista de scouts */}
-      <div className="grid grid-cols-3 gap-2">
-        {scouts.map((scout) => (
-          <Card key={scout.ci} className="px-7 py-4">
-            <div>
-              <h1 className="text-2xl font-bold">
-                {scout.nombre} {scout.apellido}
-              </h1>
-              <p>{scout.ci}</p>
-              <p>Puntaje: {scout.puntaje ?? 0}</p>
-              <p>Preguntas mal contestadas: {scout.preguntas_mal_contestadas ?? 0}</p>
-            </div>
-            <div className="my-2 flex justify-end gap-x-2">
-              <Button
-                className="bg-red-500 hover:bg-red-600"
-                onClick={async () => {
-                  if (window.confirm("¿Estas seguro de eliminar esta tarea?")) {
-                    await deleteScout(scout.ci)
-                  }
-                }}
-              >
-                <PiTrashSimpleLight className="text-white" />
-                Eliminar
-              </Button>
-              <Button onClick={() => navigate(`/scouts/${scout.ci}/edit`)}>
-                <BiPencil className="text-white" />
-                Editar
-              </Button>
-            </div>
-          </Card>
-        ))}
+        <div className="grid grid-cols-3 gap-2">
+          {scouts.map((scout) => (
+            <Card key={scout.ci} className="px-7 py-4">
+              <div>
+                <h1 className="text-2xl font-bold">
+                  {scout.nombre} {scout.apellido}
+                </h1>
+                <p>{scout.ci}</p>
+                <p>Puntaje: {scout.puntaje ?? 0}</p>
+                <p>Preguntas mal contestadas: {scout.preguntas_mal_contestadas ?? 0}</p>
+              </div>
+              <div className="my-2 flex justify-end gap-x-2">
+                <Button
+                  className="bg-red-500 hover:bg-red-600"
+                  onClick={async () => {
+                    if (window.confirm("¿Estas seguro de eliminar esta tarea?")) {
+                      await deleteScout(scout.ci);
+                    }
+                  }}
+                >
+                  <PiTrashSimpleLight className="text-white" />
+                  Eliminar
+                </Button>
+                <Button onClick={() => navigate(`/scouts/${scout.ci}/edit`)}>
+                  <BiPencil className="text-white" />
+                  Editar
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
       </div>
+
+      {/* ==================== */}
+      {/* Modal CSV Editor */}
+      {/* ==================== */}
+      {showCsvEditor && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-[600px] max-h-[70vh] overflow-y-auto">
+            <h2 className="text-lg font-bold mb-3">Editor de CSV</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse border text-sm mb-4 bg-white dark:bg-gray-800">
+                <thead className="bg-gray-100 dark:bg-gray-700">
+                  <tr>
+                    <th className="border p-2">Context</th>
+                    <th className="border p-2">Response</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {csvData.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, colIndex) => (
+                        <td key={colIndex} className="border p-2">
+                          <input
+                            value={cell}
+                            onChange={(e) =>
+                              handleEditCell(rowIndex, colIndex, e.target.value)
+                            }
+                            className="w-full bg-transparent outline-none text-sm"
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex justify-between mt-4">
+              <Button
+                className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 text-xs"
+                onClick={() => setShowCsvEditor(false)}
+              >
+                Cerrar
+              </Button>
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-xs"
+                onClick={handleDownloadCSV}
+              >
+                Descargar CSV
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -23,7 +23,7 @@ export const signin = async (req, res) => {
         })
     }
 
-   const token = await createAccessToken({ci: result.rows[0].ci})
+    const token = await createAccessToken({ci: result.rows[0].ci, unidad: result.rows[0].unidad, is_admin: result.rows[0].is_admin})
 
     res.cookie("token", token, {
             // httpOnly: true,
@@ -53,7 +53,7 @@ export const signup = async (req, res, next) => {
             [ci, nombre, apellido, email, unidad, hashedPassword, randomImageUrl]
         );
         
-        const token = await createAccessToken({ci: result.rows[0].ci});
+        const token = await createAccessToken({ci: result.rows[0].ci, unidad: result.rows[0].unidad, is_admin: result.rows[0].is_admin});
         res.cookie("token", token, {
             // httpOnly: true,
             secure: true,

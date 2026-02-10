@@ -25,6 +25,30 @@ export const privateRoutes = [
         path: '/scouts/new'
     },
     {
+        name: 'Registros',
+        path: '/registros'
+    },
+    {
+        name: 'Admin: Registros',
+        path: '/admin/registros',
+        adminOnly: true
+    },
+    {
+        name: 'Crear Admin',
+        path: '/admin/create',
+        adminOnly: true
+    },
+    {
+        name: 'Crear Dirigente',
+        path: '/admin/dirigentes/create',
+        adminOnly: true
+    },
+    {
+        name: 'Enviar Reporte',
+        path: '/admin/send-report',
+        adminOnly: true
+    },
+    {
         name: 'Perfil del dirigente',
         path: '/profile'
     }
