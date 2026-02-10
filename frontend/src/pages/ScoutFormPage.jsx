@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Input, Textscout, Label, Button } from '../components/ui';
+import { Card, Input, Label, Button } from '../components/ui';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useScout } from "../context/scoutContex.jsx";
@@ -15,6 +15,7 @@ function ScoutFormPage() {
   const navigate = useNavigate();
   const { createScout, loadScout, errors: ScoutErrors, updateScout, setErrors } = useScout();
   const params = useParams();
+  const esBeca = watch('es_beca');
 
   const onSubmit = handleSubmit(async (data) => {
     setErrors([]); 
@@ -30,16 +31,28 @@ function ScoutFormPage() {
   });
 
   useEffect(() => {
-    setErrors([]); // limpiar errores al entrar al formulario
+    setErrors([]);
     if (params.ci) {
       loadScout(params.ci).then((scout) => {
         setValue("ci", scout.ci);
-        setValue("nombre", scout.nombre);
-        setValue("apellido", scout.apellido);
-        setValue("unidad", scout.unidad);
+        setValue("primer_nombre", scout.primer_nombre);
+        setValue("segundo_nombre", scout.segundo_nombre);
+        setValue("primer_apellido", scout.primer_apellido);
+        setValue("segundo_apellido", scout.segundo_apellido);
+        setValue("fecha_nacimiento", scout.fecha_nacimiento);
+        setValue("sexo", scout.sexo);
+        setValue("grupo", scout.grupo);
         setValue("rama", scout.rama);
+        setValue("unidad", scout.unidad);
         setValue("etapa", scout.etapa);
-        
+        setValue("curso", scout.curso);
+        setValue("numero_deposito", scout.numero_deposito);
+        setValue("monto", scout.monto);
+        setValue("es_beca", scout.es_beca);
+        setValue("tipo_beca", scout.tipo_beca);
+        setValue("contacto_emergencia_nombre_parentesco", scout.contacto_emergencia_nombre_parentesco);
+        setValue("contacto_emergencia_celular", scout.contacto_emergencia_celular);
+        setValue("envio", scout.envio);
       });
     }
   }, []);
@@ -54,45 +67,179 @@ function ScoutFormPage() {
   }, [watch]);
 
   return (
-    <div className="h-[calc(100vh-64px)] flex justify-center items-center">
-      <Card>
+    <div className="min-h-screen flex justify-center items-center p-4">
+      <Card className="w-full max-w-2xl">
         {ScoutErrors.map((error, i) => (
-          <p className="text-red-500" key={i}>{error}</p>
+          <p className="text-red-500 mb-4" key={i}>{error}</p>
         ))}
-        <h2>{params.ci ? "Editar Scout" : "Registrar Scout"}</h2>
-        <form onSubmit={onSubmit}>
-          <Label htmlFor="ci">Carnet de identidad</Label>
-          <Input
-            placeholder="Ingresa el CI"
-            {...register('ci', {
-              required: true,
-              valueAsNumber: true,
-            })}
-          />
-          {errors.ci && <p className="text-red-500">El ci es requerido</p>}
+        <h2 className="text-2xl font-bold mb-6">{params.ci ? "Editar Scout" : "Registrar Scout"}</h2>
+        <form onSubmit={onSubmit} className="space-y-4">
+          
+          {/* C.I. */}
+          <div>
+            <Label htmlFor="ci">Carnet de identidad</Label>
+            <Input
+              placeholder="Ingresa el CI"
+              type="number"
+              {...register('ci', { required: "El CI es requerido", valueAsNumber: true })}
+            />
+            {errors.ci && <p className="text-red-500 text-sm">{errors.ci.message}</p>}
+          </div>
 
-          {/* el resto del formulario como ya lo tienes */}
-          <Label htmlFor="nombre">Nombre</Label>
-          <Input placeholder="Ingresa el nombre" {...register('nombre', { required: true })} />
-          {errors.nombre && <p className="text-red-500">El nombre es requerido</p>}
+          {/* Nombres */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="primer_nombre">Primer Nombre</Label>
+              <Input placeholder="Primer nombre" {...register('primer_nombre', { required: "Es requerido" })} />
+              {errors.primer_nombre && <p className="text-red-500 text-sm">{errors.primer_nombre.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="segundo_nombre">Segundo Nombre</Label>
+              <Input placeholder="Segundo nombre (opcional)" {...register('segundo_nombre')} />
+            </div>
+          </div>
 
-          <Label htmlFor="apellido">Apellido</Label>
-          <Input placeholder="Ingresa el apellido" {...register('apellido', { required: true })} />
-          {errors.apellido && <p className="text-red-500">El apellido es requerido</p>}
+          {/* Apellidos */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="primer_apellido">Primer Apellido</Label>
+              <Input placeholder="Primer apellido" {...register('primer_apellido', { required: "Es requerido" })} />
+              {errors.primer_apellido && <p className="text-red-500 text-sm">{errors.primer_apellido.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="segundo_apellido">Segundo Apellido</Label>
+              <Input placeholder="Segundo apellido (opcional)" {...register('segundo_apellido')} />
+            </div>
+          </div>
 
-          <Label htmlFor="unidad">Unidad</Label>
-          <Input placeholder="Ingresa la unidad" {...register('unidad', { required: true })} />
-          {errors.unidad && <p className="text-red-500">La unidad es requerida</p>}
+          {/* Fecha de nacimiento y Sexo */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="fecha_nacimiento">Fecha de Nacimiento</Label>
+              <Input 
+                type="date" 
+                {...register('fecha_nacimiento', { required: "Es requerida" })} 
+              />
+              {errors.fecha_nacimiento && <p className="text-red-500 text-sm">{errors.fecha_nacimiento.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="sexo">Sexo</Label>
+              <select 
+                {...register('sexo', { required: "Es requerido" })} 
+                className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="M" className="text-gray-800">Masculino</option>
+                <option value="F" className="text-gray-800">Femenino</option>
+              </select>
+              {errors.sexo && <p className="text-red-500 text-sm">{errors.sexo.message}</p>}
+            </div>
+          </div>
 
-          <Label htmlFor="rama">Rama</Label>
-          <Input placeholder="Ingresa la rama" {...register('rama', { required: true })} />
-          {errors.rama && <p className="text-red-500">La rama es requerida</p>}
+          {/* Grupo y Rama */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="grupo">Grupo</Label>
+              <Input 
+                placeholder="Ingresa el grupo" 
+                {...register('grupo', { required: "Es requerido" })}
+              />
+              {errors.grupo && <p className="text-red-500 text-sm">{errors.grupo.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="rama">Rama</Label>
+              <Input placeholder="Ingresa la rama" {...register('rama', { required: "Es requerida" })} />
+              {errors.rama && <p className="text-red-500 text-sm">{errors.rama.message}</p>}
+            </div>
+          </div>
 
-          <Label htmlFor="etapa">Etapa</Label>
-          <Input placeholder="Ingresa la etapa" {...register('etapa', { required: true })} />
-          {errors.etapa && <p className="text-red-500">La etapa es requerida</p>}
+          {/* Unidad y Etapa */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="unidad">Unidad</Label>
+              <Input placeholder="Ingresa la unidad" {...register('unidad', { required: "Es requerida" })} />
+              {errors.unidad && <p className="text-red-500 text-sm">{errors.unidad.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="etapa">Etapa</Label>
+              <Input placeholder="Ingresa la etapa" {...register('etapa', { required: "Es requerida" })} />
+              {errors.etapa && <p className="text-red-500 text-sm">{errors.etapa.message}</p>}
+            </div>
+          </div>
 
-          <Button>{params.ci ? "Editar Scout" : "Registrar Scout"}</Button>
+          {/* Curso */}
+          <div>
+            <Label htmlFor="curso">Curso</Label>
+            <Input placeholder="Ingresa el curso (opcional)" {...register('curso')} />
+          </div>
+
+          {/* Número de Depósito y Monto */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="numero_deposito">Número de Depósito</Label>
+              <Input placeholder="Número de depósito (opcional)" {...register('numero_deposito')} />
+            </div>
+            <div>
+              <Label htmlFor="monto">Monto</Label>
+              <Input 
+                type="number" 
+                step="0.01"
+                placeholder="Monto (opcional)" 
+                {...register('monto', { valueAsNumber: true })} 
+              />
+            </div>
+          </div>
+
+          {/* Envío */}
+          <div>
+            <Label htmlFor="envio">Envio</Label>
+            <Input 
+              placeholder="Envio (opcional)" 
+              {...register('envio')} 
+            />
+          </div>
+
+          {/* Beca */}
+          <div>
+            <Label className="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                {...register('es_beca')}
+                className="w-4 h-4"
+              />
+              <span>¿Es beca?</span>
+            </Label>
+          </div>
+
+          {/* Tipo de Beca (condicional) */}
+          {esBeca && (
+            <div>
+              <Label htmlFor="tipo_beca">Tipo de Beca</Label>
+              <Input placeholder="Ingresa el tipo de beca" {...register('tipo_beca')} />
+            </div>
+          )}
+
+          {/* Contacto de Emergencia */}
+          <div>
+            <Label htmlFor="contacto_emergencia_nombre_parentesco">Contacto de Emergencia (Nombre y Parentesco)</Label>
+            <Input 
+              placeholder="Nombre completo y parentesco (ej: María García - Madre)" 
+              {...register('contacto_emergencia_nombre_parentesco')} 
+            />
+          </div>
+
+          {/* Celular de Emergencia */}
+          <div>
+            <Label htmlFor="contacto_emergencia_celular">Número de Celular de Emergencia</Label>
+            <Input 
+              placeholder="Número de celular" 
+              {...register('contacto_emergencia_celular')} 
+            />
+          </div>
+
+          {/* Botón Submit */}
+          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
+            {params.ci ? "Editar Scout" : "Registrar Scout"}
+          </Button>
         </form>
       </Card>
     </div>

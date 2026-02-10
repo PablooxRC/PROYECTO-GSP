@@ -6,14 +6,14 @@ const DURATION = 15;
 const endpoints = [
   {
     name: 'login',
-    url: 'https://172.20.10.2:4000/login',
+    url: 'https://172.20.10.3:4000/login',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: { ci: '8637944' }
   },
   {
     name: 'save-wrong-answers',
-    url: 'https://172.20.10.2:4000/save-wrong-answers',
+    url: 'https://172.20.10.3:4000/save-wrong-answers',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: { ci: '8637944', answers: ['pregunta1', 'pregunta2'] }

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 function Navbar(){
     const location = useLocation();
-    const {isAuth, signout} = useAuth()
+    const {isAuth, signout, user} = useAuth()
     return(
         <nav className="bg-white border-gray-200 dark:bg-gray-900">
           <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
@@ -27,7 +27,9 @@ function Navbar(){
                 <ul className="font-medium flex-nowrap flex overflow-x-auto space-x-4 md:space-x-6 p-0 m-0">
                 {
                     isAuth
-                    ? privateRoutes.map(({ path, name }) => (
+                    ? privateRoutes.map(({ path, name, adminOnly }) => {
+                        if (adminOnly && !user?.is_admin) return null
+                        return (
                         <li
                             className={`${location.pathname === path ? "bg-blue-600 px-3 py-1" : ""}`}
                             key={path}
@@ -39,7 +41,8 @@ function Navbar(){
                             {name}
                             </Link>
                         </li>
-                        ))
+                        )
+                        })
                     : publicRoutes.map(({ path, name }) => (
                         <li
                             className={`${location.pathname === path ? "bg-blue-600 px-3 py-1" : ""}`}
