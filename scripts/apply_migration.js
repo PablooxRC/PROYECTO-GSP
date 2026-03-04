@@ -3,16 +3,44 @@ import fs from 'fs'
 import path from 'path'
 import { pool } from '../src/db.js'
 
+const migrations = [
+  'init.sql',
+  'migration_create_registros_table.sql',
+  'migration_add_envio_field.sql',
+  'migration_create_report_logs.sql',
+  'migration_add_fields_dirigente.sql',
+  'migration_add_is_admin_dirigente.sql',
+  'migration_scouts_campos_nuevos.sql',
+  'migration_add_envio_dirigente.sql',
+  'migration_change_envio_type.sql',
+  'migration_add_create_at_scouts.sql'
+]
+
 async function apply() {
   try {
-    const filePath = path.resolve('./database/migration_create_report_logs.sql')
-    const sql = fs.readFileSync(filePath, 'utf8')
-    console.log('Applying migration:', filePath)
-    await pool.query(sql)
-    console.log('Migration applied successfully')
+    for (const migration of migrations) {
+      const filePath = path.resolve(`./database/${migration}`)
+      if (!fs.existsSync(filePath)) {
+        console.log(`⚠️  Archivo no encontrado: ${migration}`)
+        continue
+      }
+      const sql = fs.readFileSync(filePath, 'utf8')
+      console.log(`\n📝 Aplicando migración: ${migration}`)
+      try {
+        await pool.query(sql)
+        console.log(`✅ Migración completada: ${migration}`)
+      } catch (migrationErr) {
+        if (migrationErr.message.includes('ya existe') || migrationErr.message.includes('already exists')) {
+          console.log(`⏭️  Saltando (ya existe): ${migration}`)
+        } else {
+          throw migrationErr
+        }
+      }
+    }
+    console.log('\n🎉 Todas las migraciones se procesaron exitosamente')
     process.exit(0)
   } catch (err) {
-    console.error('Migration failed:', err)
+    console.error('\n❌ Error en migración:', err.message)
     process.exit(1)
   }
 }

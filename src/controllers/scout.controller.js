@@ -10,6 +10,41 @@ export const getScouts = async (req, res, next) => {
   }
 };
 
+// Seleccionar todos los scouts (Admin)
+export const getScoutsAdmin = async (req, res, next) => {
+  try {
+    if (!req.isAdmin) {
+      return res.status(403).json({ message: 'No autorizado' })
+    }
+    
+    const { from, to } = req.query;
+    let query = 'SELECT * FROM scouts';
+    let params = [];
+    let whereConditions = [];
+
+    if (from) {
+      whereConditions.push(`create_at >= $${params.length + 1}`);
+      params.push(from);
+    }
+
+    if (to) {
+      whereConditions.push(`create_at <= $${params.length + 1}`);
+      params.push(to);
+    }
+
+    if (whereConditions.length > 0) {
+      query += ` WHERE ${whereConditions.join(' AND ')}`;
+    }
+
+    query += ` ORDER BY create_at DESC NULLS LAST`;
+
+    const result = await pool.query(query, params);
+    return res.json(result.rows);
+  } catch (error) {
+    next(error)
+  }
+};
+
 // Seleccionar Scout específico
 export const getScout = async (req, res) => {
   try {

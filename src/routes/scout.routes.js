@@ -1,10 +1,12 @@
 import Router from 'express-promise-router'
-import {createScout, deleteScout, getScouts, getScout, updateScout}  from '../controllers/scout.controller.js'
+import {createScout, deleteScout, getScouts, getScoutsAdmin, getScout, updateScout}  from '../controllers/scout.controller.js'
 
 import { isAuth } from '../middlewares/auth.middleware.js';
 import { validateSchema } from '../middlewares/validate.middleware.js';
 import { createScoutSchema, updateScoutSchema} from '../schemas/scout.schema.js';
 const router = Router();
+
+router.get('/scouts/admin/all', isAuth, getScoutsAdmin)
 
 router.get('/scouts', isAuth, getScouts)
 

@@ -13,7 +13,7 @@ function AdminDirigenteCreate(){
   const onSubmit = handleSubmit(async (data) => {
     try {
       await axios.post('/admins/dirigentes', data)
-      navigate('/scouts')
+      navigate('/admin/dirigentes')
     } catch (err) {
       alert(err?.response?.data?.message || 'Error creando dirigente')
     }
@@ -54,6 +54,11 @@ function AdminDirigenteCreate(){
             </div>
           </div>
 
+          <div>
+            <Label>Email</Label>
+            <Input type="email" {...register('email')} />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Fecha de Nacimiento</Label>
@@ -83,6 +88,14 @@ function AdminDirigenteCreate(){
           <div>
             <Label>Nivel de Formación</Label>
             <Input {...register('nivel_formacion')} />
+          </div>
+
+          <div>
+            <Label>Envío (Descripción)</Label>
+            <Input 
+              {...register('envio')} 
+              placeholder="Ej: Primer envío, Enviado a casa, etc."
+            />
           </div>
 
           <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">Registrar Dirigente</Button>

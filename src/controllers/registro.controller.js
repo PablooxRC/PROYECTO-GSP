@@ -3,12 +3,40 @@ import { pool } from '../db.js'
 // Obtener todos los registros del dirigente
 export const getRegistros = async (req, res, next) => {
     try {
-        let result;
-        if (req.isAdmin) {
-            result = await pool.query('SELECT * FROM registros ORDER BY fecha_deposito DESC NULLS LAST');
-        } else {
-            result = await pool.query('SELECT * FROM registros WHERE dirigente_ci = $1 ORDER BY fecha_deposito DESC NULLS LAST', [req.userCI]);
+        const { from, to } = req.query;
+        let query = `
+            SELECT r.*, 
+                   s.nombre AS scout_nombre, s.apellido AS scout_apellido,
+                   d.nombre AS dirigente_nombre, d.apellido AS dirigente_apellido, d.email AS dirigente_email, d.unidad AS dirigente_unidad
+            FROM registros r 
+            LEFT JOIN scouts s ON r.scout_ci = s.ci
+            LEFT JOIN dirigente d ON r.dirigente_ci = d.ci
+        `;
+        let params = [];
+        let whereConditions = [];
+
+        if (!req.isAdmin) {
+            whereConditions.push(`r.dirigente_ci = $${params.length + 1}`);
+            params.push(req.userCI);
         }
+
+        if (from) {
+            whereConditions.push(`r.fecha_deposito >= $${params.length + 1}`);
+            params.push(from);
+        }
+
+        if (to) {
+            whereConditions.push(`r.fecha_deposito <= $${params.length + 1}`);
+            params.push(to);
+        }
+
+        if (whereConditions.length > 0) {
+            query += ` WHERE ${whereConditions.join(' AND ')}`;
+        }
+
+        query += ` ORDER BY r.fecha_deposito DESC NULLS LAST`;
+
+        const result = await pool.query(query, params);
         return res.json(result.rows);
     } catch (error) {
         next(error);
@@ -37,9 +65,21 @@ export const getRegistrosByScout = async (req, res, next) => {
         const { scout_ci } = req.params
         let result;
         if (req.isAdmin) {
-            result = await pool.query('SELECT * FROM registros WHERE scout_ci = $1 ORDER BY fecha_deposito DESC NULLS LAST', [scout_ci]);
+            result = await pool.query(`
+                SELECT r.*, s.nombre AS scout_nombre, s.apellido AS scout_apellido 
+                FROM registros r 
+                LEFT JOIN scouts s ON r.scout_ci = s.ci 
+                WHERE r.scout_ci = $1 
+                ORDER BY r.fecha_deposito DESC NULLS LAST
+            `, [scout_ci]);
         } else {
-            result = await pool.query('SELECT * FROM registros WHERE scout_ci = $1 AND dirigente_ci = $2 ORDER BY fecha_deposito DESC NULLS LAST', [scout_ci, req.userCI]);
+            result = await pool.query(`
+                SELECT r.*, s.nombre AS scout_nombre, s.apellido AS scout_apellido 
+                FROM registros r 
+                LEFT JOIN scouts s ON r.scout_ci = s.ci 
+                WHERE r.scout_ci = $1 AND r.dirigente_ci = $2 
+                ORDER BY r.fecha_deposito DESC NULLS LAST
+            `, [scout_ci, req.userCI]);
         }
         return res.json(result.rows)
     } catch (error) {
@@ -53,9 +93,19 @@ export const getRegistro = async (req, res, next) => {
         const { id } = req.params
         let result;
         if (req.isAdmin) {
-            result = await pool.query('SELECT * FROM registros WHERE id = $1', [id]);
+            result = await pool.query(`
+                SELECT r.*, s.nombre AS scout_nombre, s.apellido AS scout_apellido 
+                FROM registros r 
+                LEFT JOIN scouts s ON r.scout_ci = s.ci 
+                WHERE r.id = $1
+            `, [id]);
         } else {
-            result = await pool.query('SELECT * FROM registros WHERE id = $1 AND dirigente_ci = $2', [id, req.userCI]);
+            result = await pool.query(`
+                SELECT r.*, s.nombre AS scout_nombre, s.apellido AS scout_apellido 
+                FROM registros r 
+                LEFT JOIN scouts s ON r.scout_ci = s.ci 
+                WHERE r.id = $1 AND r.dirigente_ci = $2
+            `, [id, req.userCI]);
         }
 
         if (result.rowCount === 0) {

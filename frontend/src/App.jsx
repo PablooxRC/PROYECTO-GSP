@@ -18,6 +18,7 @@ import NotFound from './pages/NotFound'
 import AdminRegistrosPage from './pages/AdminRegistrosPage'
 import AdminCreatePage from './pages/AdminCreatePage'
 import AdminDirigenteCreate from './pages/AdminDirigenteCreate'
+import AdminDirigentesPage from './pages/AdminDirigentesPage'
 import AdminSendReport from './pages/AdminSendReport'
 
 
@@ -63,6 +64,7 @@ function App(){
           <Route path="/registros/:id/edit" element={<RegistroFormPage/>} />
           <Route path="/admin/registros" element={<AdminRegistrosPage/>} />
           <Route path="/admin/create" element={<AdminCreatePage/>} />
+          <Route path="/admin/dirigentes" element={<AdminDirigentesPage/>} />
           <Route path="/admin/dirigentes/create" element={<AdminDirigenteCreate/>} />
           <Route path="/admin/send-report" element={<AdminSendReport/>} />
         </Route>

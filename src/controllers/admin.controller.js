@@ -39,6 +39,19 @@ export const listAdmins = async (req, res, next) => {
     }
 }
 
+// Listar todos los dirigentes (no admins)
+export const listDirigentes = async (req, res, next) => {
+    if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
+    try {
+        const result = await pool.query(
+            'SELECT ci, nombre, apellido, email, unidad, envio, create_at FROM dirigente WHERE is_admin = FALSE ORDER BY create_at DESC'
+        )
+        return res.json(result.rows)
+    } catch (error) {
+        next(error)
+    }
+}
+
 // Crear dirigente (solo admins pueden crear dirigentes desde el panel)
 export const createDirigente = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
@@ -49,11 +62,13 @@ export const createDirigente = async (req, res, next) => {
         segundo_nombre,
         primer_apellido,
         segundo_apellido,
+        email,
         fecha_nacimiento,
         sexo,
         grupo,
         unidad,
         nivel_formacion,
+        envio,
         password
     } = req.body
 
@@ -62,12 +77,60 @@ export const createDirigente = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(pwd, 10)
         const gravatar = null
         const result = await pool.query(
-            `INSERT INTO dirigente (ci, nombre, apellido, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, password, gravatar) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
-            [ci, `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, hashedPassword, gravatar]
+            `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
+            [ci, `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar]
         )
         return res.json(result.rows[0])
     } catch (error) {
         if (error.code === '23505') return res.status(400).json({ message: 'Ya existe un dirigente con ese CI o email' })
+        next(error)
+    }
+}
+
+// Actualizar dirigente
+export const updateDirigente = async (req, res, next) => {
+    if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
+    
+    const { ci } = req.params
+    const { envio } = req.body
+    
+    try {
+        const result = await pool.query(
+            'UPDATE dirigente SET envio = $1 WHERE ci = $2 RETURNING *',
+            [envio, ci]
+        )
+        
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Dirigente no encontrado' })
+        }
+        
+        return res.json(result.rows[0])
+    } catch (error) {
+        next(error)
+    }
+}
+
+// Eliminar dirigente
+export const deleteDirigente = async (req, res, next) => {
+    if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
+    
+    const { ci } = req.params
+    
+    try {
+        const result = await pool.query(
+            'DELETE FROM dirigente WHERE ci = $1 RETURNING *',
+            [ci]
+        )
+        
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Dirigente no encontrado' })
+        }
+        
+        return res.json({ message: 'Dirigente eliminado correctamente', data: result.rows[0] })
+    } catch (error) {
+        if (error.code === '23503') {
+            return res.status(400).json({ message: 'No se puede eliminar: hay registros asociados a este dirigente' })
+        }
         next(error)
     }
 }

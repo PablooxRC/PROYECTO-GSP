@@ -1,16 +1,13 @@
 CREATE TABLE scouts(
-    ci PRIMARY KEY,
+    ci VARCHAR(20) PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     rama VARCHAR(255) NOT NULL,
     unidad VARCHAR(255) NOT NULL,
     etapa VARCHAR(255) NOT NULL,
-    nivel actual VARCHAR(255),
-    logros INTEGER
-)
-ALTER TABLE scout ADD COLUMN dirigente_ci  REFERENCES dirigente(ci);
-
-ALTER TABLE "scouts"
-ADD COLUMN apellido VARCHAR(255);
+    nivel_actual VARCHAR(255),
+    logros INTEGER,
+    apellido VARCHAR(255)
+);
 
 CREATE TABLE dirigente (
     ci INTEGER PRIMARY KEY,
@@ -20,7 +17,8 @@ CREATE TABLE dirigente (
     password VARCHAR(200) NOT NULL,
     email VARCHAR(200) UNIQUE NOT NULL,
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    upadate_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    upadate_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    gravatar VARCHAR(250)
 );
 
-ALTER TABLE dirigente ADD COLUMN gravatar VARCHAR(250);
+ALTER TABLE scouts ADD COLUMN dirigente_ci INTEGER REFERENCES dirigente(ci);

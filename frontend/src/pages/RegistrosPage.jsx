@@ -65,7 +65,12 @@ function RegistrosPage() {
             <div>
               <h2 className="text-xl font-bold mb-2 text-white">Registro #{registro.id}</h2>
 
-              <p className="text-sm text-white">Scout CI: {registro.scout_ci}</p>
+              <p className="text-sm text-white mb-1">
+                <strong>Scout:</strong> {registro.scout_nombre && registro.scout_apellido 
+                  ? `${registro.scout_nombre} ${registro.scout_apellido}` 
+                  : `CI: ${registro.scout_ci}`
+                }
+              </p>
               {registro.unidad && <p className="text-sm text-white"><strong>Unidad:</strong> {registro.unidad}</p>}
               {registro.etapa_progresion && <p className="text-sm text-white"><strong>Etapa:</strong> {registro.etapa_progresion}</p>}
               {registro.colegio && <p className="text-sm text-white"><strong>Colegio:</strong> {registro.colegio}</p>}

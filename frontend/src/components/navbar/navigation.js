@@ -39,6 +39,11 @@ export const privateRoutes = [
         adminOnly: true
     },
     {
+        name: 'Ver Dirigentes',
+        path: '/admin/dirigentes',
+        adminOnly: true
+    },
+    {
         name: 'Crear Dirigente',
         path: '/admin/dirigentes/create',
         adminOnly: true
