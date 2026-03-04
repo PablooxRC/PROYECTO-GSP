@@ -1,10 +1,10 @@
 import {z} from 'zod'
 
 export const createScoutSchema = z.object({
-    ci: z.number({ 
+    ci: z.string({ 
         required_error: "El CI es necesario",
-        invalid_type_error: "El CI debe ser un número entero positivo "
-     }).int().positive(),
+        invalid_type_error: "El CI debe ser un texto"
+     }).min(1),
     primer_nombre: z.string({ 
         required_error: "El primer nombre es requerido",
         invalid_type_error: "El primer nombre debe ser un texto"
@@ -40,6 +40,8 @@ export const createScoutSchema = z.object({
     curso: z.string().optional(),
     numero_deposito: z.string().optional(),
     monto: z.number().nonnegative().optional(),
+    fecha_deposito: z.string().optional(),
+    hora_deposito: z.string().optional(),
     es_beca: z.boolean().default(false),
     tipo_beca: z.string().optional(),
     contacto_emergencia_nombre_parentesco: z.string().optional(),

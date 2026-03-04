@@ -44,7 +44,7 @@ export const listDirigentes = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
     try {
         const result = await pool.query(
-            'SELECT ci, nombre, apellido, email, unidad, envio, create_at FROM dirigente WHERE is_admin = FALSE ORDER BY create_at DESC'
+            'SELECT ci, nombre, apellido, email, unidad, envio, create_at, nivel_formacion FROM dirigente WHERE is_admin = FALSE ORDER BY create_at DESC'
         )
         return res.json(result.rows)
     } catch (error) {
@@ -69,7 +69,11 @@ export const createDirigente = async (req, res, next) => {
         unidad,
         nivel_formacion,
         envio,
-        password
+        password,
+        numero_deposito,
+        monto,
+        fecha_deposito,
+        hora_deposito
     } = req.body
 
     try {
@@ -77,8 +81,8 @@ export const createDirigente = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(pwd, 10)
         const gravatar = null
         const result = await pool.query(
-            `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
-            [ci, `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar]
+            `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20) RETURNING *`,
+            [ci, `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar, numero_deposito || null, monto || null, fecha_deposito || null, hora_deposito || null]
         )
         return res.json(result.rows[0])
     } catch (error) {
@@ -140,30 +144,48 @@ export const sendReport = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
 
     const { from, to, recipient_email } = req.body
+    
+    // Validar que recipient_email esté definido
+    if (!recipient_email) {
+        return res.status(400).json({ message: 'El email del destinatario es requerido' })
+    }
+    
     // determinar rango
     const fromDate = from ? new Date(from) : null
     const toDate = to ? new Date(to) : null
 
     try {
-        // Consultar registros según rango
-        let registrosQuery = 'SELECT * FROM registros'
-        const params = []
-        if (fromDate && toDate) {
-            registrosQuery += ' WHERE fecha_deposito BETWEEN $1 AND $2'
-            params.push(fromDate.toISOString().slice(0,10), toDate.toISOString().slice(0,10))
-        } else if (fromDate) {
-            registrosQuery += ' WHERE fecha_deposito >= $1'
-            params.push(fromDate.toISOString().slice(0,10))
-        } else if (toDate) {
-            registrosQuery += ' WHERE fecha_deposito <= $1'
-            params.push(toDate.toISOString().slice(0,10))
-        }
-
-        registrosQuery += ' ORDER BY fecha_deposito NULLS LAST'
-        const registrosRes = await pool.query(registrosQuery, params)
+        // Obtener todos los scouts para la hoja de Registros
+        const registrosRes = await pool.query(`
+            SELECT 
+                s.ci as scout_ci,
+                s.primer_nombre,
+                s.segundo_nombre,
+                s.primer_apellido,
+                s.segundo_apellido,
+                s.grupo,
+                s.unidad,
+                s.etapa,
+                s.fecha_nacimiento,
+                s.sexo,
+                r.colegio,
+                r.curso
+            FROM scouts s
+            LEFT JOIN (
+                SELECT DISTINCT ON (scout_ci) scout_ci, colegio, curso, id
+                FROM registros
+                ORDER BY scout_ci, id DESC
+            ) r ON s.ci = r.scout_ci
+            ORDER BY s.ci
+        `)
 
         // Obtener scouts y dirigentes completos
-        const scoutsRes = await pool.query('SELECT * FROM scouts')
+        const scoutsRes = await pool.query(`
+            SELECT DISTINCT ON (s.ci) s.*, r.colegio, r.curso
+            FROM scouts s
+            LEFT JOIN registros r ON s.ci = r.scout_ci
+            ORDER BY s.ci, r.id DESC
+        `)
         // Leer siempre todas las columnas y detectar qué columnas existen
         const dirigentesRes = await pool.query('SELECT * FROM dirigente')
 
@@ -175,62 +197,72 @@ export const sendReport = async (req, res, next) => {
 
         // Registros columns
         rSheet.columns = [
-            { header: 'ID', key: 'id', width: 10 },
-            { header: 'Scout CI', key: 'scout_ci', width: 15 },
-            { header: 'Unidad', key: 'unidad', width: 20 },
-            { header: 'Etapa', key: 'etapa_progresion', width: 20 },
-            { header: 'Colegio', key: 'colegio', width: 30 },
-            { header: 'Curso', key: 'curso', width: 15 },
-            { header: 'Numero Deposito', key: 'numero_deposito', width: 20 },
-            { header: 'Fecha Deposito', key: 'fecha_deposito', width: 15 },
-            { header: 'Monto', key: 'monto', width: 12 },
-            { header: 'Envio', key: 'envio', width: 30 },
-            { header: 'Contacto Nombre', key: 'contacto_nombre', width: 25 },
-            { header: 'Contacto Parentesco', key: 'contacto_parentesco', width: 20 },
-            { header: 'Contacto Celular', key: 'contacto_celular', width: 20 }
+            { header: 'N° DE SECUENCIA', key: 'secuencia', width: 15 },
+            { header: 'CÉDULA DE IDENTIDAD', key: 'ci', width: 20 },
+            { header: 'PRIMER NOMBRE', key: 'primer_nombre', width: 20 },
+            { header: 'SEGUNDO NOMBRE', key: 'segundo_nombre', width: 20 },
+            { header: 'PRIMER APELLIDO', key: 'primer_apellido', width: 20 },
+            { header: 'SEGUNDO APELLIDO', key: 'segundo_apellido', width: 20 },
+            { header: 'GRUPO', key: 'grupo', width: 12 },
+            { header: 'UNIDAD', key: 'unidad', width: 18 },
+            { header: 'ETAPA DE PROGRESIÓN', key: 'etapa', width: 20 },
+            { header: 'FECHA DE NACIMIENTO', key: 'fecha_nacimiento', width: 20 },
+            { header: 'SEXO', key: 'sexo', width: 8 },
+            { header: 'COLEGIO', key: 'colegio', width: 25 },
+            { header: 'CURSO', key: 'curso', width: 12 }
         ]
 
+        let registrosSecuencia = 1
         registrosRes.rows.forEach(row => {
             rSheet.addRow({
-                id: row.id,
-                scout_ci: row.scout_ci,
-                unidad: row.unidad,
-                etapa_progresion: row.etapa_progresion,
-                colegio: row.colegio,
-                curso: row.curso,
-                numero_deposito: row.numero_deposito,
-                fecha_deposito: row.fecha_deposito ? new Date(row.fecha_deposito).toLocaleDateString() : null,
-                monto: row.monto,
-                envio: row.envio,
-                contacto_nombre: row.contacto_nombre,
-                contacto_parentesco: row.contacto_parentesco,
-                contacto_celular: row.contacto_celular
+                secuencia: registrosSecuencia++,
+                ci: (row.scout_ci || '').toString().toUpperCase(),
+                primer_nombre: (row.primer_nombre || '').toUpperCase(),
+                segundo_nombre: (row.segundo_nombre || '').toUpperCase(),
+                primer_apellido: (row.primer_apellido || '').toUpperCase(),
+                segundo_apellido: (row.segundo_apellido || '').toUpperCase(),
+                grupo: (row.grupo || '').toUpperCase(),
+                unidad: (row.unidad || '').toUpperCase(),
+                etapa: (row.etapa || '').toUpperCase(),
+                fecha_nacimiento: row.fecha_nacimiento ? new Date(row.fecha_nacimiento).toLocaleDateString().toUpperCase() : '',
+                sexo: (row.sexo || '').toUpperCase(),
+                colegio: (row.colegio || '').toUpperCase(),
+                curso: (row.curso || '').toUpperCase()
             })
         })
 
         // Scouts sheet (flatten names)
         sSheet.columns = [
-            { header: 'CI', key: 'ci', width: 15 },
-            { header: 'Nombre', key: 'nombre', width: 25 },
-            { header: 'Apellido', key: 'apellido', width: 25 },
-            { header: 'Fecha Nacimiento', key: 'fecha_nacimiento', width: 15 },
-            { header: 'Sexo', key: 'sexo', width: 8 },
-            { header: 'Grupo', key: 'grupo', width: 12 },
-            { header: 'Unidad', key: 'unidad', width: 18 },
-            { header: 'Etapa', key: 'etapa', width: 12 },
-            { header: 'Curso', key: 'curso', width: 12 }
+            { header: 'N° DE SECUENCIA', key: 'secuencia', width: 15 },
+            { header: 'CÉDULA DE IDENTIDAD', key: 'ci', width: 20 },
+            { header: 'PRIMER NOMBRE', key: 'primer_nombre', width: 20 },
+            { header: 'SEGUNDO NOMBRE', key: 'segundo_nombre', width: 20 },
+            { header: 'PRIMER APELLIDO', key: 'primer_apellido', width: 20 },
+            { header: 'SEGUNDO APELLIDO', key: 'segundo_apellido', width: 20 },
+            { header: 'GRUPO', key: 'grupo', width: 12 },
+            { header: 'UNIDAD', key: 'unidad', width: 18 },
+            { header: 'ETAPA DE PROGRESIÓN', key: 'etapa', width: 20 },
+            { header: 'FECHA DE NACIMIENTO', key: 'fecha_nacimiento', width: 20 },
+            { header: 'SEXO', key: 'sexo', width: 8 },
+            { header: 'COLEGIO', key: 'colegio', width: 25 },
+            { header: 'CURSO', key: 'curso', width: 12 }
         ]
+        let secuencia = 1
         scoutsRes.rows.forEach(row => {
             sSheet.addRow({
-                ci: row.ci,
-                nombre: row.nombre,
-                apellido: row.apellido,
-                fecha_nacimiento: row.fecha_nacimiento || null,
-                sexo: row.sexo || null,
-                grupo: row.grupo || null,
-                unidad: row.unidad || null,
-                etapa: row.etapa || null,
-                curso: row.curso || null
+                secuencia: secuencia++,
+                ci: (row.ci || '').toString().toUpperCase(),
+                primer_nombre: (row.primer_nombre || '').toUpperCase(),
+                segundo_nombre: (row.segundo_nombre || '').toUpperCase(),
+                primer_apellido: (row.primer_apellido || '').toUpperCase(),
+                segundo_apellido: (row.segundo_apellido || '').toUpperCase(),
+                grupo: (row.grupo || '').toUpperCase(),
+                unidad: (row.unidad || '').toUpperCase(),
+                etapa: (row.etapa || '').toUpperCase(),
+                fecha_nacimiento: row.fecha_nacimiento ? new Date(row.fecha_nacimiento).toLocaleDateString().toUpperCase() : '',
+                sexo: (row.sexo || '').toUpperCase(),
+                colegio: (row.colegio || '').toUpperCase(),
+                curso: (row.curso || '').toUpperCase()
             })
         })
 

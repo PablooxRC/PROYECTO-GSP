@@ -1,66 +1,66 @@
-import React, { useEffect, useState } from 'react'
-import { Card, Button } from '../components/ui'
-import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
-import { PiTrashSimpleLight } from 'react-icons/pi'
-import { BiPencil } from 'react-icons/bi'
-import adminApi from '../api/admin.api'
+import React, { useEffect, useState } from "react";
+import { Card, Button } from "../components/ui";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { PiTrashSimpleLight } from "react-icons/pi";
+import { BiPencil } from "react-icons/bi";
+import adminApi from "../api/admin.api";
 
 function AdminDirigentesPage() {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const [dirigentes, setDirigentes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [editingId, setEditingId] = useState(null)
-  const [editEnvio, setEditEnvio] = useState('')
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [dirigentes, setDirigentes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editEnvio, setEditEnvio] = useState("");
 
   useEffect(() => {
-    loadDirigentes()
-  }, [])
+    loadDirigentes();
+  }, []);
 
   const loadDirigentes = async () => {
     try {
-      setLoading(true)
-      const response = await adminApi.getDirigentes()
-      setDirigentes(response.data)
-      setError(null)
+      setLoading(true);
+      const response = await adminApi.getDirigentes();
+      setDirigentes(response.data);
+      setError(null);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Error cargando dirigentes')
-      console.error(err)
+      setError(err?.response?.data?.message || "Error cargando dirigentes");
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleEdit = (dirigente) => {
-    setEditingId(dirigente.ci)
-    setEditEnvio(dirigente.envio || '')
-  }
+    setEditingId(dirigente.ci);
+    setEditEnvio(dirigente.envio || "");
+  };
 
   const handleSaveEdit = async (ci) => {
     try {
-      await adminApi.updateDirigente(ci, { envio: editEnvio })
-      setEditingId(null)
-      await loadDirigentes()
+      await adminApi.updateDirigente(ci, { envio: editEnvio });
+      setEditingId(null);
+      await loadDirigentes();
     } catch (err) {
-      alert(err?.response?.data?.message || 'Error actualizando dirigente')
+      alert(err?.response?.data?.message || "Error actualizando dirigente");
     }
-  }
+  };
 
   const handleDelete = async (ci) => {
-    if (window.confirm('¿Estás seguro de eliminar este dirigente?')) {
+    if (window.confirm("¿Estás seguro de eliminar este dirigente?")) {
       try {
-        await adminApi.deleteDirigente(ci)
-        await loadDirigentes()
+        await adminApi.deleteDirigente(ci);
+        await loadDirigentes();
       } catch (err) {
-        alert(err?.response?.data?.message || 'Error eliminando dirigente')
+        alert(err?.response?.data?.message || "Error eliminando dirigente");
       }
     }
-  }
+  };
 
   if (!user?.is_admin) {
-    return <p className="text-red-500 text-center mt-4">No autorizado</p>
+    return <p className="text-red-500 text-center mt-4">No autorizado</p>;
   }
 
   return (
@@ -79,7 +79,7 @@ function AdminDirigentesPage() {
 
         <Button
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4"
-          onClick={() => navigate('/admin/dirigentes/create')}
+          onClick={() => navigate("/admin/dirigentes/create")}
         >
           ➕ Crear Dirigente
         </Button>
@@ -103,23 +103,34 @@ function AdminDirigentesPage() {
                 <h2 className="text-2xl font-bold mb-2">
                   {dirigente.nombre} {dirigente.apellido}
                 </h2>
-                <p className="text-sm text-gray-400 mb-3">C.I.: {dirigente.ci}</p>
+                <p className="text-sm text-gray-400 mb-3">
+                  C.I.: {dirigente.ci}
+                </p>
 
                 {dirigente.email && (
                   <p className="text-sm text-blue-400 mb-1">
                     <strong>Email:</strong> {dirigente.email}
                   </p>
                 )}
-                
+
                 {dirigente.unidad && (
                   <p className="text-sm text-gray-300 mb-1">
                     <strong>Unidad:</strong> {dirigente.unidad}
                   </p>
                 )}
 
+                {dirigente.nivel_formacion && (
+                  <p className="text-sm text-gray-300 mb-1">
+                    <strong>Nivel de Formación:</strong>{" "}
+                    {dirigente.nivel_formacion}
+                  </p>
+                )}
+
                 {editingId === dirigente.ci ? (
                   <div className="mt-3 p-2 bg-gray-700 rounded">
-                    <label className="block text-sm font-semibold mb-2">Envío:</label>
+                    <label className="block text-sm font-semibold mb-2">
+                      Envío:
+                    </label>
                     <input
                       type="text"
                       value={editEnvio}
@@ -131,16 +142,17 @@ function AdminDirigentesPage() {
                 ) : (
                   <div className="mt-3 p-2 bg-gray-700 rounded">
                     <p className="text-sm">
-                      <strong>Envío:</strong>{' '}
+                      <strong>Envío:</strong>{" "}
                       <span className="text-gray-300 ml-1">
-                        {dirigente.envio || 'Sin especificar'}
+                        {dirigente.envio || "Sin especificar"}
                       </span>
                     </p>
                   </div>
                 )}
 
                 <p className="text-xs text-gray-500 mt-2">
-                  Registrado: {new Date(dirigente.create_at).toLocaleDateString('es-ES')}
+                  Registrado:{" "}
+                  {new Date(dirigente.create_at).toLocaleDateString("es-ES")}
                 </p>
               </div>
 
@@ -184,7 +196,7 @@ function AdminDirigentesPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default AdminDirigentesPage
+export default AdminDirigentesPage;

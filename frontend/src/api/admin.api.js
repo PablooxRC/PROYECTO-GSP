@@ -1,19 +1,19 @@
 import axios from './axios'
 
 export const sendReport = (payload) => {
-  return axios.post('/admins/send-report', payload)
+  return axios.post('/admin/send-report', payload)
 }
 
 export const getDirigentes = () => {
-  return axios.get('/admins/dirigentes-list')
+  return axios.get('/admin/dirigentes-list')
 }
 
 export const updateDirigente = (ci, payload) => {
-  return axios.put(`/admins/dirigentes/${ci}`, payload)
+  return axios.put(`/admin/dirigentes/${ci}`, payload)
 }
 
 export const deleteDirigente = (ci) => {
-  return axios.delete(`/admins/dirigentes/${ci}`)
+  return axios.delete(`/admin/dirigentes/${ci}`)
 }
 
 export const getScoutsAdmin = (from, to) => {

@@ -13,7 +13,10 @@ const migrations = [
   'migration_scouts_campos_nuevos.sql',
   'migration_add_envio_dirigente.sql',
   'migration_change_envio_type.sql',
-  'migration_add_create_at_scouts.sql'
+  'migration_add_create_at_scouts.sql',
+  'migration_change_scouts_ci_type.sql',
+  'migration_change_scout_ci_type.sql',
+  'migration_add_deposito_dirigente.sql'
 ]
 
 async function apply() {

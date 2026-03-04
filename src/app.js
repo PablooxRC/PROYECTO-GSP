@@ -84,7 +84,7 @@ app.post('/api/signout', signout);
 app.get('/api/profile', isAuth, profile);
 
 // Scouts
-app.use('/api/scouts', taskRoutes);
+app.use('/api', taskRoutes);
 
 // Registros
 app.use('/api/registros', registroRoutes);
