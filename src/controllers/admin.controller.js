@@ -143,7 +143,7 @@ export const deleteDirigente = async (req, res, next) => {
 export const sendReport = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
 
-    const { from, to, recipient_email } = req.body
+    const { from, to, recipient_email, imagenBase64 } = req.body
     
     // Validar que recipient_email esté definido
     if (!recipient_email) {
@@ -322,9 +322,23 @@ export const sendReport = async (req, res, next) => {
 
         // Guardar workbook temporalmente
         const tmpDir = os.tmpdir()
-        const fileName = `reporte_${Date.now()}.xlsx`
-        const filePath = path.join(tmpDir, fileName)
+        const excelFileName = 'inscripciones.xlsx'
+        const filePath = path.join(tmpDir, excelFileName)
         await workbook.xlsx.writeFile(filePath)
+
+        // Preparar adjuntos (Excel + imagen si se proporciona en base64)
+        const attachments = [
+            { filename: excelFileName, path: filePath }
+        ]
+        
+        // Si se proporciona una imagen en base64, adjuntarla
+        if (imagenBase64) {
+            attachments.push({
+                filename: 'inscripciones-logo.png',
+                content: Buffer.from(imagenBase64.split(',')[1] || imagenBase64, 'base64'),
+                cid: 'inscripciones-logo'
+            })
+        }
 
         // Enviar email con nodemailer
         const auth = {
@@ -344,11 +358,10 @@ export const sendReport = async (req, res, next) => {
         const mailOptions = {
             from: process.env.FROM_EMAIL || process.env.SMTP_USER,
             to: recipient_email,
-            subject: `Reporte de Registros ${from || ''} ${to || ''}`,
-            text: 'Adjunto el reporte en formato Excel.',
-            attachments: [
-                { filename: fileName, path: filePath }
-            ]
+            subject: `Inscripciones ${from || ''} ${to || ''}`,
+            text: 'Adjunto el reporte con las inscripciones en formato Excel.',
+            html: `<h3>Inscripciones</h3><p>Adjunto encontrarás el reporte con los datos de inscripciones.</p>${imagenBase64 ? '<hr><p><img src="cid:inscripciones-logo" style="max-width: 200px;"></p>' : ''}`,
+            attachments: attachments
         }
 
         try {

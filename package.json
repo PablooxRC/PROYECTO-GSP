@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon .",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "seed": "node scripts/seed_admin.js",
+    "clean": "node scripts/clean_database.js"
   },
   "keywords": [],
   "author": "",
