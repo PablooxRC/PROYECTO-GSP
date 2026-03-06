@@ -172,7 +172,7 @@ function RegistrosPage() {
                 Eliminar
               </Button>
               <Button
-                onClick={() => navigate(`/registros/${registro.id}/edit`)}
+                onClick={() => navigate(`/scouts/${registro.scout_ci}/edit`)}
               >
                 <BiPencil className="text-white" />
                 Editar

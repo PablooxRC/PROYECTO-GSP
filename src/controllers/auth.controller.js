@@ -50,8 +50,8 @@ export const signup = asyncHandler(async (req, res, next) => {
     try {
         const user = await queryOne(
             pool,
-            'INSERT INTO dirigente(ci, nombre, apellido, email, unidad, password, gravatar) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            [ci, nombre, apellido, email, unidad, hashedPassword, randomImageUrl]
+            'INSERT INTO dirigente(ci, nombre, apellido, email, unidad, password, gravatar, admin_registrado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [ci, nombre, apellido, email, unidad, hashedPassword, randomImageUrl, false]
         );
         
         const token = await createAccessToken({ci: user.ci, unidad: user.unidad, is_admin: user.is_admin});

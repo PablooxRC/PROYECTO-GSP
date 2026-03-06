@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import { Card, Input, Label, Button } from "../components/ui";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 function AdminDirigenteCreate() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const params = useParams();
   const {
     register,
     handleSubmit,
@@ -17,7 +18,42 @@ function AdminDirigenteCreate() {
 
   useEffect(() => {
     setValue("grupo", "PANDA");
-  }, []);
+    // Si es edición, cargar los datos del dirigente
+    if (params.ci) {
+      loadDirigente(params.ci);
+    }
+  }, [params.ci]);
+
+  const loadDirigente = async (ci) => {
+    try {
+      const response = await axios.get(`/admin/dirigentes-list`);
+      const dirigentes = response.data;
+      const dirigente = dirigentes.find((d) => d.ci === ci);
+
+      if (dirigente) {
+        setValue("ci", dirigente.ci);
+        setValue("primer_nombre", dirigente.primer_nombre);
+        setValue("segundo_nombre", dirigente.segundo_nombre);
+        setValue("primer_apellido", dirigente.primer_apellido);
+        setValue("segundo_apellido", dirigente.segundo_apellido);
+        setValue("email", dirigente.email);
+        setValue("fecha_nacimiento", dirigente.fecha_nacimiento);
+        setValue("sexo", dirigente.sexo);
+        setValue("unidad", dirigente.unidad);
+        setValue("grupo", dirigente.grupo);
+        setValue("nivel_formacion", dirigente.nivel_formacion);
+        setValue("numero_deposito", dirigente.numero_deposito);
+        setValue("monto", dirigente.monto);
+        setValue("fecha_deposito", dirigente.fecha_deposito);
+        setValue("hora_deposito", dirigente.hora_deposito);
+        setValue("envio", dirigente.envio);
+        setValue("es_colaborador", dirigente.es_colaborador);
+      }
+    } catch (err) {
+      console.error("Error cargando dirigente:", err);
+      alert("Error cargando datos del dirigente");
+    }
+  };
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -28,23 +64,36 @@ function AdminDirigenteCreate() {
         monto: data.monto ? parseFloat(data.monto) : null,
         es_colaborador: data.es_colaborador ? true : false,
       };
-      await axios.post("/admin/dirigentes", submitData);
+
+      if (params.ci) {
+        // Editar dirigente existente
+        await axios.put(`/admin/dirigentes/${params.ci}`, submitData);
+      } else {
+        // Crear nuevo dirigente
+        await axios.post("/admin/dirigentes", submitData);
+      }
       navigate("/admin/dirigentes");
     } catch (err) {
-      alert(err?.response?.data?.message || "Error creando dirigente");
+      alert(err?.response?.data?.message || "Error guardando dirigente");
     }
   });
 
   if (!user?.is_admin) return <p className="text-red-500">No autorizado</p>;
 
+  const pageTitle = params.ci ? "Editar Dirigente" : "Registrar Dirigente";
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-4">Registrar Dirigente</h2>
+        <h2 className="text-2xl font-bold mb-4">{pageTitle}</h2>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <Label>Cédula de Identidad</Label>
-            <Input type="text" {...register("ci", { required: true })} />
+            <Input
+              type="text"
+              {...register("ci", { required: true })}
+              disabled={params.ci ? true : false}
+            />
             {errors.ci && (
               <p className="text-red-500 text-sm">CI es requerido</p>
             )}
@@ -113,6 +162,11 @@ function AdminDirigenteCreate() {
           </div>
 
           <div>
+            <Label>Grupo</Label>
+            <Input {...register("grupo")} />
+          </div>
+
+          <div>
             <Label>Nivel de Formación</Label>
             <Input {...register("nivel_formacion")} />
           </div>
@@ -172,7 +226,7 @@ function AdminDirigenteCreate() {
           </div>
 
           <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
-            Registrar Dirigente
+            {params.ci ? "Guardar Cambios" : "Registrar Dirigente"}
           </Button>
         </form>
       </Card>

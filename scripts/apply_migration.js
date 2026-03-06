@@ -19,7 +19,8 @@ const migrations = [
   'migration_add_deposito_dirigente.sql',
   'migration_add_es_colaborador_dirigente.sql',
   'migration_change_dirigente_ci_type.sql',
-  'migration_change_registros_dirigente_ci_type.sql'
+  'migration_change_registros_dirigente_ci_type.sql',
+  'migration_add_admin_registrado.sql'
 ]
 
 async function apply() {

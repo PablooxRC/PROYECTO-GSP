@@ -72,6 +72,10 @@ function App() {
                 path="/admin/dirigentes/create"
                 element={<AdminDirigenteCreate />}
               />
+              <Route
+                path="/admin/dirigentes/:ci/edit"
+                element={<AdminDirigenteCreate />}
+              />
               <Route path="/admin/send-report" element={<AdminSendReport />} />
             </Route>
 

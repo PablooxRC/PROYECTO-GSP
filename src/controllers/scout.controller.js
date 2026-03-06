@@ -202,33 +202,42 @@ export const updateScout = async (req, res) => {
   const nombre = `${primer_nombre || ''}${segundo_nombre ? ' ' + segundo_nombre : ''}`.trim();
   const apellido = `${primer_apellido || ''}${segundo_apellido ? ' ' + segundo_apellido : ''}`.trim();
 
+  // Construir dinámicamente la condición WHERE según si es admin
+  let whereClause = 'WHERE ci = $22';
+  const params = [
+    ciNuevo,
+    primer_nombre,
+    segundo_nombre,
+    primer_apellido,
+    segundo_apellido,
+    nombre,
+    apellido,
+    fecha_nacimiento,
+    sexo,
+    grupo || 'PANDA',
+    rama,
+    unidad,
+    etapa,
+    curso,
+    numero_deposito,
+    monto,
+    es_beca || false,
+    tipo_beca,
+    contacto_emergencia_nombre_parentesco,
+    contacto_emergencia_celular,
+    envio,
+    ciViejo,
+  ];
+
+  // Si no es admin, filtrar también por dirigente_ci
+  if (!req.isAdmin) {
+    whereClause = 'WHERE ci = $22 AND dirigente_ci = $23';
+    params.push(req.userCI);
+  }
+
   const result = await pool.query(
-    'UPDATE scouts SET ci = $1, primer_nombre = $2, segundo_nombre = $3, primer_apellido = $4, segundo_apellido = $5, nombre = $6, apellido = $7, fecha_nacimiento = $8, sexo = $9, grupo = $10, rama = $11, unidad = $12, etapa = $13, curso = $14, numero_deposito = $15, monto = $16, es_beca = $17, tipo_beca = $18, contacto_emergencia_nombre_parentesco = $19, contacto_emergencia_celular = $20, envio = $21 WHERE ci = $22 AND dirigente_ci = $23 RETURNING *',
-    [
-      ciNuevo,
-      primer_nombre,
-      segundo_nombre,
-      primer_apellido,
-      segundo_apellido,
-      nombre,
-      apellido,
-      fecha_nacimiento,
-      sexo,
-      grupo || 'PANDA',
-      rama,
-      unidad,
-      etapa,
-      curso,
-      numero_deposito,
-      monto,
-      es_beca || false,
-      tipo_beca,
-      contacto_emergencia_nombre_parentesco,
-      contacto_emergencia_celular,
-      envio,
-      ciViejo,
-      req.userCI,
-    ]
+    `UPDATE scouts SET ci = $1, primer_nombre = $2, segundo_nombre = $3, primer_apellido = $4, segundo_apellido = $5, nombre = $6, apellido = $7, fecha_nacimiento = $8, sexo = $9, grupo = $10, rama = $11, unidad = $12, etapa = $13, curso = $14, numero_deposito = $15, monto = $16, es_beca = $17, tipo_beca = $18, contacto_emergencia_nombre_parentesco = $19, contacto_emergencia_celular = $20, envio = $21 ${whereClause} RETURNING *`,
+    params
   );
 
   if (result.rowCount == 0) {

@@ -12,8 +12,6 @@ function AdminDirigentesPage() {
   const [dirigentes, setDirigentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editingId, setEditingId] = useState(null);
-  const [editEnvio, setEditEnvio] = useState("");
 
   useEffect(() => {
     loadDirigentes();
@@ -30,21 +28,6 @@ function AdminDirigentesPage() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEdit = (dirigente) => {
-    setEditingId(dirigente.ci);
-    setEditEnvio(dirigente.envio || "");
-  };
-
-  const handleSaveEdit = async (ci) => {
-    try {
-      await adminApi.updateDirigente(ci, { envio: editEnvio });
-      setEditingId(null);
-      await loadDirigentes();
-    } catch (err) {
-      alert(err?.response?.data?.message || "Error actualizando dirigente");
     }
   };
 
@@ -126,29 +109,14 @@ function AdminDirigentesPage() {
                   </p>
                 )}
 
-                {editingId === dirigente.ci ? (
-                  <div className="mt-3 p-2 bg-gray-700 rounded">
-                    <label className="block text-sm font-semibold mb-2">
-                      Envío:
-                    </label>
-                    <input
-                      type="text"
-                      value={editEnvio}
-                      onChange={(e) => setEditEnvio(e.target.value)}
-                      placeholder="Descripción de envío"
-                      className="w-full p-2 rounded bg-gray-600 text-white text-sm mb-2"
-                    />
-                  </div>
-                ) : (
-                  <div className="mt-3 p-2 bg-gray-700 rounded">
-                    <p className="text-sm">
-                      <strong>Envío:</strong>{" "}
-                      <span className="text-gray-300 ml-1">
-                        {dirigente.envio || "Sin especificar"}
-                      </span>
-                    </p>
-                  </div>
-                )}
+                <div className="mt-3 p-2 bg-gray-700 rounded">
+                  <p className="text-sm">
+                    <strong>Envío:</strong>{" "}
+                    <span className="text-gray-300 ml-1">
+                      {dirigente.envio || "Sin especificar"}
+                    </span>
+                  </p>
+                </div>
 
                 <p className="text-sm mt-2">
                   <strong>Colaborador:</strong>{" "}
@@ -170,39 +138,22 @@ function AdminDirigentesPage() {
               </div>
 
               <div className="my-4 flex justify-end gap-x-2">
-                {editingId === dirigente.ci ? (
-                  <>
-                    <Button
-                      className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1"
-                      onClick={() => handleSaveEdit(dirigente.ci)}
-                    >
-                      ✓ Guardar
-                    </Button>
-                    <Button
-                      className="bg-gray-600 hover:bg-gray-700 text-white text-sm px-3 py-1"
-                      onClick={() => setEditingId(null)}
-                    >
-                      ✕ Cancelar
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      className="bg-red-500 hover:bg-red-600"
-                      onClick={() => handleDelete(dirigente.ci)}
-                    >
-                      <PiTrashSimpleLight className="text-white" />
-                      Eliminar
-                    </Button>
-                    <Button
-                      className="bg-blue-600 hover:bg-blue-700"
-                      onClick={() => handleEdit(dirigente)}
-                    >
-                      <BiPencil className="text-white" />
-                      Editar
-                    </Button>
-                  </>
-                )}
+                <Button
+                  className="bg-red-500 hover:bg-red-600"
+                  onClick={() => handleDelete(dirigente.ci)}
+                >
+                  <PiTrashSimpleLight className="text-white" />
+                  Eliminar
+                </Button>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() =>
+                    navigate(`/admin/dirigentes/${dirigente.ci}/edit`)
+                  }
+                >
+                  <BiPencil className="text-white" />
+                  Editar
+                </Button>
               </div>
             </Card>
           ))}

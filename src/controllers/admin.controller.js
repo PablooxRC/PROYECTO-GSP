@@ -16,7 +16,7 @@ export const createAdmin = async (req, res, next) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10)
         const result = await pool.query(
-            'INSERT INTO dirigente (ci, nombre, apellido, email, unidad, password, is_admin) VALUES ($1,$2,$3,$4,$5,$6, true) RETURNING *',
+            'INSERT INTO dirigente (ci, nombre, apellido, email, unidad, password, is_admin, admin_registrado) VALUES ($1,$2,$3,$4,$5,$6, true, true) RETURNING *',
             [String(ci), nombre, apellido, email, unidad, hashedPassword]
         )
         return res.json(result.rows[0])
@@ -44,7 +44,7 @@ export const listDirigentes = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
     try {
         const result = await pool.query(
-            'SELECT ci, nombre, apellido, email, unidad, envio, create_at, nivel_formacion, es_colaborador FROM dirigente WHERE is_admin = FALSE ORDER BY create_at DESC'
+            'SELECT ci, nombre, apellido, email, unidad, envio, create_at, nivel_formacion, es_colaborador FROM dirigente WHERE is_admin = FALSE AND admin_registrado = TRUE ORDER BY create_at DESC'
         )
         return res.json(result.rows)
     } catch (error) {
@@ -87,8 +87,8 @@ export const createDirigente = async (req, res, next) => {
         })
         
         const result = await pool.query(
-            `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito, es_colaborador) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) RETURNING *`,
-            [String(ci), `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar, numero_deposito || null, monto || null, fecha_deposito || null, hora_deposito || null, es_colaborador || false]
+            `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito, es_colaborador, admin_registrado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22) RETURNING *`,
+            [String(ci), `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar, numero_deposito || null, monto || null, fecha_deposito || null, hora_deposito || null, es_colaborador || false, true]
         )
         return res.json(result.rows[0])
     } catch (error) {
@@ -103,12 +103,70 @@ export const updateDirigente = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
     
     const { ci } = req.params
-    const { envio } = req.body
+    const {
+        nombre,
+        primer_nombre,
+        segundo_nombre,
+        apellido,
+        primer_apellido,
+        segundo_apellido,
+        email,
+        unidad,
+        grupo,
+        fecha_nacimiento,
+        sexo,
+        nivel_formacion,
+        numero_deposito,
+        monto,
+        fecha_deposito,
+        hora_deposito,
+        envio,
+        es_colaborador,
+    } = req.body
     
     try {
         const result = await pool.query(
-            'UPDATE dirigente SET envio = $1 WHERE ci = $2 RETURNING *',
-            [envio, ci]
+            `UPDATE dirigente SET 
+                nombre = COALESCE($1, nombre),
+                primer_nombre = COALESCE($2, primer_nombre),
+                segundo_nombre = COALESCE($3, segundo_nombre),
+                apellido = COALESCE($4, apellido),
+                primer_apellido = COALESCE($5, primer_apellido),
+                segundo_apellido = COALESCE($6, segundo_apellido),
+                email = COALESCE($7, email),
+                unidad = COALESCE($8, unidad),
+                grupo = COALESCE($9, grupo),
+                fecha_nacimiento = COALESCE($10, fecha_nacimiento),
+                sexo = COALESCE($11, sexo),
+                nivel_formacion = COALESCE($12, nivel_formacion),
+                numero_deposito = COALESCE($13, numero_deposito),
+                monto = COALESCE($14, monto),
+                fecha_deposito = COALESCE($15, fecha_deposito),
+                hora_deposito = COALESCE($16, hora_deposito),
+                envio = COALESCE($17, envio),
+                es_colaborador = COALESCE($18, es_colaborador)
+            WHERE ci = $19 RETURNING *`,
+            [
+                nombre,
+                primer_nombre,
+                segundo_nombre,
+                apellido,
+                primer_apellido,
+                segundo_apellido,
+                email,
+                unidad,
+                grupo,
+                fecha_nacimiento,
+                sexo,
+                nivel_formacion,
+                numero_deposito,
+                monto,
+                fecha_deposito,
+                hora_deposito,
+                envio,
+                es_colaborador,
+                ci
+            ]
         )
         
         if (result.rowCount === 0) {
@@ -193,7 +251,7 @@ export const sendReport = async (req, res) => {
             ORDER BY s.ci, r.id DESC
         `)
 
-        const dirigentesRes = await pool.query('SELECT * FROM dirigente')
+        const dirigentesRes = await pool.query('SELECT * FROM dirigente WHERE admin_registrado = TRUE')
 
         // ===============================
         // CREAR EXCEL CON 3 HOJAS
