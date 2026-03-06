@@ -52,6 +52,25 @@ function RegisterPage() {
           {errors.password && (
             <p className="text-red-500"> La contraseña es requerida</p>
           )}
+          <Label htmlFor="unidad">Unidad</Label>
+          <select
+            {...register("unidad", {
+              required: true,
+            })}
+            className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Seleccionar Unidad</option>
+            <option value="Hathi">Hathi</option>
+            <option value="Jacala">Jacala</option>
+            <option value="Castores">Castores</option>
+            <option value="Halcones">Halcones</option>
+            <option value="Tiburones">Tiburones</option>
+            <option value="Locotos">Locotos</option>
+            <option value="Clan Destino">Clan Destino</option>
+          </select>
+          {errors.unidad && (
+            <p className="text-red-500"> La unidad es requerida</p>
+          )}
           <Button>Registrar</Button>
           <div className="flex justify-between my-4">
             <p>¿Ya tienes una cuenta?</p>

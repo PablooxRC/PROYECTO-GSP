@@ -27,7 +27,11 @@ export const signupSchema= z.object({
         invalid_type_error: 'El email debe ser un texto'
     }).email({
         message: "El email debe ser un email valido "
-    })
+    }),
+    unidad: z.string({
+        required_error: "La unidad es requerida",
+        invalid_type_error: "La unidad debe ser un texto"
+    }).min(1)
 })
 
 export const updateSchema= z.object({ 

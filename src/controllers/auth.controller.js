@@ -9,19 +9,26 @@ import { queryOne } from '../utils/dbHelpers.js'
 //acceder 
 export const signin = asyncHandler(async (req, res) => {
     const {email, password} = req.body
+    
+    console.log('[SIGNIN] Intento de login:', { email, passwordProvided: !!password })
 
     const user = await queryOne(pool, 'SELECT * FROM dirigente WHERE email = $1', [email])
 
     if (!user){
+        console.log('[SIGNIN] Usuario no encontrado:', email)
         throw new AuthenticationError('Datos incorrectos o usuario inexistente')
     }
+    
+    console.log('[SIGNIN] Usuario encontrado:', { ci: user.ci, email: user.email, hasPassword: !!user.password })
 
     const validPassword = await bcrypt.compare(password, user.password)
 
     if (!validPassword){
+        console.log('[SIGNIN] Contraseña inválida para:', email)
         throw new AuthenticationError('La contraseña es incorrecta')
     }
 
+    console.log('[SIGNIN] Login exitoso para:', email)
     const token = await createAccessToken({ci: user.ci, unidad: user.unidad, is_admin: user.is_admin})
 
     res.cookie("token", token, {
@@ -35,7 +42,7 @@ export const signin = asyncHandler(async (req, res) => {
 
 //Registrar dirigente
 export const signup = asyncHandler(async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, unidad } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -53,8 +60,8 @@ export const signup = asyncHandler(async (req, res, next) => {
         
         const user = await queryOne(
             pool,
-            'INSERT INTO dirigente(ci, email, password, gravatar, admin_registrado) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [tempCi, email, hashedPassword, randomImageUrl, false]
+            'INSERT INTO dirigente(ci, email, password, unidad, gravatar, admin_registrado) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [tempCi, email, hashedPassword, unidad, randomImageUrl, false]
         );
         
         const token = await createAccessToken({ci: user.ci, unidad: user.unidad, is_admin: user.is_admin});
