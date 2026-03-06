@@ -196,13 +196,13 @@ export const sendReport = async (req, res) => {
         const dirigentesRes = await pool.query('SELECT * FROM dirigente')
 
         // ===============================
-        // CREAR EXCEL
+        // CREAR EXCEL CON 3 HOJAS
         // ===============================
 
         const workbook = new ExcelJS.Workbook()
-        const rSheet = workbook.addWorksheet('Registros')
-        const sSheet = workbook.addWorksheet('Scouts')
-        const dSheet = workbook.addWorksheet('Dirigentes')
+        const scoutsSheet = workbook.addWorksheet('Scouts')
+        const dirigentesSheet = workbook.addWorksheet('Dirigentes')
+        const colaboradoresSheet = workbook.addWorksheet('Colaboradores')
 
         // ===============================
         // FUNCIÓN DE ESTILO SEGURA
@@ -268,33 +268,12 @@ export const sendReport = async (req, res) => {
             { header: 'CURSO', key: 'curso', width: 12 }
         ]
 
-        rSheet.columns = baseColumns
-        sSheet.columns = [...baseColumns]
+        scoutsSheet.columns = baseColumns
 
         let secuencia = 1
 
-        registrosRes.rows.forEach(row => {
-            rSheet.addRow({
-                secuencia: secuencia++,
-                ci: row.scout_ci?.toString().toUpperCase() || '',
-                primer_nombre: row.primer_nombre?.toUpperCase() || '',
-                segundo_nombre: row.segundo_nombre?.toUpperCase() || '',
-                primer_apellido: row.primer_apellido?.toUpperCase() || '',
-                segundo_apellido: row.segundo_apellido?.toUpperCase() || '',
-                grupo: row.grupo?.toUpperCase() || '',
-                unidad: row.unidad?.toUpperCase() || '',
-                etapa: row.etapa?.toUpperCase() || '',
-                fecha_nacimiento: row.fecha_nacimiento ? new Date(row.fecha_nacimiento).toLocaleDateString() : '',
-                sexo: row.sexo?.toUpperCase() || '',
-                colegio: row.colegio?.toUpperCase() || '',
-                curso: row.curso?.toUpperCase() || ''
-            })
-        })
-
-        secuencia = 1
-
         scoutsRes.rows.forEach(row => {
-            sSheet.addRow({
+            scoutsSheet.addRow({
                 secuencia: secuencia++,
                 ci: row.ci?.toString().toUpperCase() || '',
                 primer_nombre: row.primer_nombre?.toUpperCase() || '',
@@ -311,31 +290,73 @@ export const sendReport = async (req, res) => {
             })
         })
 
-        dSheet.columns = [
-            { header: 'CI', key: 'ci', width: 15 },
-            { header: 'Nombre', key: 'nombre', width: 30 },
-            { header: 'Apellido', key: 'apellido', width: 30 },
-            { header: 'Fecha Nac', key: 'fecha_nacimiento', width: 15 },
-            { header: 'Sexo', key: 'sexo', width: 10 },
-            { header: 'Grupo', key: 'grupo', width: 15 },
-            { header: 'Unidad', key: 'unidad', width: 20 }
+        // DIRIGENTES - Todos excepto admins
+        const dirigentesColumns = [
+            { header: 'N° DE SECUENCIA', key: 'secuencia', width: 15 },
+            { header: 'CI', key: 'ci', width: 20 },
+            { header: 'NOMBRE', key: 'nombre', width: 30 },
+            { header: 'APELLIDO', key: 'apellido', width: 30 },
+            { header: 'EMAIL', key: 'email', width: 30 },
+            { header: 'UNIDAD', key: 'unidad', width: 20 },
+            { header: 'SEXO', key: 'sexo', width: 10 },
+            { header: 'GRUPO', key: 'grupo', width: 15 },
+            { header: 'FECHA NACIMIENTO', key: 'fecha_nacimiento', width: 20 },
+            { header: 'ES COLABORADOR', key: 'es_colaborador', width: 15 }
         ]
 
-        dirigentesRes.rows.forEach(row => {
-            dSheet.addRow({
-                ci: row.ci || '',
-                nombre: row.nombre || '',
-                apellido: row.apellido || '',
-                fecha_nacimiento: row.fecha_nacimiento || '',
-                sexo: row.sexo || '',
-                grupo: row.grupo || '',
-                unidad: row.unidad || ''
+        dirigentesSheet.columns = dirigentesColumns
+
+        secuencia = 1
+        const dirigentesNoAdmins = dirigentesRes.rows.filter(d => !d.is_admin)
+        dirigentesNoAdmins.forEach(row => {
+            dirigentesSheet.addRow({
+                secuencia: secuencia++,
+                ci: row.ci?.toString().toUpperCase() || '',
+                nombre: row.nombre?.toUpperCase() || '',
+                apellido: row.apellido?.toUpperCase() || '',
+                email: row.email || '',
+                unidad: row.unidad?.toUpperCase() || '',
+                sexo: row.sexo?.toUpperCase() || '',
+                grupo: row.grupo?.toUpperCase() || '',
+                fecha_nacimiento: row.fecha_nacimiento ? new Date(row.fecha_nacimiento).toLocaleDateString() : '',
+                es_colaborador: row.es_colaborador ? 'SÍ' : 'NO'
             })
         })
 
-        styleSheet(rSheet)
-        styleSheet(sSheet)
-        styleSheet(dSheet)
+        // COLABORADORES - Solo dirigentes que son colaboradores
+        const colaboradoresColumns = [
+            { header: 'N° DE SECUENCIA', key: 'secuencia', width: 15 },
+            { header: 'CI', key: 'ci', width: 20 },
+            { header: 'NOMBRE', key: 'nombre', width: 30 },
+            { header: 'APELLIDO', key: 'apellido', width: 30 },
+            { header: 'EMAIL', key: 'email', width: 30 },
+            { header: 'UNIDAD', key: 'unidad', width: 20 },
+            { header: 'SEXO', key: 'sexo', width: 10 },
+            { header: 'GRUPO', key: 'grupo', width: 15 },
+            { header: 'FECHA NACIMIENTO', key: 'fecha_nacimiento', width: 20 }
+        ]
+
+        colaboradoresSheet.columns = colaboradoresColumns
+
+        secuencia = 1
+        const colaboradores = dirigentesRes.rows.filter(d => d.es_colaborador && !d.is_admin)
+        colaboradores.forEach(row => {
+            colaboradoresSheet.addRow({
+                secuencia: secuencia++,
+                ci: row.ci?.toString().toUpperCase() || '',
+                nombre: row.nombre?.toUpperCase() || '',
+                apellido: row.apellido?.toUpperCase() || '',
+                email: row.email || '',
+                unidad: row.unidad?.toUpperCase() || '',
+                sexo: row.sexo?.toUpperCase() || '',
+                grupo: row.grupo?.toUpperCase() || '',
+                fecha_nacimiento: row.fecha_nacimiento ? new Date(row.fecha_nacimiento).toLocaleDateString() : ''
+            })
+        })
+
+        styleSheet(scoutsSheet)
+        styleSheet(dirigentesSheet)
+        styleSheet(colaboradoresSheet)
 
         // ===============================
         // GUARDAR EXCEL
