@@ -6,7 +6,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 
-// Crear un nuevo admin (solo accesible por admins existentes)
+// Crear admin (solo accesible por admins existentes)
 export const createAdmin = async (req, res, next) => {
     if (!req.isAdmin) {
         return res.status(403).json({ message: 'Acceso denegado' })
@@ -17,7 +17,7 @@ export const createAdmin = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 10)
         const result = await pool.query(
             'INSERT INTO dirigente (ci, nombre, apellido, email, unidad, password, is_admin) VALUES ($1,$2,$3,$4,$5,$6, true) RETURNING *',
-            [ci, nombre, apellido, email, unidad, hashedPassword]
+            [String(ci), nombre, apellido, email, unidad, hashedPassword]
         )
         return res.json(result.rows[0])
     } catch (error) {
@@ -88,7 +88,7 @@ export const createDirigente = async (req, res, next) => {
         
         const result = await pool.query(
             `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito, es_colaborador) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) RETURNING *`,
-            [ci, `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar, numero_deposito || null, monto || null, fecha_deposito || null, hora_deposito || null, es_colaborador || false]
+            [String(ci), `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar, numero_deposito || null, monto || null, fecha_deposito || null, hora_deposito || null, es_colaborador || false]
         )
         return res.json(result.rows[0])
     } catch (error) {

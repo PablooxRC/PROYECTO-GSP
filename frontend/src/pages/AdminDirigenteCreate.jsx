@@ -24,10 +24,10 @@ function AdminDirigenteCreate() {
       // Asegurar que datos críticos sean del tipo correcto
       const submitData = {
         ...data,
-        ci: parseInt(data.ci),
+        ci: String(data.ci),
         monto: data.monto ? parseFloat(data.monto) : null,
-        es_colaborador: data.es_colaborador ? true : false
-      }
+        es_colaborador: data.es_colaborador ? true : false,
+      };
       await axios.post("/admin/dirigentes", submitData);
       navigate("/admin/dirigentes");
     } catch (err) {
@@ -44,7 +44,7 @@ function AdminDirigenteCreate() {
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <Label>Cédula de Identidad</Label>
-            <Input type="number" {...register("ci", { required: true })} />
+            <Input type="text" {...register("ci", { required: true })} />
             {errors.ci && (
               <p className="text-red-500 text-sm">CI es requerido</p>
             )}
