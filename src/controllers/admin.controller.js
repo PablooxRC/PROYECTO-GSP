@@ -73,7 +73,8 @@ export const createDirigente = async (req, res, next) => {
         numero_deposito,
         monto,
         fecha_deposito,
-        hora_deposito
+        hora_deposito,
+        es_colaborador
     } = req.body
 
     try {
@@ -81,8 +82,8 @@ export const createDirigente = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(pwd, 10)
         const gravatar = null
         const result = await pool.query(
-            `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20) RETURNING *`,
-            [ci, `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar, numero_deposito || null, monto || null, fecha_deposito || null, hora_deposito || null]
+            `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito, es_colaborador) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21) RETURNING *`,
+            [ci, `${primer_nombre || ''} ${primer_apellido || ''}`.trim(), `${primer_apellido || ''}`.trim(), email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento || null, sexo || null, grupo || null, unidad || null, nivel_formacion || null, envio || null, hashedPassword, gravatar, numero_deposito || null, monto || null, fecha_deposito || null, hora_deposito || null, es_colaborador || false]
         )
         return res.json(result.rows[0])
     } catch (error) {

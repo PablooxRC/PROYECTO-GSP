@@ -16,7 +16,8 @@ const migrations = [
   'migration_add_create_at_scouts.sql',
   'migration_change_scouts_ci_type.sql',
   'migration_change_scout_ci_type.sql',
-  'migration_add_deposito_dirigente.sql'
+  'migration_add_deposito_dirigente.sql',
+  'migration_add_es_colaborador_dirigente.sql'
 ]
 
 async function apply() {

@@ -156,6 +156,17 @@ function AdminDirigenteCreate() {
             />
           </div>
 
+          <div>
+            <Label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                {...register("es_colaborador")}
+                className="w-4 h-4"
+              />
+              <span>Es Colaborador</span>
+            </Label>
+          </div>
+
           <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
             Registrar Dirigente
           </Button>
