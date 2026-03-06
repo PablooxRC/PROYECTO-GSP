@@ -21,7 +21,14 @@ function AdminDirigenteCreate() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await axios.post("/admin/dirigentes", data);
+      // Asegurar que datos críticos sean del tipo correcto
+      const submitData = {
+        ...data,
+        ci: parseInt(data.ci),
+        monto: data.monto ? parseFloat(data.monto) : null,
+        es_colaborador: data.es_colaborador ? true : false
+      }
+      await axios.post("/admin/dirigentes", submitData);
       navigate("/admin/dirigentes");
     } catch (err) {
       alert(err?.response?.data?.message || "Error creando dirigente");
@@ -138,10 +145,7 @@ function AdminDirigenteCreate() {
             </div>
             <div>
               <Label>Hora de Depósito</Label>
-              <Input
-                type="time"
-                {...register("hora_deposito", { required: true })}
-              />
+              <Input type="time" {...register("hora_deposito")} />
               {errors.hora_deposito && (
                 <p className="text-red-500 text-sm">Hora es requerida</p>
               )}
@@ -162,7 +166,6 @@ function AdminDirigenteCreate() {
                 type="checkbox"
                 {...register("es_colaborador")}
                 className="w-4 h-4"
-                value="true"
               />
               <span>Es Colaborador</span>
             </Label>
