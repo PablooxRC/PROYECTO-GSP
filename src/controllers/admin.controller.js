@@ -44,7 +44,7 @@ export const listDirigentes = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
     try {
         const result = await pool.query(
-            'SELECT ci, nombre, apellido, email, unidad, envio, create_at, nivel_formacion FROM dirigente WHERE is_admin = FALSE ORDER BY create_at DESC'
+            'SELECT ci, nombre, apellido, email, unidad, envio, create_at, nivel_formacion, es_colaborador FROM dirigente WHERE is_admin = FALSE ORDER BY create_at DESC'
         )
         return res.json(result.rows)
     } catch (error) {
