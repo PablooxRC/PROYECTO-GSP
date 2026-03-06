@@ -162,6 +162,7 @@ function AdminDirigenteCreate() {
                 type="checkbox"
                 {...register("es_colaborador")}
                 className="w-4 h-4"
+                value="true"
               />
               <span>Es Colaborador</span>
             </Label>
