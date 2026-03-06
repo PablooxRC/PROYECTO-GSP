@@ -150,6 +150,13 @@ function AdminDirigentesPage() {
                   </div>
                 )}
 
+                <p className="text-sm mt-2">
+                  <strong>Colaborador:</strong>{" "}
+                  <span className={dirigente.es_colaborador ? "text-green-400" : "text-gray-400"}>
+                    {dirigente.es_colaborador ? "✓ Sí" : "✗ No"}
+                  </span>
+                </p>
+
                 <p className="text-xs text-gray-500 mt-2">
                   Registrado:{" "}
                   {new Date(dirigente.create_at).toLocaleDateString("es-ES")}
