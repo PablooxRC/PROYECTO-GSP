@@ -16,18 +16,6 @@ export const signinSchema = z.object({
 })
 
 export const signupSchema= z.object({ 
-     ci: z.number({ 
-        required_error: "El CI es necesario",
-        invalid_type_error: "El CI debe ser un número entero positivo "
-     }).positive(),
-    nombre: z.string({ 
-        required_error: "El nombre es requerido",
-        invalid_type_error: "El nombre debe ser un texto"
-     }).min(1),
-    apellido: z.string({ 
-        required_error: "El apellido es requerido",
-        invalid_type_error: "El apellido debe ser un texto"
-     }).min(1),
     password: z.string({
         required_error: "La contraseña es requerida",
         invalid_type_error: "La contraseña deber ser un texto"
@@ -39,11 +27,7 @@ export const signupSchema= z.object({
         invalid_type_error: 'El email debe ser un texto'
     }).email({
         message: "El email debe ser un email valido "
-    }),
-    unidad: z.string({ 
-        required_error: "La unidad es requerido",
-        invalid_type_error: "La unidad debe ser un texto"
-     }).min(1),
+    })
 })
 
 export const updateSchema= z.object({ 

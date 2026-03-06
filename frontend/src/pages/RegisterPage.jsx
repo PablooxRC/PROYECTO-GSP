@@ -27,40 +27,6 @@ function RegisterPage(){
         }
         <h3 className='text-2xl font-bold'> Registrarse</h3>
         <form onSubmit={onSubmit}>
-          <Label htmlFor="id">
-            Carnet de identidad
-          </Label>
-          <Input placeholder="Ingresa tu CI"
-            {... register('ci',{
-              required: true,
-              valueAsNumber: true
-            })}
-          />
-          {
-            errors.ci && <p className = "text-red-500"> El ci es requerido</p>
-          }
-          <Label htmlFor="name">
-            Nombre
-          </Label>
-          <Input placeholder="Ingresa tu nombre"
-            {... register('nombre', {
-              required: true,
-            })}
-          />
-          {
-            errors.nombre && <p className = "text-red-500"> El nombre es requerido</p>
-          }
-          <Label htmlFor="lastname">
-            Apellido
-          </Label>
-          <Input placeholder="Ingresa tu apellido"
-            {... register('apellido', {
-              required: true,
-            })}
-          />
-          {
-            errors.apellido && <p className = "text-red-500"> El apellido es requerido</p>
-          }
           <Label htmlFor="email">
             Email
           </Label>
@@ -72,17 +38,6 @@ function RegisterPage(){
           {
             errors.email && <p className = "text-red-500"> El email es requerido</p>
           }
-          <Label htmlFor="unidad">
-            Unidad
-          </Label>
-          <Input placeholder="Ingresa tu unidad"
-            {... register('unidad', {
-              required: true,
-            })}
-          />
-          {
-            errors.unidad && <p className = "text-red-500"> La unidad es requerida</p>
-          }
           <Label htmlFor="password">
             Contraseña
           </Label>
@@ -92,7 +47,7 @@ function RegisterPage(){
             })}
           />
           {
-            errors.password && <p className = "text-red-500"> La contraseña es requerido</p>
+            errors.password && <p className = "text-red-500"> La contraseña es requerida</p>
           }
           <Button>
             Registrar

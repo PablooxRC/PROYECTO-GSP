@@ -35,7 +35,7 @@ export const signin = asyncHandler(async (req, res) => {
 
 //Registrar dirigente
 export const signup = asyncHandler(async (req, res, next) => {
-    const { ci, nombre, apellido, email, unidad, password } = req.body;
+    const { email, password } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -48,10 +48,13 @@ export const signup = asyncHandler(async (req, res, next) => {
     const randomImageUrl = scoutImages[Math.floor(Math.random() * scoutImages.length)];
     
     try {
+        // Generar un CI temporal único basado en timestamp + random
+        const tempCi = `TEMP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
         const user = await queryOne(
             pool,
-            'INSERT INTO dirigente(ci, nombre, apellido, email, unidad, password, gravatar, admin_registrado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [ci, nombre, apellido, email, unidad, hashedPassword, randomImageUrl, false]
+            'INSERT INTO dirigente(ci, email, password, gravatar, admin_registrado) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [tempCi, email, hashedPassword, randomImageUrl, false]
         );
         
         const token = await createAccessToken({ci: user.ci, unidad: user.unidad, is_admin: user.is_admin});
@@ -65,7 +68,7 @@ export const signup = asyncHandler(async (req, res, next) => {
         sendSuccess(res, user, 'Cuenta creada correctamente', 201);
     } catch (error) {
         if (error.code == "23505") {
-            throw new ConflictError('El email o CI ya está registrado');
+            throw new ConflictError('El email ya está registrado');
         }
         throw error;
     }
