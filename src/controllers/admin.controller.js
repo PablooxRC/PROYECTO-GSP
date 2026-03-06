@@ -290,7 +290,7 @@ export const sendReport = async (req, res) => {
             })
         })
 
-        // DIRIGENTES - Todos excepto admins
+        // DIRIGENTES - Solo dirigentes que NO son colaboradores
         const dirigentesColumns = [
             { header: 'N° DE SECUENCIA', key: 'secuencia', width: 15 },
             { header: 'CI', key: 'ci', width: 20 },
@@ -300,14 +300,14 @@ export const sendReport = async (req, res) => {
             { header: 'UNIDAD', key: 'unidad', width: 20 },
             { header: 'SEXO', key: 'sexo', width: 10 },
             { header: 'GRUPO', key: 'grupo', width: 15 },
-            { header: 'FECHA NACIMIENTO', key: 'fecha_nacimiento', width: 20 },
-            { header: 'ES COLABORADOR', key: 'es_colaborador', width: 15 }
+            { header: 'FECHA NACIMIENTO', key: 'fecha_nacimiento', width: 20 }
         ]
 
         dirigentesSheet.columns = dirigentesColumns
 
         secuencia = 1
-        const dirigentesNoAdmins = dirigentesRes.rows.filter(d => !d.is_admin)
+        // Solo dirigentes que NO son admins Y NO son colaboradores
+        const dirigentesNoAdmins = dirigentesRes.rows.filter(d => !d.is_admin && !d.es_colaborador)
         dirigentesNoAdmins.forEach(row => {
             dirigentesSheet.addRow({
                 secuencia: secuencia++,
@@ -318,8 +318,7 @@ export const sendReport = async (req, res) => {
                 unidad: row.unidad?.toUpperCase() || '',
                 sexo: row.sexo?.toUpperCase() || '',
                 grupo: row.grupo?.toUpperCase() || '',
-                fecha_nacimiento: row.fecha_nacimiento ? new Date(row.fecha_nacimiento).toLocaleDateString() : '',
-                es_colaborador: row.es_colaborador ? 'SÍ' : 'NO'
+                fecha_nacimiento: row.fecha_nacimiento ? new Date(row.fecha_nacimiento).toLocaleDateString() : ''
             })
         })
 
