@@ -188,10 +188,16 @@ function ScoutFormPage() {
           {/* Grupo y Rama */}
           <div>
             <Label htmlFor="rama">Rama</Label>
-            <Input
-              placeholder="Ingresa la rama"
+            <select
               {...register("rama", { required: "Es requerida" })}
-            />
+              className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Seleccionar Rama</option>
+              <option value="Lobatos">Lobatos</option>
+              <option value="Exploradores">Exploradores</option>
+              <option value="Pioneros">Pioneros</option>
+              <option value="Rovers">Rovers</option>
+            </select>
             {errors.rama && (
               <p className="text-red-500 text-sm">{errors.rama.message}</p>
             )}
@@ -201,10 +207,19 @@ function ScoutFormPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="unidad">Unidad</Label>
-              <Input
-                placeholder="Ingresa la unidad"
+              <select
                 {...register("unidad", { required: "Es requerida" })}
-              />
+                className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Seleccionar Unidad</option>
+                <option value="Hathi">Hathi</option>
+                <option value="Jacala">Jacala</option>
+                <option value="Castores">Castores</option>
+                <option value="Halcones">Halcones</option>
+                <option value="Tiburones">Tiburones</option>
+                <option value="Locotos">Locotos</option>
+                <option value="Clan Destino">Clan Destino</option>
+              </select>
               {errors.unidad && (
                 <p className="text-red-500 text-sm">{errors.unidad.message}</p>
               )}
