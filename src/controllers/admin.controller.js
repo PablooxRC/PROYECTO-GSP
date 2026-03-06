@@ -39,12 +39,12 @@ export const listAdmins = async (req, res, next) => {
     }
 }
 
-// Listar todos los dirigentes (no admins)
+// Listar todos los dirigentes (admins y dirigentes registrados por admin)
 export const listDirigentes = async (req, res, next) => {
     if (!req.isAdmin) return res.status(403).json({ message: 'Acceso denegado' })
     try {
         const result = await pool.query(
-            'SELECT ci, nombre, apellido, email, unidad, envio, create_at, nivel_formacion, es_colaborador FROM dirigente WHERE is_admin = FALSE AND admin_registrado = TRUE ORDER BY create_at DESC'
+            'SELECT ci, nombre, apellido, email, unidad, envio, create_at, nivel_formacion, es_colaborador FROM dirigente WHERE (is_admin = TRUE OR admin_registrado = TRUE) ORDER BY create_at DESC'
         )
         return res.json(result.rows)
     } catch (error) {
@@ -251,7 +251,7 @@ export const sendReport = async (req, res) => {
             ORDER BY s.ci, r.id DESC
         `)
 
-        const dirigentesRes = await pool.query('SELECT * FROM dirigente WHERE admin_registrado = TRUE')
+        const dirigentesRes = await pool.query('SELECT * FROM dirigente WHERE (is_admin = TRUE OR admin_registrado = TRUE)')
 
         // ===============================
         // CREAR EXCEL CON 3 HOJAS
@@ -364,9 +364,9 @@ export const sendReport = async (req, res) => {
         dirigentesSheet.columns = dirigentesColumns
 
         secuencia = 1
-        // Solo dirigentes que NO son admins Y NO son colaboradores
-        const dirigentesNoAdmins = dirigentesRes.rows.filter(d => !d.is_admin && !d.es_colaborador)
-        dirigentesNoAdmins.forEach(row => {
+        // Dirigentes (incluyendo admins) que NO son colaboradores
+        const dirigentes = dirigentesRes.rows.filter(d => !d.es_colaborador)
+        dirigentes.forEach(row => {
             dirigentesSheet.addRow({
                 secuencia: secuencia++,
                 ci: row.ci?.toString().toUpperCase() || '',
