@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { sendReport, getScoutsAdmin } from "../api/admin.api";
+import { sendReport, getScoutsAdmin, getDirigentes } from "../api/admin.api";
 import axios from "../api/axios";
 import { Card } from "../components/ui";
 
@@ -11,6 +11,7 @@ export default function AdminSendReport() {
   const [message, setMessage] = useState(null);
   const [registros, setRegistros] = useState([]);
   const [scouts, setScouts] = useState([]);
+  const [dirigentes, setDirigentes] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [imagenBase64, setImagenBase64] = useState(null);
@@ -41,8 +42,12 @@ export default function AdminSendReport() {
       // Obtener todos los scouts
       const scoutsResponse = await getScoutsAdmin(from, to);
 
+      // Obtener todos los dirigentes
+      const dirigentesResponse = await getDirigentes();
+
       setRegistros(registrosResponse.data);
       setScouts(scoutsResponse.data);
+      setDirigentes(dirigentesResponse.data);
       setShowPreview(true);
 
       const scoutsConRegistro = new Set(
@@ -365,66 +370,78 @@ export default function AdminSendReport() {
                 })()}
 
                 {/* DIRIGENTES SECTION */}
-                {registros.length > 0 && (
+                {dirigentes.length > 0 && (
                   <div>
                     <h3 className="text-xl font-bold mb-4">
-                      Dirigentes Registrados
+                      Dirigentes Registrados ({dirigentes.length})
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Array.from(
-                        new Map(
-                          registros.map((r) => [r.dirigente_ci, r]),
-                        ).values(),
-                      ).map((registro) => (
-                        <Card
-                          key={`dir-${registro.dirigente_ci}`}
-                          className="px-6 py-4"
-                        >
-                          <h3 className="text-xl font-bold mb-2">
-                            {registro.dirigente_nombre &&
-                            registro.dirigente_apellido
-                              ? `${registro.dirigente_nombre} ${registro.dirigente_apellido}`
-                              : `Dirigente ${registro.dirigente_ci}`}
-                          </h3>
+                      {dirigentes.map((dirigente) => {
+                        // Obtener registros para este dirigente en el período
+                        const registrosDirigente = registros.filter(
+                          (r) => r.dirigente_ci === dirigente.ci,
+                        );
+                        const tieneRegistros = registrosDirigente.length > 0;
 
-                          <p className="text-gray-400 text-sm mb-3">
-                            C.I.:{" "}
-                            <span className="text-gray-300">
-                              {registro.dirigente_ci}
-                            </span>
-                          </p>
+                        return (
+                          <Card
+                            key={`dir-${dirigente.ci}`}
+                            className={`px-6 py-4 ${
+                              tieneRegistros
+                                ? "border-2 border-green-600"
+                                : "border-2 border-gray-600"
+                            }`}
+                          >
+                            <h3 className="text-xl font-bold mb-2">
+                              {dirigente.nombre} {dirigente.apellido}
+                            </h3>
 
-                          <p className="mb-2">
-                            <span className="text-blue-400">
-                              {registro.dirigente_email || "Sin email"}
-                            </span>
-                          </p>
-
-                          <p className="text-gray-300 mb-3">
-                            <strong>Unidad:</strong>{" "}
-                            {registro.dirigente_unidad || "-"}
-                          </p>
-
-                          <div className="bg-gray-700 p-3 rounded mb-3">
-                            <p className="text-gray-400 text-sm">Envío</p>
-                            <p className="text-white">
-                              {registro.envio || "-"}
+                            <p className="text-gray-400 text-sm mb-3">
+                              C.I.:{" "}
+                              <span className="text-gray-300">
+                                {dirigente.ci}
+                              </span>
                             </p>
-                          </div>
 
-                          <p className="text-gray-500 text-sm">
-                            Registros en este período:{" "}
-                            <strong className="text-green-400">
-                              {
-                                registros.filter(
-                                  (r) =>
-                                    r.dirigente_ci === registro.dirigente_ci,
-                                ).length
-                              }
-                            </strong>
-                          </p>
-                        </Card>
-                      ))}
+                            <p className="mb-2">
+                              <span className="text-blue-400">
+                                {dirigente.email || "Sin email"}
+                              </span>
+                            </p>
+
+                            <p className="text-gray-300 mb-3">
+                              <strong>Unidad:</strong> {dirigente.unidad || "-"}
+                            </p>
+
+                            <div className="bg-gray-700 p-3 rounded mb-3">
+                              <p className="text-gray-400 text-sm">Envío</p>
+                              <p className="text-white">
+                                {dirigente.envio || "Sin especificar"}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <p className="text-gray-500 text-sm">
+                                Registros en periodo:{" "}
+                                <strong
+                                  className={
+                                    tieneRegistros
+                                      ? "text-green-400"
+                                      : "text-gray-400"
+                                  }
+                                >
+                                  {registrosDirigente.length}
+                                </strong>
+                              </p>
+                              {dirigente.es_colaborador && (
+                                <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded">
+                                  Colaborador
+                                </span>
+                              )}
+                            </div>
+                          </Card>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
