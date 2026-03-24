@@ -138,17 +138,21 @@ cat .env
 
 ---
 
-### 6️⃣ EJECUTAR MIGRACIONES Y CREAR ADMIN
+### 6️⃣ EJECUTAR MIGRACIONES (Admin + Patrón se crean automáticamente)
 
 ```bash
 # Migraciones
 psql -h localhost -U scout_user -d scouts_db < database/init.sql
 
-# Crear admin
-node scripts/seed_admin.js
+# Ejecutar todas las migraciones (incluyendo seed de admin + patrón)
+for file in database/migration_*.sql; do
+  echo "Ejecutando: $file"
+  psql -h localhost -U scout_user -d scouts_db < "$file"
+done
 
-# Deberías ver:
-# ✅ Admin creado: CI=1234567, Password=admin123
+# ✅ Admin y Patrón ya creados:
+#    - Admin: CI=8637944, Pass=admin123, Email=admin@scouts.com
+#    - Patrón: CI=1111111, Pass=patron123, Email=patron@scouts.com
 ```
 
 ---
@@ -245,10 +249,10 @@ pm2 restart scout-backend
 # Test 1: Backend responde
 curl http://150.203.35.120:3000/health
 
-# Test 2: Puedes hacer login
+# Test 2: Puedes hacer login (Admin)
 curl -X POST http://150.203.35.120:3000/api/login \
   -H "Content-Type: application/json" \
-  -d '{"ci":"1234567","password":"admin123"}'
+  -d '{"ci":"8637944","password":"admin123"}'
 
 # Test 3: Frontend carga
 # Abre: https://scout-app-2025.netlify.app
@@ -257,13 +261,21 @@ curl -X POST http://150.203.35.120:3000/api/login \
 
 ---
 
-## 📞 URLS FINALES
+## 📞 CREDENCIALES Y URLS
 
 ```
-FRONTEND:     https://scout-app-2025.netlify.app
-BACKEND:      http://150.203.35.120:3000
-ADMIN CI:     1234567
-ADMIN PASS:   admin123
+FRONTEND:         https://scout-app-2025.netlify.app
+BACKEND:          http://150.203.35.120:3000
+
+ADMIN:
+  CI:             8637944
+  Password:       admin123
+  Email:          admin@scouts.com
+
+PATRÓN:
+  CI:             1111111
+  Password:       patron123
+  Email:          patron@scouts.com
 ```
 
 ---

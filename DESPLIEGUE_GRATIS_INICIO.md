@@ -189,12 +189,14 @@ Tu app está online, gratuita, y profesional
 
 ---
 
-## 🌍 URLS FINALES
+## 🌍 URLS Y CREDENCIALES FINALES
 
 ```
 Frontend:   https://algo.netlify.app (automático)
 Backend:    http://TU_IP_ORACLE:3000
-Admin:      CI=1234567, Pass=admin123
+
+ADMIN:      CI=8637944, Pass=admin123, Email=admin@scouts.com
+PATRÓN:     CI=1111111, Pass=patron123, Email=patron@scouts.com
 ```
 
 ---

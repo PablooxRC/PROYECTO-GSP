@@ -262,7 +262,7 @@ SESSION_SECRET=OtroSecretoLargo456!@#$%^&*()
 
 Presiona: `Ctrl+X` → `Y` → `Enter` para guardar
 
-### Paso 2.11: Ejecutar Migraciones BD
+### Paso 2.11: Ejecutar Migraciones BD (incluyendo Admin + Patrón)
 
 ```bash
 cd /home/ubuntu/scout-app
@@ -270,25 +270,32 @@ cd /home/ubuntu/scout-app
 # Ejecutar script de inicialización
 psql -h localhost -U scout_user -d scouts_db < database/init.sql
 
-# Ejecutar todas las migraciones
+# Ejecutar todas las migraciones (en orden alfabético)
 for file in database/migration_*.sql; do
   echo "Ejecutando: $file"
   psql -h localhost -U scout_user -d scouts_db < "$file"
 done
+
+# ✅ Esto crea automáticamente:
+# - Admin: CI=8637944, Email=admin@scouts.com, Pass=admin123
+# - Patrón: CI=1111111, Email=patron@scouts.com, Pass=patron123
 ```
 
-### Paso 2.12: Crear Usuario Admin
+**Verificar que se crearon:**
 
 ```bash
-node scripts/seed_admin.js
-```
+# Conectar a la BD y verificar los admins
+psql -h localhost -U scout_user -d scouts_db
 
-**Salida esperada:**
+# En la consola de psql:
+SELECT ci, nombre, apellido, email, is_admin FROM dirigente
+WHERE is_admin = true;
 
-```
-✅ Admin creado:
-   CI: 1234567
-   Contraseña: admin123
+# Deberías ver:
+#    ci    | nombre  | apellido |      email       | is_admin
+# --------+---------+----------+------------------+----------
+#  8637944| Pablo   | Rodriguez| admin@scouts.com | t
+#  1111111| Patrón  | Principal| patron@scouts.com| t
 ```
 
 ### Paso 2.13: Instalar PM2 (Gestor de procesos)
@@ -462,15 +469,20 @@ curl -X GET http://150.203.35.120:3000/api/health
 # Deberías ver: {"status":"ok"}
 ```
 
-### Paso 5.2: Probar Login
+### Paso 5.2: Probar Login (Admin)
 
 ```bash
-# Obten un admin existente de BD
+# Credenciales creadas automáticamente en migraciones
 curl -X POST http://150.203.35.120:3000/api/login \
   -H "Content-Type: application/json" \
-  -d '{"ci":"1234567","password":"admin123"}'
+  -d '{"ci":"8637944","password":"admin123"}'
 
 # Respuesta esperada: {"token":"eyJhbG..."}
+
+# También puedes probar con el Patrón:
+curl -X POST http://150.203.35.120:3000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"ci":"1111111","password":"patron123"}'
 ```
 
 ### Paso 5.3: Probar Frontend
@@ -643,13 +655,25 @@ Si tienes problemas:
 
 ---
 
-## 📌 RESUMEN DE URLS
+## 📌 RESUMEN DE URLS Y CREDENCIALES
 
 ```
 🌐 Frontend:  https://scout-app-2025.netlify.app
 🔌 Backend:   http://150.203.35.120:3000
 🗂️ BD Local:  localhost:5432 (solo desde VM)
 📊 PM2 Web:   http://150.203.35.120:9615 (si habilitas)
+
+CREDENCIALES (Creadas automáticamente en migraciones):
+
+👤 ADMIN:
+   CI:        8637944
+   Email:     admin@scouts.com
+   Password:  admin123
+
+👑 PATRÓN:
+   CI:        1111111
+   Email:     patron@scouts.com
+   Password:  patron123
 ```
 
 ---

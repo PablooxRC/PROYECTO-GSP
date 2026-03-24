@@ -60,6 +60,24 @@
 
 ---
 
+### 4. 👤 [GUIA_USUARIOS_ADMIN_PATRON.md](GUIA_USUARIOS_ADMIN_PATRON.md)
+
+**Inicio recomendado**: Después del despliegue  
+**Tiempo**: 10 minutos  
+**Qué contiene**:
+
+- Explicación de creación automática de usuarios
+- Credenciales del admin y patrón
+- Cómo personalizar usuarios
+- Generación de hashes bcrypt
+- Consultas SQL útiles
+- Preguntas frecuentes
+- **Resultado**: Entiendes cómo se crean y administran los usuarios
+
+**Usa esto si**: Necesitas cambiar contraseñas o agregar más admins
+
+---
+
 ## 🎯 RUTA RECOMENDADA (PRINCIPIANTES)
 
 ```
@@ -135,16 +153,19 @@ PASO 4: ¡Celebra! 🎉
 
 ## 🎯 TABLA DE REFERENCIA RÁPIDA
 
-| Necesito          | Documento                            | Sección         |
-| ----------------- | ------------------------------------ | --------------- |
-| Empezar ahora     | DESPLIEGUE_RAPIDO_60MIN.md           | Cualquier parte |
-| Entender todo     | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 1-6        |
-| Decidir opción    | MAPA_DECISIONES_DESPLIEGUE.md        | Sección 4       |
-| Crear BD          | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 2, Paso 8  |
-| Conectar SSH      | DESPLIEGUE_RAPIDO_60MIN.md           | Paso 2          |
-| Problema con CORS | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4          |
-| Backup de datos   | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 6          |
-| Certificado SSL   | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4, Paso 1  |
+| Necesito             | Documento                            | Sección              |
+| -------------------- | ------------------------------------ | -------------------- |
+| Empezar ahora        | DESPLIEGUE_RAPIDO_60MIN.md           | Cualquier parte      |
+| Entender todo        | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 1-6             |
+| Decidir opción       | MAPA_DECISIONES_DESPLIEGUE.md        | Sección 4            |
+| Crear BD             | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 2, Paso 8       |
+| Conectar SSH         | DESPLIEGUE_RAPIDO_60MIN.md           | Paso 2               |
+| Problema con CORS    | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4               |
+| Backup de datos      | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 6               |
+| Certificado SSL      | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4, Paso 1       |
+| Credenciales admin   | GUIA_USUARIOS_ADMIN_PATRON.md        | Resumen Rápido       |
+| Cambiar contraseña   | GUIA_USUARIOS_ADMIN_PATRON.md        | Personalización      |
+| Agregar más usuarios | GUIA_USUARIOS_ADMIN_PATRON.md        | Preguntas Frecuentes |
 
 ---
 
