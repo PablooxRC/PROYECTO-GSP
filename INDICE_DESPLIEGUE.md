@@ -199,17 +199,17 @@ PASO 4: ¡Sistema profesional online! 🎉
 
 ## 🎯 TABLA DE REFERENCIA RÁPIDA
 
-| Necesito              | Documento                            | Sección              |
-| --------------------- | ------------------------------------ | -------------------- |
-| **Empezar FÁCIL**     | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | Comando-a-comando    |
-| **Empezar RÁPIDO**    | DESPLIEGUE_RAPIDO_60MIN.md           | Cualquier parte      |
-| **Entender TODO**     | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 1-6             |
-| **Decidir opción**    | MAPA_DECISIONES_DESPLIEGUE.md        | Sección 4            |
-| Desplegar sin Oracle  | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | Plan Rápido          |
-| Problema con BD       | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | "Cannot connect..."  |
-| Problema con CORS     | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4               |
-| Credenciales admin    | GUIA_USUARIOS_ADMIN_PATRON.md        | Resumen Rápido       |
-| Cambiar contraseña    | GUIA_USUARIOS_ADMIN_PATRON.md        | Personalización      |
+| Necesito             | Documento                            | Sección             |
+| -------------------- | ------------------------------------ | ------------------- |
+| **Empezar FÁCIL**    | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | Comando-a-comando   |
+| **Empezar RÁPIDO**   | DESPLIEGUE_RAPIDO_60MIN.md           | Cualquier parte     |
+| **Entender TODO**    | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 1-6            |
+| **Decidir opción**   | MAPA_DECISIONES_DESPLIEGUE.md        | Sección 4           |
+| Desplegar sin Oracle | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | Plan Rápido         |
+| Problema con BD      | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | "Cannot connect..." |
+| Problema con CORS    | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4              |
+| Credenciales admin   | GUIA_USUARIOS_ADMIN_PATRON.md        | Resumen Rápido      |
+| Cambiar contraseña   | GUIA_USUARIOS_ADMIN_PATRON.md        | Personalización     |
 
 ---
 
