@@ -78,22 +78,68 @@
 
 ---
 
-## 🎯 RUTA RECOMENDADA (PRINCIPIANTES)
+### 5. 🚂 [DESPLIEGUE_RAILWAY_ALTERNATIVA.md](DESPLIEGUE_RAILWAY_ALTERNATIVA.md)
+
+**Inicio recomendado**: Si NO quieres usar Oracle Cloud  
+**Tiempo**: 60-90 minutos en total  
+**Plataforma**: Railway (alternativa más fácil)  
+**Qué contiene**:
+
+- Setup automático desde GitHub
+- Railway PostgreSQL incluido
+- Despliegue sin SSH
+- Dashboard visual
+- Logs en tiempo real
+- Tablita comparativa vs Oracle
+- **Resultado**: Backend corriendo en Railway + Frontend en Netlify
+
+**Usa esto si**: Prefieres interfaz gráfica sobre línea de comandos
+
+---
+
+## 🎯 RUTA RECOMENDADA (ELIGE UNA)
+
+### ✅ Opción 1: Si quieres lo MÁS FÁCIL
+
+```
+PASO 1: Lee
+└─→ DESPLIEGUE_RAILWAY_ALTERNATIVA.md (5 min)
+
+PASO 2: Sigue Paso a Paso (90 min total)
+└─→ Crear cuenta Railway
+└─→ BD PostgreSQL automática
+└─→ Push a GitHub → Deploy
+└─→ Frontend en Netlify
+
+PASO 3: ¡ONLINE en 90 minutos! 🎉
+```
+
+### ✅ Opción 2: Si quieres lo MÁS RÁPIDO (con CLI)
+
+```
+PASO 1: Lee
+└─→ DESPLIEGUE_RAPIDO_60MIN.md (5 min)
+
+PASO 2: Sigue Paso a Paso (60 min total)
+└─→ Crear VM Oracle
+└─→ Instalar todo con comandos
+└─→ Deploy
+
+PASO 3: ¡ONLINE en 60 minutos! 🎉
+```
+
+### ✅ Opción 3: Si quieres lo MÁS COMPLETO (con seguridad)
 
 ```
 PASO 1: Lee
 └─→ MAPA_DECISIONES_DESPLIEGUE.md (5 min)
 
-PASO 2: Elige Tu Ruta
-├─→ Opción A: Rápida (1 hora) → DESPLIEGUE_RAPIDO_60MIN.md
-└─→ Opción B: Completa (2-3 horas) → GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md
+PASO 2: Lee
+└─→ GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md (180 min)
 
-PASO 3: Sigue Paso a Paso
-└─→ Copia comandos
-└─→ Ejecuta en VM
-└─→ Verifica que funciona
+PASO 3: Implementa todo paso a paso
 
-PASO 4: ¡Celebra! 🎉
+PASO 4: ¡Sistema profesional online! 🎉
 ```
 
 ---
@@ -153,19 +199,17 @@ PASO 4: ¡Celebra! 🎉
 
 ## 🎯 TABLA DE REFERENCIA RÁPIDA
 
-| Necesito             | Documento                            | Sección              |
-| -------------------- | ------------------------------------ | -------------------- |
-| Empezar ahora        | DESPLIEGUE_RAPIDO_60MIN.md           | Cualquier parte      |
-| Entender todo        | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 1-6             |
-| Decidir opción       | MAPA_DECISIONES_DESPLIEGUE.md        | Sección 4            |
-| Crear BD             | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 2, Paso 8       |
-| Conectar SSH         | DESPLIEGUE_RAPIDO_60MIN.md           | Paso 2               |
-| Problema con CORS    | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4               |
-| Backup de datos      | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 6               |
-| Certificado SSL      | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4, Paso 1       |
-| Credenciales admin   | GUIA_USUARIOS_ADMIN_PATRON.md        | Resumen Rápido       |
-| Cambiar contraseña   | GUIA_USUARIOS_ADMIN_PATRON.md        | Personalización      |
-| Agregar más usuarios | GUIA_USUARIOS_ADMIN_PATRON.md        | Preguntas Frecuentes |
+| Necesito              | Documento                            | Sección              |
+| --------------------- | ------------------------------------ | -------------------- |
+| **Empezar FÁCIL**     | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | Comando-a-comando    |
+| **Empezar RÁPIDO**    | DESPLIEGUE_RAPIDO_60MIN.md           | Cualquier parte      |
+| **Entender TODO**     | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 1-6             |
+| **Decidir opción**    | MAPA_DECISIONES_DESPLIEGUE.md        | Sección 4            |
+| Desplegar sin Oracle  | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | Plan Rápido          |
+| Problema con BD       | DESPLIEGUE_RAILWAY_ALTERNATIVA.md    | "Cannot connect..."  |
+| Problema con CORS     | GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md | FASE 4               |
+| Credenciales admin    | GUIA_USUARIOS_ADMIN_PATRON.md        | Resumen Rápido       |
+| Cambiar contraseña    | GUIA_USUARIOS_ADMIN_PATRON.md        | Personalización      |
 
 ---
 

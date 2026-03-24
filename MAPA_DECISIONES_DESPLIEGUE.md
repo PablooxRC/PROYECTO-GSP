@@ -52,31 +52,47 @@
  [RUTA 1]      [RUTA 2]      [RUTA 3]
 ```
 
-### RUTA 1: Sin experiencia técnica
+### RUTA 1: Sin experiencia técnica (MÁS FÁCIL)
 
-**Leer primero**: 📄 `DESPLIEGUE_RAPIDO_60MIN.md`
+**Mejor opción**: 📄 `DESPLIEGUE_RAILWAY_ALTERNATIVA.md`
 
-- Sigue paso a paso
-- Copia y pega comandos
-- Máximo 2 horas
-- ✅ Recomendado para ti
+- ✅ Sin SSH ni línea de comandos complejos
+- ✅ Dashboard visual (no terminal)
+- ✅ BD automática incluida
+- ✅ Deploy desde GitHub (click button)
+- **Tiempo**: 60-90 minutos
+- **Dificultad**: Muy fácil (Dashboard web)
 
-### RUTA 2: Experiencia básica
+**Plan**: Crear cuenta → Railway crea todo → Deploy
 
-**Leer primero**: 📄 `GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md`
+---
 
-- Entiende cada paso
-- Puedes personalizarlo
-- Aprovecha todas las features
+### RUTA 2: Experiencia básica (MÁS COMÚN)
 
-### RUTA 3: Experiencia avanzada
+**Mejor opción**: 📄 `DESPLIEGUE_RAPIDO_60MIN.md`
 
-**Opciones extras**:
+- Comandos copy-paste
+- Explicación breve
+- Máquina virtual Oracle
+- **Tiempo**: 60 minutos
+- **Dificultad**: Media
 
-- Docker en Oracle Cloud
-- Kubernetes (overkill para este proyecto)
-- CI/CD con GitHub Actions
-- Monitoreo con Prometheus
+**Plan**: Oracle Cloud → SSH → Instalaciones → Deploy
+
+---
+
+### RUTA 3: Experiencia avanzada (MÁS CONTROL)
+
+**Mejor opción**: 📄 `GUIA_DESPLIEGUE_GRATUITO_COMPLETO.md`
+
+- Explicación detallada de cada paso
+- Configuración profesional
+- Seguridad y SSL
+- Monitoreo y backups
+- **Tiempo**: 120-180 minutos
+- **Dificultad**: Media-Alta
+
+**Plan**: Entender todo → Implementar paso a paso → Producción
 
 ---
 
