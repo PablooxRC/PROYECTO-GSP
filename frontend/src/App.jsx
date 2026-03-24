@@ -5,6 +5,7 @@ import { ScoutProvides } from "./context/scoutContex.jsx";
 import { RegistroProvider } from "./context/registroContex.jsx";
 import Navbar from "./components/navbar/Navbar.jsx";
 import { ProtectedRoute } from "./components/ProtecttedRoute.jsx";
+import { Spinner } from "./components/ui";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -14,16 +15,22 @@ import ScoutFormPage from "./pages/ScoutFormPage";
 import RegistrosPage from "./pages/RegistrosPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
-import AdminRegistrosPage from "./pages/AdminRegistrosPage";
 import AdminCreatePage from "./pages/AdminCreatePage";
 import AdminDirigenteCreate from "./pages/AdminDirigenteCreate";
 import AdminDirigentesPage from "./pages/AdminDirigentesPage";
 import AdminSendReport from "./pages/AdminSendReport";
 
 function App() {
-  const { isAuth, loading } = useAuth();
-  console.log(loading);
-  if (loading) return <h1>cargando.....</h1>;
+  const { isAuth, loading, user } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <Spinner size="lg" text="Cargando aplicación..." />
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -49,7 +56,16 @@ function App() {
                 </ScoutProvides>
               }
             >
-              <Route path="/scouts" element={<ScoutsPage />} />
+              <Route
+                element={
+                  <ProtectedRoute
+                    isAllowed={user?.unidad !== "Dirigente Institucional"}
+                    redirectTo="/registros"
+                  />
+                }
+              >
+                <Route path="/scouts" element={<ScoutsPage />} />
+              </Route>
               <Route path="/scouts/new" element={<ScoutFormPage />} />
               <Route path="/scouts/:ci/edit" element={<ScoutFormPage />} />
             </Route>
@@ -62,7 +78,6 @@ function App() {
               }
             >
               <Route path="/registros" element={<RegistrosPage />} />
-              <Route path="/admin/registros" element={<AdminRegistrosPage />} />
               <Route path="/admin/create" element={<AdminCreatePage />} />
               <Route
                 path="/admin/dirigentes"

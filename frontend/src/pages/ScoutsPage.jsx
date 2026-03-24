@@ -1,23 +1,48 @@
-import { useEffect } from "react"
-import { Button } from '../components/ui/Button.jsx'
-import { Card } from '../components/ui/Card.jsx'
-import { useScout } from "../context/scoutContex.jsx"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from '../context/AuthContext'
-import { PiTrashSimpleLight } from 'react-icons/pi'
-import { BiPencil } from 'react-icons/bi'
+import { useEffect, useState } from "react";
+import { Button, Card, ConfirmModal, Alert } from "../components/ui";
+import { useScout } from "../context/scoutContex.jsx";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { PiTrashSimpleLight } from "react-icons/pi";
+import { BiPencil } from "react-icons/bi";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 function ScoutPage() {
-  const { scouts, loadscouts, deleteScout } = useScout()
-  const navigate = useNavigate()
-  const { user } = useAuth()
+  const { scouts, loadscouts, deleteScout } = useScout();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [toDelete, setToDelete] = useState(null);
+  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
-    loadscouts()
-  }, [])
+    loadscouts();
+  }, []);
+
+  const handleDeleteClick = (scout) => {
+    setToDelete(scout);
+  };
+
+  const confirmDeleteAction = async () => {
+    try {
+      await deleteScout(toDelete.ci);
+      setToDelete(null);
+      await loadscouts();
+      setAlert({ type: "success", message: "Scout eliminado correctamente" });
+    } catch (err) {
+      setToDelete(null);
+      setAlert({
+        type: "error",
+        message: getErrorMessage(err, "Error eliminando scout"),
+      });
+    }
+  };
+
+  const cancelDelete = () => {
+    setToDelete(null);
+  };
 
   function handlePrintReport() {
-    const printWindow = window.open('', '', 'width=800,height=600')
+    const printWindow = window.open("", "", "width=800,height=600");
     const htmlContent = `
       <html>
         <head>
@@ -43,7 +68,9 @@ function ScoutPage() {
               </tr>
             </thead>
             <tbody>
-              ${scouts.map(scout => `
+              ${scouts
+                .map(
+                  (scout) => `
                 <tr>
                   <td>${scout.nombre}</td>
                   <td>${scout.apellido}</td>
@@ -51,17 +78,19 @@ function ScoutPage() {
                   <td>${scout.puntaje ?? 0}</td>
                   <td>${scout.preguntas_mal_contestadas ?? 0}</td>
                 </tr>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </tbody>
           </table>
         </body>
       </html>
-    `
-    printWindow.document.write(htmlContent)
-    printWindow.document.close()
-    printWindow.focus()
-    printWindow.print()
-    printWindow.close()
+    `;
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
   }
 
   return (
@@ -72,6 +101,29 @@ function ScoutPage() {
           Unidad: {user?.unidad || "No disponible"}
         </h1>
       </div>
+
+      {/* Confirm Modal para eliminación */}
+      <ConfirmModal
+        isOpen={!!toDelete}
+        title="Confirmar eliminación"
+        message={
+          toDelete
+            ? `¿Estás seguro de que deseas eliminar a ${toDelete.nombre} ${toDelete.apellido} (C.I.: ${toDelete.ci})? Esta acción no se puede deshacer.`
+            : ""
+        }
+        variant="danger"
+        confirmText="Eliminar"
+        onConfirm={confirmDeleteAction}
+        onCancel={cancelDelete}
+      />
+
+      {alert && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
 
       {/* Acciones */}
       <div className="mb-4 flex gap-4">
@@ -92,16 +144,15 @@ function ScoutPage() {
               </h1>
               <p>{scout.ci}</p>
               <p>Puntaje: {scout.puntaje ?? 0}</p>
-              <p>Preguntas mal contestadas: {scout.preguntas_mal_contestadas ?? 0}</p>
+              <p>
+                Preguntas mal contestadas:{" "}
+                {scout.preguntas_mal_contestadas ?? 0}
+              </p>
             </div>
             <div className="my-2 flex justify-end gap-x-2">
               <Button
                 className="bg-red-500 hover:bg-red-600"
-                onClick={async () => {
-                  if (window.confirm("¿Estas seguro de eliminar esta tarea?")) {
-                    await deleteScout(scout.ci);
-                  }
-                }}
+                onClick={() => handleDeleteClick(scout)}
               >
                 <PiTrashSimpleLight className="text-white" />
                 Eliminar
@@ -115,7 +166,7 @@ function ScoutPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default ScoutPage
+export default ScoutPage;

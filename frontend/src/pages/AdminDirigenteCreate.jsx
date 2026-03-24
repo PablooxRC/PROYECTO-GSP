@@ -1,68 +1,113 @@
-import React, { useEffect } from "react";
-import { Card, Input, Label, Button } from "../components/ui";
+import React, { useEffect, useState } from "react";
+import { Card, Input, Label, Button, Alert } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../api/axios";
+import { getDirigente } from "../api/admin.api";
+import { getPadronByCi } from "../api/padron.api";
 import { useAuth } from "../context/AuthContext";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 function AdminDirigenteCreate() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const params = useParams();
+  const [padronMsg, setPadronMsg] = useState(null);
+  const [alertMsg, setAlertMsg] = useState(null);
+
+  const handleCiBlur = async (e) => {
+    if (params.ci) return;
+    const ci = e.target.value.trim();
+    if (!ci) return;
+    try {
+      const res = await getPadronByCi(ci);
+      const p = res.data;
+      setValue("primer_nombre", p.primer_nombre || "");
+      setValue("segundo_nombre", p.segundo_nombre || "");
+      setValue("primer_apellido", p.primer_apellido || "");
+      setValue("segundo_apellido", p.segundo_apellido || "");
+      setValue(
+        "fecha_nacimiento",
+        p.fecha_nacimiento ? p.fecha_nacimiento.slice(0, 10) : "",
+      );
+      setValue("sexo", p.sexo || "");
+      setValue("unidad", p.unidad || "");
+      setPadronMsg({ type: "ok", text: "✓ Datos cargados desde el padrón" });
+    } catch {
+      setPadronMsg({
+        type: "warn",
+        text: "CI no encontrado en el padrón — completar manualmente",
+      });
+    }
+    setTimeout(() => setPadronMsg(null), 4000);
+  };
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm();
 
   useEffect(() => {
     setValue("grupo", "PANDA");
-    // Si es edición, cargar los datos del dirigente
     if (params.ci) {
       loadDirigente(params.ci);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.ci]);
 
   const loadDirigente = async (ci) => {
     try {
-      const response = await axios.get(`/admin/dirigentes-list`);
-      const dirigentes = response.data;
-      const dirigente = dirigentes.find((d) => d.ci === ci);
-
-      if (dirigente) {
-        setValue("ci", dirigente.ci);
-        setValue("primer_nombre", dirigente.primer_nombre);
-        setValue("segundo_nombre", dirigente.segundo_nombre);
-        setValue("primer_apellido", dirigente.primer_apellido);
-        setValue("segundo_apellido", dirigente.segundo_apellido);
-        setValue("email", dirigente.email);
-        setValue("fecha_nacimiento", dirigente.fecha_nacimiento);
-        setValue("sexo", dirigente.sexo);
-        setValue("unidad", dirigente.unidad);
-        setValue("grupo", dirigente.grupo);
-        setValue("nivel_formacion", dirigente.nivel_formacion);
-        setValue("numero_deposito", dirigente.numero_deposito);
-        setValue("monto", dirigente.monto);
-        setValue("fecha_deposito", dirigente.fecha_deposito);
-        setValue("hora_deposito", dirigente.hora_deposito);
-        setValue("envio", dirigente.envio);
-        setValue("es_colaborador", dirigente.es_colaborador);
-      }
+      const response = await getDirigente(ci);
+      const d = response.data;
+      reset({
+        ci: d.ci,
+        primer_nombre: d.primer_nombre,
+        segundo_nombre: d.segundo_nombre,
+        primer_apellido: d.primer_apellido,
+        segundo_apellido: d.segundo_apellido,
+        email: d.email,
+        fecha_nacimiento: d.fecha_nacimiento
+          ? new Date(d.fecha_nacimiento).toISOString().slice(0, 10)
+          : "",
+        sexo: d.sexo ?? "",
+        unidad: d.unidad ?? "",
+        grupo: d.grupo,
+        nivel_formacion: d.nivel_formacion,
+        numero_deposito: d.numero_deposito,
+        monto: d.monto,
+        fecha_deposito: d.fecha_deposito
+          ? new Date(d.fecha_deposito).toISOString().slice(0, 10)
+          : "",
+        hora_deposito: d.hora_deposito,
+        envio: d.envio,
+        es_colaborador: d.es_colaborador,
+      });
     } catch (err) {
       console.error("Error cargando dirigente:", err);
-      alert("Error cargando datos del dirigente");
+      setAlertMsg({
+        type: "error",
+        message: "Error cargando datos del dirigente",
+      });
     }
   };
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // Asegurar que datos críticos sean del tipo correcto
+      // Asegurar que datos críticos sean del tipo correcto y undefined se convierta a null
       const submitData = {
         ...data,
-        ci: String(data.ci),
         monto: data.monto ? parseFloat(data.monto) : null,
         es_colaborador: data.es_colaborador ? true : false,
+        fecha_deposito: data.fecha_deposito || null,
+        fecha_nacimiento: data.fecha_nacimiento || null,
+        segundo_nombre: data.segundo_nombre || null,
+        segundo_apellido: data.segundo_apellido || null,
+        nivel_formacion: data.nivel_formacion || null,
+        numero_deposito: data.numero_deposito || null,
+        hora_deposito: data.hora_deposito || null,
+        envio: data.envio || null,
       };
 
       if (params.ci) {
@@ -72,9 +117,18 @@ function AdminDirigenteCreate() {
         // Crear nuevo dirigente
         await axios.post("/admin/dirigentes", submitData);
       }
-      navigate("/admin/dirigentes");
+      setAlertMsg({
+        type: "success",
+        message: params.ci
+          ? "Dirigente actualizado correctamente"
+          : "Dirigente creado correctamente",
+      });
+      setTimeout(() => navigate("/admin/dirigentes"), 1500);
     } catch (err) {
-      alert(err?.response?.data?.message || "Error guardando dirigente");
+      setAlertMsg({
+        type: "error",
+        message: getErrorMessage(err, "Error guardando dirigente"),
+      });
     }
   });
 
@@ -86,16 +140,26 @@ function AdminDirigenteCreate() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-lg">
         <h2 className="text-2xl font-bold mb-4">{pageTitle}</h2>
+
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <Label>Cédula de Identidad</Label>
             <Input
               type="text"
-              {...register("ci", { required: true })}
-              disabled={params.ci ? true : false}
+              {...register("ci", { required: "CI es obligatorio" })}
+              disabled={!!params.ci}
+              placeholder="Ej: 12345678"
+              onBlur={handleCiBlur}
             />
+            {padronMsg && (
+              <p
+                className={`text-sm mt-1 ${padronMsg.type === "ok" ? "text-green-400" : "text-yellow-400"}`}
+              >
+                {padronMsg.text}
+              </p>
+            )}
             {errors.ci && (
-              <p className="text-red-500 text-sm">CI es requerido</p>
+              <p className="text-red-500 text-sm">{errors.ci.message}</p>
             )}
           </div>
 
@@ -123,7 +187,13 @@ function AdminDirigenteCreate() {
 
           <div>
             <Label>Email</Label>
-            <Input type="email" {...register("email")} />
+            <Input
+              type="email"
+              {...register("email", { required: "Email es obligatorio" })}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -158,6 +228,9 @@ function AdminDirigenteCreate() {
               <option value="Tiburones">Tiburones</option>
               <option value="Locotos">Locotos</option>
               <option value="Clan Destino">Clan Destino</option>
+              <option value="Dirigente Institucional">
+                Dirigente Institucional
+              </option>
             </select>
           </div>
 
@@ -191,11 +264,7 @@ function AdminDirigenteCreate() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Fecha de Depósito</Label>
-              <Input
-                type="date"
-                defaultValue={new Date().toISOString().split("T")[0]}
-                {...register("fecha_deposito")}
-              />
+              <Input type="date" {...register("fecha_deposito")} />
             </div>
             <div>
               <Label>Hora de Depósito</Label>
@@ -229,6 +298,14 @@ function AdminDirigenteCreate() {
             {params.ci ? "Guardar Cambios" : "Registrar Dirigente"}
           </Button>
         </form>
+
+        {alertMsg && (
+          <Alert
+            type={alertMsg.type}
+            message={alertMsg.message}
+            onClose={() => setAlertMsg(null)}
+          />
+        )}
       </Card>
     </div>
   );

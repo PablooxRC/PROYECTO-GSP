@@ -67,6 +67,9 @@ function RegisterPage() {
             <option value="Tiburones">Tiburones</option>
             <option value="Locotos">Locotos</option>
             <option value="Clan Destino">Clan Destino</option>
+            <option value="Dirigente Institucional">
+              Dirigente Institucional
+            </option>
           </select>
           {errors.unidad && (
             <p className="text-red-500"> La unidad es requerida</p>

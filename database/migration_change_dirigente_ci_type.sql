@@ -1,9 +1,9 @@
 -- Cambiar el tipo de CI en tabla dirigente de INTEGER a VARCHAR
 ALTER TABLE scouts 
-DROP CONSTRAINT scouts_dirigente_ci_fkey;
+DROP CONSTRAINT IF EXISTS scouts_dirigente_ci_fkey;
 
 ALTER TABLE dirigente 
-DROP CONSTRAINT dirigente_pkey CASCADE;
+DROP CONSTRAINT IF EXISTS dirigente_pkey CASCADE;
 
 ALTER TABLE dirigente 
 ALTER COLUMN ci TYPE VARCHAR(20);
@@ -15,7 +15,6 @@ ADD CONSTRAINT dirigente_pkey PRIMARY KEY (ci);
 ALTER TABLE scouts 
 ALTER COLUMN dirigente_ci TYPE VARCHAR(20);
 
-ALTER TABLE scouts 
-ADD CONSTRAINT scouts_dirigente_ci_fkey FOREIGN KEY (dirigente_ci) REFERENCES dirigente(ci);
+-- FK eliminada intencionalmente: scouts.dirigente_ci puede apuntar a dirigente o perfiles
 
 CREATE INDEX IF NOT EXISTS idx_dirigente_ci ON dirigente(ci);

@@ -3,6 +3,7 @@ import { Card, Input, Label, Button } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useScout } from "../context/scoutContex.jsx";
+import { getPadronByCi } from "../api/padron.api";
 
 function ScoutFormPage() {
   const {
@@ -11,6 +12,7 @@ function ScoutFormPage() {
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm();
   const navigate = useNavigate();
   const {
@@ -22,14 +24,63 @@ function ScoutFormPage() {
   } = useScout();
   const params = useParams();
   const esBeca = watch("es_beca");
+  const [padronMsg, setPadronMsg] = useState(null);
+
+  const handleCiBlur = async (e) => {
+    if (params.ci) return; // no auto-fill al editar
+    const ci = e.target.value.trim();
+    if (!ci) return;
+    try {
+      const res = await getPadronByCi(ci);
+      const p = res.data;
+      setValue("primer_nombre", p.primer_nombre || "");
+      setValue("segundo_nombre", p.segundo_nombre || "");
+      setValue("primer_apellido", p.primer_apellido || "");
+      setValue("segundo_apellido", p.segundo_apellido || "");
+      setValue(
+        "fecha_nacimiento",
+        p.fecha_nacimiento ? p.fecha_nacimiento.slice(0, 10) : "",
+      );
+      setValue("sexo", p.sexo || "M");
+      setValue("unidad", p.unidad || "");
+      setValue("colegio", p.colegio || "");
+      if (p.contacto_nombre || p.contacto_parentesco) {
+        setValue(
+          "contacto_emergencia_nombre_parentesco",
+          [p.contacto_nombre, p.contacto_parentesco]
+            .filter(Boolean)
+            .join(" - "),
+        );
+      }
+      setValue("contacto_emergencia_celular", p.contacto_celular || "");
+      setPadronMsg({ type: "ok", text: "✓ Datos cargados desde el padrón" });
+    } catch {
+      setPadronMsg({
+        type: "warn",
+        text: "CI no encontrado en el padrón — completar manualmente",
+      });
+    }
+    setTimeout(() => setPadronMsg(null), 4000);
+  };
 
   const onSubmit = handleSubmit(async (data) => {
     setErrors([]);
+    // Sanear tipos antes de enviar
+    const payload = {
+      ...data,
+      monto:
+        data.monto === "" || data.monto === undefined || isNaN(data.monto)
+          ? null
+          : Number(data.monto),
+      es_beca: data.es_beca === true || data.es_beca === "true",
+      fecha_nacimiento: data.fecha_nacimiento ? data.fecha_nacimiento : null,
+      fecha_deposito: data.fecha_deposito ? data.fecha_deposito : null,
+    };
     let scout;
     if (!params.ci) {
-      scout = await createScout(data);
+      scout = await createScout(payload);
     } else {
-      scout = await updateScout(params.ci, data);
+      scout = await updateScout(params.ci, payload);
     }
     if (scout) {
       navigate("/scouts");
@@ -40,32 +91,35 @@ function ScoutFormPage() {
     setErrors([]);
     if (params.ci) {
       loadScout(params.ci).then((scout) => {
-        setValue("ci", scout.ci);
-        setValue("primer_nombre", scout.primer_nombre);
-        setValue("segundo_nombre", scout.segundo_nombre);
-        setValue("primer_apellido", scout.primer_apellido);
-        setValue("segundo_apellido", scout.segundo_apellido);
-        setValue("fecha_nacimiento", scout.fecha_nacimiento);
-        setValue("sexo", scout.sexo);
-        setValue("grupo", scout.grupo);
-        setValue("rama", scout.rama);
-        setValue("unidad", scout.unidad);
-        setValue("etapa", scout.etapa);
-        setValue("curso", scout.curso);
-        setValue("colegio", scout.colegio);
-        setValue("numero_deposito", scout.numero_deposito);
-        setValue("monto", scout.monto);
-        setValue("es_beca", scout.es_beca);
-        setValue("tipo_beca", scout.tipo_beca);
-        setValue(
-          "contacto_emergencia_nombre_parentesco",
-          scout.contacto_emergencia_nombre_parentesco,
-        );
-        setValue(
-          "contacto_emergencia_celular",
-          scout.contacto_emergencia_celular,
-        );
-        setValue("envio", scout.envio);
+        reset({
+          ci: scout.ci,
+          primer_nombre: scout.primer_nombre,
+          segundo_nombre: scout.segundo_nombre,
+          primer_apellido: scout.primer_apellido,
+          segundo_apellido: scout.segundo_apellido,
+          fecha_nacimiento: scout.fecha_nacimiento
+            ? new Date(scout.fecha_nacimiento).toISOString().slice(0, 10)
+            : undefined,
+          sexo: scout.sexo ?? "M",
+          grupo: scout.grupo,
+          rama: scout.rama ?? "",
+          unidad: scout.unidad ?? "",
+          etapa: scout.etapa,
+          curso: scout.curso,
+          colegio: scout.colegio,
+          numero_deposito: scout.numero_deposito,
+          monto: scout.monto,
+          es_beca: scout.es_beca,
+          tipo_beca: scout.tipo_beca,
+          contacto_emergencia_nombre_parentesco:
+            scout.contacto_emergencia_nombre_parentesco,
+          contacto_emergencia_celular: scout.contacto_emergencia_celular,
+          fecha_deposito: scout.fecha_deposito
+            ? new Date(scout.fecha_deposito).toISOString().slice(0, 10)
+            : undefined,
+          hora_deposito: scout.hora_deposito,
+          envio: scout.envio,
+        });
       });
     } else {
       setValue("grupo", "PANDA");
@@ -100,7 +154,15 @@ function ScoutFormPage() {
               placeholder="Ingresa el CI"
               type="text"
               {...register("ci", { required: "El CI es requerido" })}
+              onBlur={handleCiBlur}
             />
+            {padronMsg && (
+              <p
+                className={`text-sm mt-1 ${padronMsg.type === "ok" ? "text-green-400" : "text-yellow-400"}`}
+              >
+                {padronMsg.text}
+              </p>
+            )}
             {errors.ci && (
               <p className="text-red-500 text-sm">{errors.ci.message}</p>
             )}
@@ -278,11 +340,7 @@ function ScoutFormPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="fecha_deposito">Fecha de Depósito</Label>
-              <Input
-                type="date"
-                defaultValue={new Date().toISOString().split("T")[0]}
-                {...register("fecha_deposito")}
-              />
+              <Input type="date" {...register("fecha_deposito")} />
             </div>
             <div>
               <Label htmlFor="hora_deposito">Hora de Depósito</Label>

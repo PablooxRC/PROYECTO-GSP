@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Button } from "../components/ui";
+import { Card, Button, ConfirmModal } from "../components/ui";
 import { useRegistro } from "../context/registroContex";
 import { useAuth } from "../context/AuthContext";
 import { PiTrashSimpleLight } from "react-icons/pi";
 import { BiPencil } from "react-icons/bi";
+import { formatDate } from "../utils/formatDate";
 
 function RegistrosPage() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ function RegistrosPage() {
   } = useRegistro();
   const { user } = useAuth();
   const [unidadFiltro, setUnidadFiltro] = useState("Todas");
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   // unidades ahora viene del provider; mostrar 'Todas' por defecto
   const opcionesUnidades = ["Todas", ...(unidades || [])];
@@ -35,10 +37,13 @@ function RegistrosPage() {
     if (user?.is_admin && typeof loadUnidades === "function") loadUnidades();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (window.confirm("¿Estás seguro de eliminar este registro?")) {
-      await deleteRegistro(id);
-    }
+  const handleDelete = (id) => {
+    setConfirmDelete(id);
+  };
+
+  const executeDelete = async () => {
+    await deleteRegistro(confirmDelete);
+    setConfirmDelete(null);
   };
 
   return (
@@ -122,7 +127,12 @@ function RegistrosPage() {
                   {registro.fecha_deposito && (
                     <p className="text-sm text-white">
                       <strong>Fecha:</strong>{" "}
-                      {new Date(registro.fecha_deposito).toLocaleDateString()}
+                      {formatDate(registro.fecha_deposito)}
+                    </p>
+                  )}
+                  {registro.hora_deposito && (
+                    <p className="text-sm text-white">
+                      <strong>Hora:</strong> {registro.hora_deposito}
                     </p>
                   )}
                   {registro.monto && (
@@ -189,6 +199,16 @@ function RegistrosPage() {
           </p>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Eliminar registro"
+        message="¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer."
+        variant="danger"
+        confirmText="Eliminar"
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

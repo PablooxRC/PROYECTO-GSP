@@ -1,13 +1,19 @@
-import pg from 'pg'
+import pg from "pg";
+import config from "./config.js";
 
 export const pool = new pg.Pool({
-    port: 5432,
-    host: 'localhost',
-    user: 'postgres',
-    password: '12345678',
-    database: 'Scouts'
-})
+  host: config.DB_HOST,
+  port: config.DB_PORT,
+  user: config.DB_USER,
+  password: config.DB_PASSWORD,
+  database: config.DB_NAME,
+  max: config.DB_MAX_CONNECTIONS,
+});
 
-pool.on('connect', ()=> {
-    console.log('Server on port', 3000)
-})
+pool.on("connect", () => {
+  console.log("Conexión a BD establecida");
+});
+
+pool.on("error", (err) => {
+  console.error("Error inesperado en pool de BD:", err.message);
+});

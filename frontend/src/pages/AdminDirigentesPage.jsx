@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button } from "../components/ui";
+import { Card, Button, ConfirmModal, Alert } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PiTrashSimpleLight } from "react-icons/pi";
 import { BiPencil } from "react-icons/bi";
 import adminApi from "../api/admin.api";
+import { formatDate } from "../utils/formatDate";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 function AdminDirigentesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [dirigentes, setDirigentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
     loadDirigentes();
-  }, []);
+  }, [location]);
 
   const loadDirigentes = async () => {
     try {
@@ -24,21 +29,32 @@ function AdminDirigentesPage() {
       setDirigentes(response.data);
       setError(null);
     } catch (err) {
-      setError(err?.response?.data?.message || "Error cargando dirigentes");
+      setError(getErrorMessage(err, "Error cargando dirigentes"));
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (ci) => {
-    if (window.confirm("¿Estás seguro de eliminar este dirigente?")) {
-      try {
-        await adminApi.deleteDirigente(ci);
-        await loadDirigentes();
-      } catch (err) {
-        alert(err?.response?.data?.message || "Error eliminando dirigente");
-      }
+  const handleDelete = (ci) => {
+    setConfirmDelete(ci);
+  };
+
+  const executeDelete = async () => {
+    try {
+      await adminApi.deleteDirigente(confirmDelete);
+      setConfirmDelete(null);
+      setAlert({
+        type: "success",
+        message: "Dirigente eliminado correctamente",
+      });
+      await loadDirigentes();
+    } catch (err) {
+      setConfirmDelete(null);
+      setAlert({
+        type: "error",
+        message: getErrorMessage(err, "Error eliminando dirigente"),
+      });
     }
   };
 
@@ -133,7 +149,7 @@ function AdminDirigentesPage() {
 
                 <p className="text-xs text-gray-500 mt-2">
                   Registrado:{" "}
-                  {new Date(dirigente.create_at).toLocaleDateString("es-ES")}
+                  {formatDate(dirigente.fecha_deposito || dirigente.create_at)}
                 </p>
               </div>
 
@@ -158,6 +174,24 @@ function AdminDirigentesPage() {
             </Card>
           ))}
         </div>
+      )}
+
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Eliminar dirigente"
+        message="¿Estás seguro de eliminar este dirigente? Esta acción no se puede deshacer."
+        variant="danger"
+        confirmText="Eliminar"
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
+
+      {alert && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
       )}
     </div>
   );

@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
-import { Card, Input, Label, Button } from "../components/ui";
+import React, { useEffect, useState } from "react";
+import { Card, Input, Label, Button, Alert } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 function AdminCreatePage() {
   const navigate = useNavigate();
   const { user, setErrors } = useAuth();
+  const [alert, setAlert] = useState(null);
   const {
     register,
     handleSubmit,
@@ -15,17 +17,19 @@ function AdminCreatePage() {
   } = useForm();
 
   useEffect(() => {
-    // limpiar posibles errores globales
     if (setErrors) setErrors(null);
-  }, []);
+  }, [setErrors]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await axios.post("/admins", data);
-      navigate("/admin/registros");
+      await axios.post("/admin", data);
+      setAlert({ type: "success", message: "Admin creado correctamente" });
+      setTimeout(() => navigate("/admin/dirigentes"), 1500);
     } catch (err) {
-      // mostrar error simple dentro del form
-      alert(err?.response?.data?.message || "Error al crear admin");
+      setAlert({
+        type: "error",
+        message: getErrorMessage(err, "Error al crear admin"),
+      });
     }
   });
 
@@ -37,14 +41,6 @@ function AdminCreatePage() {
         <h2 className="text-2xl font-bold mb-4">Crear Admin</h2>
 
         <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <Label>C.I.</Label>
-            <Input type="number" {...register("ci", { required: true })} />
-            {errors.ci && (
-              <p className="text-red-500 text-sm">CI es requerido</p>
-            )}
-          </div>
-
           <div>
             <Label>Nombre</Label>
             <Input {...register("nombre", { required: true })} />
@@ -80,6 +76,9 @@ function AdminCreatePage() {
               <option value="Tiburones">Tiburones</option>
               <option value="Locotos">Locotos</option>
               <option value="Clan Destino">Clan Destino</option>
+              <option value="Dirigente Institucional">
+                Dirigente Institucional
+              </option>
             </select>
           </div>
 
@@ -98,6 +97,14 @@ function AdminCreatePage() {
             Crear Admin
           </Button>
         </form>
+
+        {alert && (
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
+        )}
       </Card>
     </div>
   );

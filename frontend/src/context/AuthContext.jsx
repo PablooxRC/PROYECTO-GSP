@@ -20,6 +20,30 @@ export function AuthProvider({ children }) {
   const [errors, setErrors] = useState(null); // Lo mantendremos como null. Si hay errores, será un array de strings.
   const [loading, setLoading] = useState(true); // Indica si se está verificando la sesión inicial
 
+  const getErrorMessages = (error, fallbackMessage) => {
+    const responseData = error?.response?.data;
+
+    if (Array.isArray(responseData?.error)) return responseData.error;
+    if (Array.isArray(responseData?.errors)) return responseData.errors;
+    if (typeof responseData?.error?.message === "string") {
+      return [responseData.error.message];
+    }
+    if (typeof responseData?.message === "string")
+      return [responseData.message];
+
+    if (error?.code === "ERR_NETWORK") {
+      return [
+        "No se pudo conectar con el servidor. Verifica que el backend este ejecutandose.",
+      ];
+    }
+
+    if (error?.response?.status === 401) {
+      return ["Correo o contrasena incorrectos."];
+    }
+
+    return [fallbackMessage];
+  };
+
   // Función para iniciar sesión
   const signin = async (data) => {
     setErrors(null); // 1. Limpiar errores anteriores al inicio de cada intento de login
@@ -31,20 +55,7 @@ export function AuthProvider({ children }) {
       return res.data.data; // Devuelve los datos del usuario en caso de éxito
     } catch (error) {
       console.log("Error en signin:", error.response || error); // Log más descriptivo para depuración
-
-      // 2. Manejo de errores basado en la respuesta del backend
-      const responseData = error?.response?.data;
-
-      if (Array.isArray(responseData?.error)) {
-        // Si el backend envía { error: ["Mensaje1", "Mensaje2"] }
-        setErrors(responseData.error);
-      } else if (typeof responseData?.message === "string") {
-        // Si el backend envía { message: "Un solo mensaje de error" }
-        setErrors([responseData.message]);
-      } else {
-        // Error genérico para otros casos (problemas de red, servidor no responde, etc.)
-        setErrors(["Ocurrió un error desconocido al iniciar sesión."]);
-      }
+      setErrors(getErrorMessages(error, "Ocurrio un error al iniciar sesion."));
 
       setUser(null); // 3. Asegura que el usuario sea nulo en caso de fallo
       setIsAuth(false); // 4. Asegura que NO esté autenticado en caso de fallo
@@ -59,20 +70,13 @@ export function AuthProvider({ children }) {
     try {
       const res = await axios.post("/signup", data); // Asegúrate que esta ruta coincida con tu backend
       console.log("Respuesta de signup exitoso:", res.data);
-      setUser(res.data);
+      setUser(res.data.data);
       setIsAuth(true);
       return res.data;
     } catch (error) {
       console.log("Error en signup:", error.response || error);
 
-      const responseData = error?.response?.data;
-      if (Array.isArray(responseData?.error)) {
-        setErrors(responseData.error);
-      } else if (typeof responseData?.message === "string") {
-        setErrors([responseData.message]);
-      } else {
-        setErrors(["Ocurrió un error desconocido al registrarse."]);
-      }
+      setErrors(getErrorMessages(error, "Ocurrio un error al registrarse."));
       setUser(null);
       setIsAuth(false);
       return null; // ¡IMPORTANTE! Devuelve null para indicar que el registro falló
@@ -96,32 +100,18 @@ export function AuthProvider({ children }) {
   // useEffect para verificar la autenticación al cargar la aplicación
   useEffect(() => {
     const checkLogin = async () => {
-      setLoading(true); // Indica que estamos verificando
-      const token = Cookie.get("token"); // Obtiene el token de la cookie
-      if (token) {
-        try {
-          // Intenta obtener el perfil del usuario usando el token
-          const res = await axios.get("/profile"); // Asegúrate que esta ruta coincida con tu backend
-          setUser(res.data.data);
-          setIsAuth(true);
-          setErrors(null); // Asegura que no haya errores si la sesión es válida
-        } catch (err) {
-          // Si el token es inválido, expirado o el backend falla
-          console.log(
-            "Error al verificar sesión con token:",
-            err.response || err,
-          );
-          setUser(null);
-          setIsAuth(false);
-          Cookie.remove("token"); // Elimina el token inválido del navegador
-          // setErrors(['Tu sesión ha expirado o es inválida. Inicia sesión de nuevo.']); // Opcional: mostrar un mensaje de error persistente
-        }
-      } else {
-        // No hay token, entonces no está autenticado
+      setLoading(true);
+      try {
+        // La cookie httpOnly se envía automáticamente con withCredentials
+        const res = await axios.get("/profile");
+        setUser(res.data.data);
+        setIsAuth(true);
+        setErrors(null);
+      } catch (err) {
         setUser(null);
         setIsAuth(false);
       }
-      setLoading(false); // Finaliza la carga, la app está lista para renderizar
+      setLoading(false);
     };
 
     checkLogin(); // Llama a la función para verificar el login

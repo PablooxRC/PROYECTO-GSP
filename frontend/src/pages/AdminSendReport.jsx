@@ -1,7 +1,12 @@
 import { useState } from "react";
-import { sendReport, getScoutsAdmin, getDirigentes } from "../api/admin.api";
+import {
+  sendReport,
+  getScoutsAdmin,
+  getDirigentesForReport,
+} from "../api/admin.api";
 import axios from "../api/axios";
 import { Card } from "../components/ui";
+import { formatDate } from "../utils/formatDate";
 
 export default function AdminSendReport() {
   const [from, setFrom] = useState("");
@@ -43,11 +48,26 @@ export default function AdminSendReport() {
       const scoutsResponse = await getScoutsAdmin(from, to);
 
       // Obtener todos los dirigentes
-      const dirigentesResponse = await getDirigentes();
+      const dirigentesResponse = await getDirigentesForReport();
+
+      // Filtrar dirigentes por fecha de depósito
+      let dirigentesFiltrados = dirigentesResponse.data;
+      if (from || to) {
+        dirigentesFiltrados = dirigentesResponse.data.filter((d) => {
+          if (!d.fecha_deposito) return false;
+
+          // Convertir fechas a formato YYYY-MM-DD para comparación
+          const fechaDirigente = d.fecha_deposito.slice(0, 10);
+
+          if (from && fechaDirigente < from) return false;
+          if (to && fechaDirigente > to) return false;
+          return true;
+        });
+      }
 
       setRegistros(registrosResponse.data);
       setScouts(scoutsResponse.data);
-      setDirigentes(dirigentesResponse.data);
+      setDirigentes(dirigentesFiltrados);
       setShowPreview(true);
 
       const scoutsConRegistro = new Set(
@@ -59,7 +79,7 @@ export default function AdminSendReport() {
 
       setMessage({
         type: "info",
-        text: `Se encontraron ${registrosResponse.data.length} registros, ${scoutsSinRegistro.length} scouts sin registro`,
+        text: `Se encontraron ${registrosResponse.data.length} registros, ${scoutsSinRegistro.length} scouts sin registro, ${dirigentesFiltrados.length} dirigentes`,
       });
     } catch (err) {
       console.error("Error:", err);
@@ -74,24 +94,90 @@ export default function AdminSendReport() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage(null);
+  const handleDownloadExcel = async () => {
     try {
-      await sendReport({
-        from: from || null,
-        to: to || null,
-        recipient_email: email || null,
-        imagenBase64: imagenBase64 || null,
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (from) params.append("from", from);
+      if (to) params.append("to", to);
+
+      const url = `/admin/download-report${params.toString() ? "?" + params.toString() : ""}`;
+      const response = await axios.get(url, {
+        responseType: "blob",
       });
-      setMessage({ type: "success", text: "Reporte enviado correctamente" });
-      setShowPreview(false);
-      setRegistros([]);
+
+      // Crear un blob y descargar
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `reporte-${from || "inicio"}-${to || "fin"}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(link.href);
+
+      setMessage({
+        type: "success",
+        text: "Reporte descargado correctamente",
+      });
     } catch (err) {
       setMessage({
         type: "error",
-        text: err?.response?.data?.message || err.message || "Error",
+        text:
+          err?.response?.data?.message ||
+          err.message ||
+          "Error descargando reporte",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validación simple
+    if (!email) {
+      setMessage({
+        type: "error",
+        text: "Por favor ingresa un email para enviar el reporte",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      console.log("Enviando reporte con email:", email);
+
+      await sendReport({
+        from,
+        to,
+        email: email,
+        imagenBase64,
+      });
+
+      setMessage({
+        type: "success",
+        text: `Reporte enviado correctamente a ${email}`,
+      });
+
+      // Limpiar formulario
+      setFrom("");
+      setTo("");
+      setEmail("");
+      setImagenBase64(null);
+      setImagenNombre("Sin imagen seleccionada");
+      setShowPreview(false);
+    } catch (err) {
+      console.error("Error en handleSubmit:", err);
+      setMessage({
+        type: "error",
+        text:
+          err?.response?.data?.message ||
+          err.message ||
+          "Error enviando reporte",
       });
     } finally {
       setLoading(false);
@@ -173,8 +259,8 @@ export default function AdminSendReport() {
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition"
+              disabled={loading || !email}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition disabled:opacity-50"
             >
               {loading ? "Enviando..." : "📧 Enviar Reporte"}
             </button>
@@ -197,6 +283,16 @@ export default function AdminSendReport() {
 
         {showPreview && (
           <div>
+            <div className="mb-4 flex gap-3">
+              <button
+                type="button"
+                onClick={handleDownloadExcel}
+                disabled={loading}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition"
+              >
+                {loading ? "Descargando..." : "📥 Descargar Excel"}
+              </button>
+            </div>
             <h2 className="text-2xl font-bold mb-4">
               VISTA PREVIA ({registros.length} registros,{" "}
               {
@@ -207,10 +303,13 @@ export default function AdminSendReport() {
               scouts sin registro)
             </h2>
 
-            {registros.length === 0 && scouts.length === 0 ? (
+            {registros.length === 0 &&
+            scouts.length === 0 &&
+            dirigentes.length === 0 ? (
               <Card className="p-8 text-center">
                 <p className="text-gray-400">
-                  No hay scouts ni registros en el rango de fechas seleccionado
+                  No hay scouts, registros ni dirigentes en el rango de fechas
+                  seleccionado
                 </p>
               </Card>
             ) : (
@@ -251,11 +350,7 @@ export default function AdminSendReport() {
                                 Fecha Depósito
                               </p>
                               <p className="text-sm">
-                                {registro.fecha_deposito
-                                  ? new Date(
-                                      registro.fecha_deposito,
-                                    ).toLocaleDateString()
-                                  : "-"}
+                                {formatDate(registro.fecha_deposito)}
                               </p>
                             </div>
                           </div>
@@ -412,6 +507,13 @@ export default function AdminSendReport() {
                             <p className="text-gray-300 mb-3">
                               <strong>Unidad:</strong> {dirigente.unidad || "-"}
                             </p>
+
+                            {dirigente.fecha_deposito && (
+                              <p className="text-gray-300 mb-3">
+                                <strong>Fecha Depósito:</strong>{" "}
+                                {formatDate(dirigente.fecha_deposito)}
+                              </p>
+                            )}
 
                             <div className="bg-gray-700 p-3 rounded mb-3">
                               <p className="text-gray-400 text-sm">Envío</p>
