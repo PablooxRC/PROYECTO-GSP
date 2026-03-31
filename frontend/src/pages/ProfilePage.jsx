@@ -1,6 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { Card } from "../components/ui/Card.jsx";
+import { Card } from "../components/ui";
 function ProfilePage() {
   const { user } = useAuth();
   return (
