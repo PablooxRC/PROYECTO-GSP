@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Input, Button, Label } from "../components/ui/index.js";
+import { Card, Input, Button, Label } from "../components/ui";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext.jsx";

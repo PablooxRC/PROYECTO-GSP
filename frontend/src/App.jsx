@@ -5,7 +5,7 @@ import { ScoutProvides } from "./context/scoutContex.jsx";
 import { RegistroProvider } from "./context/registroContex.jsx";
 import Navbar from "./components/navbar/Navbar.jsx";
 import { ProtectedRoute } from "./components/ProtecttedRoute.jsx";
-import { Spinner } from "./components/ui/index.js";
+import { Spinner } from "./components/ui";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";

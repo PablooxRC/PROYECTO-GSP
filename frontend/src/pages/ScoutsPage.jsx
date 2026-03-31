@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, ConfirmModal, Alert } from "../components/ui/index.js";
+import { Button, Card, ConfirmModal, Alert } from "../components/ui";
 import { useScout } from "../context/scoutContex.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";

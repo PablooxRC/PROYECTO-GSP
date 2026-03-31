@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Input, Label, Button, Alert } from "../components/ui/index.js";
+import { Card, Input, Label, Button, Alert } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";

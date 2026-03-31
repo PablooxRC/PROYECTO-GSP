@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, ConfirmModal, Alert } from "../components/ui/index.js";
+import { Card, Button, ConfirmModal, Alert } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PiTrashSimpleLight } from "react-icons/pi";

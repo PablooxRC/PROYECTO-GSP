@@ -5,7 +5,7 @@ import {
   getDirigentesForReport,
 } from "../api/admin.api";
 import axios from "../api/axios";
-import { Card } from "../components/ui/index.js";
+import { Card } from "../components/ui";
 import { formatDate } from "../utils/formatDate";
 
 export default function AdminSendReport() {
