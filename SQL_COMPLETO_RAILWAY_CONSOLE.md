@@ -148,13 +148,13 @@ ALTER TABLE dirigente
 DROP CONSTRAINT IF EXISTS dirigente_pkey CASCADE;
 
 ALTER TABLE dirigente
-ALTER COLUMN ci TYPE VARCHAR(20);
+ALTER COLUMN ci TYPE VARCHAR(50);
 
 ALTER TABLE dirigente
 ADD CONSTRAINT dirigente_pkey PRIMARY KEY (ci);
 
 ALTER TABLE scouts
-ALTER COLUMN dirigente_ci TYPE VARCHAR(20);
+ALTER COLUMN dirigente_ci TYPE VARCHAR(50);
 
 CREATE INDEX IF NOT EXISTS idx_dirigente_ci ON dirigente(ci);
 
@@ -170,6 +170,13 @@ ALTER COLUMN envio TYPE TEXT;
 -- ============================================
 
 ALTER TABLE scouts ALTER COLUMN ci TYPE VARCHAR(20);
+
+-- ============================================
+-- CONVERSIÓN PREVIA: Expandir tipos antes de FK
+-- ============================================
+
+ALTER TABLE dirigente ALTER COLUMN ci TYPE VARCHAR(50);
+ALTER TABLE scouts ALTER COLUMN dirigente_ci TYPE VARCHAR(50);
 
 -- ============================================
 -- MIGRACIÓN 14: create_padron
@@ -223,18 +230,19 @@ DELETE FROM dirigente WHERE admin_registrado = FALSE AND is_admin = FALSE;
 CREATE INDEX IF NOT EXISTS idx_perfiles_email ON perfiles(email);
 
 -- ============================================
--- MIGRACIÓN 16: create_registros_table
+-- MIGRACIÓN 16: create_registros_table (TIPOS CORRECTOS)
 -- ============================================
 
-CREATE TABLE registros (
+CREATE TABLE IF NOT EXISTS registros (
     id SERIAL PRIMARY KEY,
-    scout_ci INTEGER NOT NULL REFERENCES scouts(ci) ON DELETE CASCADE,
+    scout_ci VARCHAR(20) NOT NULL REFERENCES scouts(ci) ON DELETE CASCADE,
     unidad VARCHAR(255),
     etapa_progresion VARCHAR(255),
     colegio VARCHAR(255),
     curso VARCHAR(255),
     numero_deposito VARCHAR(255),
     fecha_deposito DATE,
+    hora_deposito TIME,
     monto NUMERIC(10, 2),
     envio VARCHAR(500),
     contacto_parentesco VARCHAR(255),
@@ -242,21 +250,21 @@ CREATE TABLE registros (
     contacto_celular VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    dirigente_ci INTEGER NOT NULL
+    dirigente_ci VARCHAR(50) NOT NULL REFERENCES dirigente(ci)
 );
 
-CREATE INDEX idx_registros_scout_ci ON registros(scout_ci);
-CREATE INDEX idx_registros_dirigente_ci ON registros(dirigente_ci);
-CREATE INDEX idx_registros_fecha_deposito ON registros(fecha_deposito);
+CREATE INDEX IF NOT EXISTS idx_registros_scout_ci ON registros(scout_ci);
+CREATE INDEX IF NOT EXISTS idx_registros_dirigente_ci ON registros(dirigente_ci);
+CREATE INDEX IF NOT EXISTS idx_registros_fecha_deposito ON registros(fecha_deposito);
 
 -- ============================================
--- MIGRACIÓN 17: create_report_logs
+-- MIGRACIÓN 17: create_report_logs (TIPOS CORRECTOS)
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS report_logs (
   id SERIAL PRIMARY KEY,
   sent_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  sent_by INTEGER REFERENCES dirigente(ci),
+  sent_by VARCHAR(50) REFERENCES dirigente(ci),
   "from" DATE,
   "to" DATE,
   recipient_email VARCHAR(255)
@@ -265,12 +273,11 @@ CREATE TABLE IF NOT EXISTS report_logs (
 CREATE INDEX IF NOT EXISTS idx_report_logs_sent_at ON report_logs(sent_at);
 
 -- ============================================
--- MIGRACIÓN 18: expand_ci_varchar
+-- MIGRACIÓN 18: expand_ci_varchar (REDUNDANTE PERO SEGURA)
 -- ============================================
 
 ALTER TABLE dirigente ALTER COLUMN ci TYPE VARCHAR(50);
 ALTER TABLE scouts ALTER COLUMN dirigente_ci TYPE VARCHAR(50);
-ALTER TABLE registros ALTER COLUMN dirigente_ci TYPE VARCHAR(50);
 
 -- ============================================
 -- MIGRACIÓN 19: scouts_campos_nuevos
@@ -296,29 +303,22 @@ CREATE INDEX IF NOT EXISTS idx_scouts_grupo ON scouts(grupo);
 CREATE INDEX IF NOT EXISTS idx_scouts_es_beca ON scouts(es_beca);
 
 -- ============================================
--- MIGRACIÓN 20: change_registros_dirigente_ci_type
+-- MIGRACIÓN 20: change_registros_dirigente_ci_type (YA HECHO)
 -- ============================================
 
-ALTER TABLE registros
-ALTER COLUMN dirigente_ci TYPE VARCHAR(20);
-
-CREATE INDEX IF NOT EXISTS idx_registros_dirigente_ci ON registros(dirigente_ci);
+-- Ya se hizo en la creación de la tabla
 
 -- ============================================
--- MIGRACIÓN 21: change_scout_ci_type (registros)
+-- MIGRACIÓN 21: change_scout_ci_type (registros) (YA HECHO)
 -- ============================================
 
-ALTER TABLE registros DROP CONSTRAINT IF EXISTS registros_scout_ci_fkey;
-
-ALTER TABLE registros ALTER COLUMN scout_ci TYPE VARCHAR(20);
-
-ALTER TABLE registros ADD CONSTRAINT registros_scout_ci_fkey FOREIGN KEY (scout_ci) REFERENCES scouts(ci) ON DELETE CASCADE;
+-- Ya se hizo en la creación de la tabla
 
 -- ============================================
--- MIGRACIÓN 22: hora_deposito_registros (AHORA SÍ)
+-- MIGRACIÓN 22: hora_deposito_registros (YA HECHO)
 -- ============================================
 
-ALTER TABLE registros ADD COLUMN IF NOT EXISTS hora_deposito TIME;
+-- Ya se agregó en la creación de la tabla
 
 -- ============================================
 -- MIGRACIÓN 23: seed_admin_and_patron (USUARIOS INICIALES)

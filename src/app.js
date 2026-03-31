@@ -32,10 +32,18 @@ const app = express();
 
 // ============= MIDDLEWARES GLOBALES =============
 
+// CORS - Detectar dinámicamente en Vercel
+const getCorsOrigin = () => {
+  if (config.VERCEL_URL) {
+    return `https://${config.VERCEL_URL}`;
+  }
+  return config.CORS_ORIGIN;
+};
+
 // CORS mejorado
 app.use(
   cors({
-    origin: config.CORS_ORIGIN,
+    origin: getCorsOrigin(),
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

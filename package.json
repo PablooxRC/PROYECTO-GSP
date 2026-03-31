@@ -7,7 +7,10 @@
     "dev": "nodemon .",
     "start": "node src/index.js",
     "seed": "node scripts/seed_admin.js",
-    "clean": "node scripts/clean_database.js"
+    "clean": "node scripts/clean_database.js",
+    "vercel:pull": "vercel env pull .env.vercel",
+    "vercel:init-db": "vercel env pull .env.vercel && export $(cat .env.vercel | xargs) && npm run seed",
+    "vercel:logs": "vercel logs --follow"
   },
   "keywords": [],
   "author": "",
