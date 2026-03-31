@@ -3,6 +3,7 @@
 ## 🔍 Verificación del Repositorio
 
 - [ ] Todos los cambios están committeados:
+
   ```bash
   git status
   # Debería ser limpio (nothing to commit)
@@ -26,11 +27,13 @@
 ## 🔐 Secretos y Variables
 
 - [ ] Tienes generado un JWT_SECRET fuerte:
+
   ```bash
   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
   ```
 
 - [ ] Tienes un SESSION_SECRET fuerte:
+
   ```bash
   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
   ```
@@ -57,6 +60,7 @@
 ## 🚀 Horario de Despliegue
 
 ### Paso 1: Commit de los cambios
+
 ```bash
 cd "d:\PROYECTO DE GRADO 2025\Software"
 git add .
@@ -65,31 +69,38 @@ git push origin master
 ```
 
 ### Paso 2: Crear BD en Vercel (5 min)
+
 1. Ve a: https://vercel.com/dashboard
 2. Storage → Create Database → PostgreSQL
 3. Nombre: `gsp-production`
 4. Copia el CONNECTION STRING
 
 ### Paso 3: Agregar proyecto a Vercel (5 min)
+
 1. Ve a: https://vercel.com/new
 2. "Import..." → Selecciona PROYECTO-GSP
 3. Click Deploy
 
 ### Paso 4: Configurar variables (5 min)
+
 En Vercel Dashboard:
+
 - Settings → Environment Variables
 - Agrega: DATABASE_URL, JWT_SECRET, SESSION_SECRET, etc.
 
 ### Paso 5: Desplegar (5 min)
+
 Click "Deploy" nuevamente después de agregar las variables
 
 ### Paso 6: Inicializar BD (5 min)
+
 ```bash
 npm run vercel:pull
 npm run vercel:init-db
 ```
 
 ### Paso 7: Probar (5 min)
+
 Visita: https://gsp.vercel.app
 
 ---
@@ -97,11 +108,13 @@ Visita: https://gsp.vercel.app
 ## ⚠️ Importante
 
 ❌ NO subas estos archivos a GitHub:
+
 - `.env.local`
 - `.env.production` (con secretos reales)
 - `node_modules/`
 
 ✅ Sí subir estos:
+
 - `vercel.json`
 - `.env.development`
 - `.env.local.example`

@@ -2,7 +2,7 @@
 
 **Fecha**: 31 de Marzo de 2026  
 **Estado**: ✅ Configuración lista para desplegar  
-**Costo**: $0 USD para siempre  
+**Costo**: $0 USD para siempre
 
 ---
 
@@ -75,7 +75,7 @@ En el panel de Vercel (Settings → Environment Variables):
    = postgresql://user:password@host:port/dbname
    (pegado de Vercel Postgres)
 
-✏️ JWT_SECRET  
+✏️ JWT_SECRET
    = (genera con: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 
 ✏️ SESSION_SECRET
@@ -178,6 +178,7 @@ npm run vercel:init-db
 ## 🎯 LO QUE LOGRASTE
 
 ### 🌐 Servidor Web
+
 - ✅ Subido gratuitamente en Vercel
 - ✅ Dominio `.vercel.app` (gratis)
 - ✅ Actualizaciones automáticas con cada `git push`
@@ -185,6 +186,7 @@ npm run vercel:init-db
 - ✅ CDN global incluido
 
 ### 🗄️ Base de Datos
+
 - ✅ PostgreSQL gratuito (Vercel Postgres)
 - ✅ 256 MB de almacenamiento (suficiente para ~10k registros)
 - ✅ Backups automáticos diarios
@@ -192,6 +194,7 @@ npm run vercel:init-db
 - ✅ Acceso desde cualquier lugar
 
 ### 💾 Ventajas
+
 - ✅ Hosting: $0/mes para siempre
 - ✅ BD: $0/mes para siempre
 - ✅ Escalable automáticamente
@@ -203,11 +206,13 @@ npm run vercel:init-db
 ## 📚 DOCUMENTOS PARA REFERENCIA
 
 ### Si necesitas ayuda:
+
 - 📖 [DESPLIEGUE_VERCEL_POSTGRES.md](DESPLIEGUE_VERCEL_POSTGRES.md) - Guía técnica completa
 - ⚡ [DESPLIEGUE_VERCEL_QUICK.md](DESPLIEGUE_VERCEL_QUICK.md) - Resumen rápido
 - ✅ [CHECKLIST_VERCEL.md](CHECKLIST_VERCEL.md) - Verificación paso a paso
 
 ### Si algo falla:
+
 - 🔧 Ver sección **TROUBLESHOOTING** en DESPLIEGUE_VERCEL_POSTGRES.md
 
 ---
@@ -215,23 +220,29 @@ npm run vercel:init-db
 ## 💬 PREGUNTAS FRECUENTES
 
 ### ¿Cuánto tiempo toma todo?
+
 **30 minutos** de aquí al final. La mayoría es clickear en Vercel.
 
 ### ¿Es realmente gratis?
+
 Sí, dentro de los límites free tier:
+
 - Vercel: 100 GB bandwidth/mes ✅
 - Vercel Postgres: 3 BDs gratis, 256 MB c/u ✅
 
 ### ¿Qué pasa cuando se llena la BD?
+
 Con ~10k registros estás a mitad del almacenamiento.
 Cuando necesites más, pagas ~$5-15/mes por más espacio.
 
 ### ¿Cómo veo los logs en producción?
+
 ```bash
 npm run vercel:logs
 ```
 
 ### ¿Cómo hago backup manual?
+
 En Vercel Postgres → Database → Backups → Download
 
 ---
@@ -251,4 +262,3 @@ Tu proyecto está 100% configurado. Solo necesitas:
 ---
 
 **¿Listo para empezar? → Lee [DESPLIEGUE_VERCEL_QUICK.md](DESPLIEGUE_VERCEL_QUICK.md)**
-
