@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Input, Label, Button } from "../components/ui";
+import { Card, Input, Label, Button } from "../components/ui/index.js";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useScout } from "../context/scoutContex.jsx";

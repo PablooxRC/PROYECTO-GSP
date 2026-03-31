@@ -6,7 +6,7 @@ import {
   Label,
   ConfirmModal,
   Alert,
-} from "../components/ui";
+} from "../components/ui/index.js";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../utils/getErrorMessage";
 import { useForm } from "react-hook-form";

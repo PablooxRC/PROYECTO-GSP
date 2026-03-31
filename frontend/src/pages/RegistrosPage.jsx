@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Button, ConfirmModal } from "../components/ui";
+import { Card, Button, ConfirmModal } from "../components/ui/index.js";
 import { useRegistro } from "../context/registroContex";
 import { useAuth } from "../context/AuthContext";
 import { PiTrashSimpleLight } from "react-icons/pi";
