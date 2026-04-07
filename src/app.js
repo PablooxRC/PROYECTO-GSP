@@ -32,11 +32,8 @@ const app = express();
 
 // ============= MIDDLEWARES GLOBALES =============
 
-// CORS - Detectar dinámicamente en Vercel
+// CORS - usar siempre CORS_ORIGIN definido en variables de entorno
 const getCorsOrigin = () => {
-  if (config.VERCEL_URL) {
-    return `https://${config.VERCEL_URL}`;
-  }
   return config.CORS_ORIGIN;
 };
 
