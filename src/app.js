@@ -32,15 +32,27 @@ const app = express();
 
 // ============= MIDDLEWARES GLOBALES =============
 
-// CORS - usar siempre CORS_ORIGIN definido en variables de entorno
-const getCorsOrigin = () => {
-  return config.CORS_ORIGIN;
-};
+// CORS - lista de orígenes permitidos
+const allowedOrigins = [
+  'https://gsp.vercel.app',
+  config.CORS_ORIGIN,
+  'http://localhost:5173',
+].filter(Boolean);
+
+console.log('🔧 CORS allowed origins:', allowedOrigins);
 
 // CORS mejorado
 app.use(
   cors({
-    origin: getCorsOrigin(),
+    origin: function (origin, callback) {
+      // Permitir requests sin origin (ej. mobile, curl, health checks)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, origin);
+      }
+      console.warn('⚠️ CORS blocked origin:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
