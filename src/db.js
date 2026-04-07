@@ -13,7 +13,7 @@ const getPoolConfig = () => {
           : false,
       max: config.DB_MAX_CONNECTIONS,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
+      connectionTimeoutMillis: 10000,
     };
   }
 
