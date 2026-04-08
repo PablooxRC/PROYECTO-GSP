@@ -3,21 +3,10 @@ import { pool } from "../db.js";
 // Seleccionar todos los scouts
 export const getScouts = async (req, res, next) => {
   try {
-    // Dirigentes ven scouts por dirigente_ci, perfiles ven scouts con dirigente_ci NULL creados por ellos
-    let result;
-    if (req.userCI && !String(req.userCI).startsWith('P')) {
-      result = await pool.query(
-        "SELECT * FROM scouts WHERE dirigente_ci = $1",
-        [req.userCI],
-      );
-    } else {
-      // Usuarios normales: mostrar scouts sin dirigente asignado
-      // que fueron creados en la misma unidad del usuario
-      result = await pool.query(
-        "SELECT * FROM scouts WHERE dirigente_ci IS NULL AND unidad = $1",
-        [req.userUnidad],
-      );
-    }
+    const result = await pool.query(
+      "SELECT * FROM scouts WHERE dirigente_ci = $1",
+      [req.userCI],
+    );
     return res.json(result.rows);
   } catch (error) {
     next(error);
@@ -110,14 +99,8 @@ export const createScout = async (req, res, next) => {
     // Inicio transacción
     await client.query("BEGIN");
 
-    // Determinar dirigente_ci: solo si el usuario existe en tabla dirigente
-    let dirigenteCi = null;
-    if (req.userCI && !String(req.userCI).startsWith('P')) {
-      const dirCheck = await client.query('SELECT ci FROM dirigente WHERE ci = $1', [req.userCI]);
-      if (dirCheck.rowCount > 0) {
-        dirigenteCi = req.userCI;
-      }
-    }
+    // Guardar el CI del usuario (dirigente o perfil) para asociar el scout
+    const dirigenteCi = req.userCI;
 
     const nombre =
       `${primer_nombre || ""}${segundo_nombre ? " " + segundo_nombre : ""}`.trim();
