@@ -13,7 +13,7 @@ function ScoutFormPage() {
     setValue,
     watch,
     reset,
-  } = useForm();
+  } = useForm({ mode: "onSubmit" });
   const navigate = useNavigate();
   const {
     createScout,
@@ -85,6 +85,14 @@ function ScoutFormPage() {
     if (scout) {
       navigate("/scouts");
     }
+  }, () => {
+    // Al fallar validación, scroll al primer error
+    setTimeout(() => {
+      const firstError = document.querySelector('.text-red-500');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   });
 
   useEffect(() => {
@@ -146,6 +154,11 @@ function ScoutFormPage() {
         <h2 className="text-2xl font-bold mb-6">
           {params.ci ? "Editar Scout" : "Registrar Scout"}
         </h2>
+        {Object.keys(errors).length > 0 && (
+          <p className="text-red-500 bg-red-500/10 p-3 rounded mb-4 text-sm">
+            Hay campos requeridos sin completar. Revisa el formulario.
+          </p>
+        )}
         <form onSubmit={onSubmit} className="space-y-4">
           {/* C.I. */}
           <div>
