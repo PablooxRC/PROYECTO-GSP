@@ -3,10 +3,21 @@ import { pool } from "../db.js";
 // Seleccionar todos los scouts
 export const getScouts = async (req, res, next) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM scouts WHERE dirigente_ci = $1",
-      [req.userCI],
-    );
+    // Dirigentes ven scouts por dirigente_ci, perfiles ven scouts con dirigente_ci NULL creados por ellos
+    let result;
+    if (req.userCI && !String(req.userCI).startsWith('P')) {
+      result = await pool.query(
+        "SELECT * FROM scouts WHERE dirigente_ci = $1",
+        [req.userCI],
+      );
+    } else {
+      // Usuarios normales: mostrar scouts sin dirigente asignado
+      // que fueron creados en la misma unidad del usuario
+      result = await pool.query(
+        "SELECT * FROM scouts WHERE dirigente_ci IS NULL AND unidad = $1",
+        [req.userUnidad],
+      );
+    }
     return res.json(result.rows);
   } catch (error) {
     next(error);
