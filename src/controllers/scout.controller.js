@@ -99,6 +99,15 @@ export const createScout = async (req, res, next) => {
     // Inicio transacción
     await client.query("BEGIN");
 
+    // Determinar dirigente_ci: solo si el usuario existe en tabla dirigente
+    let dirigenteCi = null;
+    if (req.userCI && !String(req.userCI).startsWith('P')) {
+      const dirCheck = await client.query('SELECT ci FROM dirigente WHERE ci = $1', [req.userCI]);
+      if (dirCheck.rowCount > 0) {
+        dirigenteCi = req.userCI;
+      }
+    }
+
     const nombre =
       `${primer_nombre || ""}${segundo_nombre ? " " + segundo_nombre : ""}`.trim();
     const apellido =
@@ -133,7 +142,7 @@ export const createScout = async (req, res, next) => {
         contacto_emergencia_nombre_parentesco,
         contacto_emergencia_celular,
         envio,
-        req.userCI,
+        dirigenteCi,
       ],
     );
 
@@ -176,7 +185,7 @@ export const createScout = async (req, res, next) => {
         contacto_nombre,
         contacto_emergencia_celular || null,
         hora_deposito || null,
-        req.userCI,
+        dirigenteCi,
       ],
     );
 
