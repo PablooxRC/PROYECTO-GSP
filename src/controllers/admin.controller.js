@@ -1,7 +1,7 @@
 import { pool } from "../db.js";
 import bcrypt from "bcrypt";
 import ExcelJS from "exceljs";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -417,54 +417,47 @@ export const sendReport = async (req, res) => {
   try {
     const workbook = await buildReportWorkbook();
 
-    const tmpDir = os.tmpdir();
-    const filePath = path.join(tmpDir, "inscripciones.xlsx");
-    await workbook.xlsx.writeFile(filePath);
+    const buffer = await workbook.xlsx.writeBuffer();
 
-    const attachments = [{ filename: "inscripciones.xlsx", path: filePath }];
+    const attachments = [
+      {
+        filename: "inscripciones.xlsx",
+        content: buffer,
+      },
+    ];
 
     if (imagenBase64) {
+      const base64Data = imagenBase64.includes("base64,")
+        ? imagenBase64.split("base64,")[1]
+        : imagenBase64;
       attachments.push({
         filename: "comprobante.png",
-        content: Buffer.from(
-          imagenBase64.includes("base64,")
-            ? imagenBase64.split("base64,")[1]
-            : imagenBase64,
-          "base64",
-        ),
-        cid: "logo_cid",
+        content: Buffer.from(base64Data, "base64"),
       });
     }
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: recipient_email,
-      subject: `Reporte de Inscripciones`,
-      text: "Adjunto el reporte en Excel.",
+    await resend.emails.send({
+      from: process.env.RESEND_FROM || "GSP <onboarding@resend.dev>",
+      to: [recipient_email],
+      subject: "Reporte de Inscripciones",
       html: `
                 <h3>Reporte de Inscripciones</h3>
                 <p>Adjunto se encuentra el reporte en formato Excel - Grupo Scout Panda.</p>
-                ${imagenBase64 ? '<hr><img src="cid:logo_cid" style="max-width:200px;" />' : ""}
             `,
       attachments,
     });
 
-    fs.unlinkSync(filePath);
-
     return res.json({ message: "Reporte enviado correctamente" });
   } catch (error) {
-    console.error("ERROR:", error);
+    console.error("ERROR sendReport:", error);
     return res.status(500).json({
       message: "Error interno",
       error: error.message,
+      detail: error.code || null,
+      smtp_user_set: !!process.env.SMTP_USER,
+      smtp_pass_set: !!process.env.SMTP_PASS,
     });
   }
 };
