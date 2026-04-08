@@ -17,8 +17,8 @@ function RegisterPage() {
     }
   });
   return (
-    <div className="h-[calc(100vh-64px)] flex items-center justify-center">
-      <Card>
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4">
+      <Card className="w-full max-w-md">
         {signupErrors && signupErrors.length > 0 && (
           <div className="bg-red-600 text-white p-3 rounded mb-4">
             {signupErrors.map((err, index) => (
@@ -74,7 +74,7 @@ function RegisterPage() {
           {errors.unidad && (
             <p className="text-red-500"> La unidad es requerida</p>
           )}
-          <Button>Registrar</Button>
+          <Button type="submit" className="w-full mt-4">Registrar</Button>
           <div className="flex justify-between my-4">
             <p>¿Ya tienes una cuenta?</p>
             <Link to="/login" className="font-bold">

@@ -97,7 +97,7 @@ function ScoutPage() {
     <div className="relative">
       {/* Encabezado */}
       <div>
-        <h1 className="text-4xl font-extrabold dark:text-white py-4">
+        <h1 className="text-2xl sm:text-4xl font-extrabold dark:text-white py-4">
           Unidad: {user?.unidad || "No disponible"}
         </h1>
       </div>
@@ -135,11 +135,11 @@ function ScoutPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {scouts.map((scout) => (
-          <Card key={scout.ci} className="px-7 py-4">
+          <Card key={scout.ci} className="px-5 py-4">
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-xl font-bold break-words">
                 {scout.nombre} {scout.apellido}
               </h1>
               <p>{scout.ci}</p>
@@ -149,15 +149,17 @@ function ScoutPage() {
                 {scout.preguntas_mal_contestadas ?? 0}
               </p>
             </div>
-            <div className="my-2 flex justify-end gap-x-2">
+            <div className="mt-3 flex flex-wrap gap-2">
               <Button
-                className="bg-red-500 hover:bg-red-600"
+                className="bg-red-500 hover:bg-red-600 flex-1 min-w-0 justify-center"
                 onClick={() => handleDeleteClick(scout)}
               >
                 <PiTrashSimpleLight className="text-white" />
                 Eliminar
               </Button>
-              <Button onClick={() => navigate(`/scouts/${scout.ci}/edit`)}>
+              <Button
+                className="flex-1 min-w-0 justify-center"
+                onClick={() => navigate(`/scouts/${scout.ci}/edit`)}>
                 <BiPencil className="text-white" />
                 Editar
               </Button>

@@ -188,7 +188,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Nombres */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="primer_nombre">Primer Nombre</Label>
               <Input
@@ -211,7 +211,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Apellidos */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="primer_apellido">Primer Apellido</Label>
               <Input
@@ -234,7 +234,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Fecha de nacimiento y Sexo */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="fecha_nacimiento">Fecha de Nacimiento</Label>
               <Input
@@ -285,7 +285,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Unidad y Etapa */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="unidad">Unidad</Label>
               <select
@@ -318,7 +318,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Curso y Colegio */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="curso">Curso</Label>
               <Input
@@ -336,7 +336,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Número de Depósito y Monto */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="numero_deposito">Número de Depósito</Label>
               <Input
@@ -356,7 +356,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Fecha y Hora de Depósito */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="fecha_deposito">Fecha de Depósito</Label>
               <Input type="date" {...register("fecha_deposito")} />

@@ -27,8 +27,8 @@ function LoginPage() {
   });
 
   return (
-    <div className="h-[calc(100vh-64px)] flex justify-center items-center">
-      <Card>
+    <div className="min-h-[calc(100vh-64px)] flex justify-center items-center px-4">
+      <Card className="w-full max-w-md">
         {/* ESTE ES EL BLOQUE MODIFICADO PARA MOSTRAR LOS ERRORES DEL CONTEXTO */}
         {loginErrors && loginErrors.length > 0 && (
           <div className="bg-red-600 text-white p-3 rounded mb-4">
@@ -69,7 +69,7 @@ function LoginPage() {
             })}
           />
 
-          <Button>Ingresar</Button>
+          <Button type="submit" className="w-full mt-4">Ingresar</Button>
           <div className="flex justify-between my-4">
             <p>¿No tienes una cuenta?</p>
             <Link to="/register" className="font-bold">
