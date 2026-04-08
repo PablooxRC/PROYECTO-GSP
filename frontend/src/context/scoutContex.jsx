@@ -51,8 +51,11 @@ export const ScoutProvides = ({ children }) => {
       setScouts([...scouts, res.data]);
       return res.data;
     } catch (error) {
+      console.error("Error creando scout:", error);
       if (error.response) {
-        setErrors([error.response.data.message]);
+        setErrors([error.response.data.message || "Error del servidor"]);
+      } else {
+        setErrors([error.message || "Error de conexión al crear scout"]);
       }
     }
   };
