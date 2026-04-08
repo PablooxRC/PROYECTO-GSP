@@ -21,6 +21,7 @@ export default function AdminSendReport() {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [imagenBase64, setImagenBase64] = useState(null);
   const [imagenNombre, setImagenNombre] = useState("Sin imagen seleccionada");
+  const [mensaje, setMensaje] = useState("");
 
   const handleImagenChange = (e) => {
     const file = e.target.files[0];
@@ -156,6 +157,7 @@ export default function AdminSendReport() {
         to,
         email: email,
         imagenBase64,
+        mensaje,
       });
 
       setMessage({
@@ -169,15 +171,16 @@ export default function AdminSendReport() {
       setEmail("");
       setImagenBase64(null);
       setImagenNombre("Sin imagen seleccionada");
+      setMensaje("");
       setShowPreview(false);
     } catch (err) {
       console.error("Error en handleSubmit:", err);
+      const errData = err?.response?.data;
+      const detail = errData?.error ? ` (${errData.error})` : "";
       setMessage({
         type: "error",
         text:
-          err?.response?.data?.message ||
-          err.message ||
-          "Error enviando reporte",
+          (errData?.message || err.message || "Error enviando reporte") + detail,
       });
     } finally {
       setLoading(false);
@@ -224,6 +227,19 @@ export default function AdminSendReport() {
                 placeholder="destino@ejemplo.com"
               />
             </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">
+              Mensaje adjunto (opcional)
+            </label>
+            <textarea
+              value={mensaje}
+              onChange={(e) => setMensaje(e.target.value)}
+              className="w-full p-2 rounded bg-gray-700 text-white"
+              placeholder="Escribe un mensaje para incluir en el email..."
+              rows={3}
+            />
           </div>
 
           <div className="mb-4">

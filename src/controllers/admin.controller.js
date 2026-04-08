@@ -409,7 +409,7 @@ async function buildReportWorkbook() {
 
 // Enviar reporte por email (Excel) con registros filtrados por fecha
 export const sendReport = async (req, res) => {
-  const { from, to, recipient_email, imagenBase64 } = req.body;
+  const { from, to, recipient_email, imagenBase64, mensaje } = req.body;
 
   if (!recipient_email)
     return res.status(400).json({ message: "El email es requerido" });
@@ -445,6 +445,7 @@ export const sendReport = async (req, res) => {
       html: `
                 <h3>Reporte de Inscripciones</h3>
                 <p>Adjunto se encuentra el reporte en formato Excel - Grupo Scout Panda.</p>
+                ${mensaje ? `<hr><p><strong>Mensaje:</strong></p><p>${mensaje.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>` : ''}
             `,
       attachments,
     });

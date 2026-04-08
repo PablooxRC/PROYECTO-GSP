@@ -12,7 +12,7 @@ async function seedAdmin() {
     // Verificar si el admin ya existe
     const existingAdmin = await pool.query('SELECT * FROM dirigente WHERE ci = $1', [8637944])
     
-    if (existingAdmin.rowCount > 0) {
+    if (existingAdmin.rowCount > 0) 
       console.log('✅ Admin ya existe en la BD')
       console.log(`   CI: ${existingAdmin.rows[0].ci}`)
       console.log(`   Email: ${existingAdmin.rows[0].email}`)
