@@ -50,9 +50,13 @@ export function AuthProvider({ children }) {
     try {
       const res = await axios.post("/signin", data); // Asegúrate que esta ruta coincida con tu backend
       console.log("Respuesta de signin exitoso:", res.data);
-      setUser(res.data.data);
+      const userData = res.data.data;
+      if (userData.token) {
+        localStorage.setItem("token", userData.token);
+      }
+      setUser(userData);
       setIsAuth(true);
-      return res.data.data; // Devuelve los datos del usuario en caso de éxito
+      return userData; // Devuelve los datos del usuario en caso de éxito
     } catch (error) {
       console.log("Error en signin:", error.response || error); // Log más descriptivo para depuración
       setErrors(getErrorMessages(error, "Ocurrio un error al iniciar sesion."));
@@ -70,7 +74,11 @@ export function AuthProvider({ children }) {
     try {
       const res = await axios.post("/signup", data); // Asegúrate que esta ruta coincida con tu backend
       console.log("Respuesta de signup exitoso:", res.data);
-      setUser(res.data.data);
+      const userData = res.data.data;
+      if (userData.token) {
+        localStorage.setItem("token", userData.token);
+      }
+      setUser(userData);
       setIsAuth(true);
       return res.data;
     } catch (error) {
@@ -87,6 +95,7 @@ export function AuthProvider({ children }) {
   const signout = async () => {
     try {
       await axios.post("/signout"); // Asegúrate que esta ruta coincida con tu backend
+      localStorage.removeItem("token");
       setUser(null);
       setIsAuth(false);
       setErrors(null); // Limpiar errores al cerrar sesión
@@ -101,6 +110,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const checkLogin = async () => {
       setLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setUser(null);
+        setIsAuth(false);
+        setLoading(false);
+        return;
+      }
       try {
         // La cookie httpOnly se envía automáticamente con withCredentials
         const res = await axios.get("/profile");

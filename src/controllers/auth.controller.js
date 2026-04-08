@@ -66,7 +66,7 @@ export const signin = asyncHandler(async (req, res) => {
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
-  sendSuccess(res, user, "Sesión iniciada correctamente");
+  sendSuccess(res, { ...user, token }, "Sesión iniciada correctamente");
 });
 
 //Registrar perfil de usuario
@@ -105,7 +105,7 @@ export const signup = asyncHandler(async (req, res, next) => {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    sendSuccess(res, user, "Cuenta creada correctamente", 201);
+    sendSuccess(res, { ...user, token }, "Cuenta creada correctamente", 201);
   } catch (error) {
     if (error.code == "23505") {
       throw new ConflictError("El email ya está registrado");
