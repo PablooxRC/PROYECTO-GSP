@@ -25,6 +25,7 @@ function ScoutFormPage() {
   const params = useParams();
   const esBeca = watch("es_beca");
   const [padronMsg, setPadronMsg] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleCiBlur = async (e) => {
     if (params.ci) return; // no auto-fill al editar
@@ -65,25 +66,30 @@ function ScoutFormPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     setErrors([]);
-    // Sanear tipos antes de enviar
-    const payload = {
-      ...data,
-      monto:
-        data.monto === "" || data.monto === undefined || isNaN(data.monto)
-          ? null
-          : Number(data.monto),
-      es_beca: data.es_beca === true || data.es_beca === "true",
-      fecha_nacimiento: data.fecha_nacimiento ? data.fecha_nacimiento : null,
-      fecha_deposito: data.fecha_deposito ? data.fecha_deposito : null,
-    };
-    let scout;
-    if (!params.ci) {
-      scout = await createScout(payload);
-    } else {
-      scout = await updateScout(params.ci, payload);
-    }
-    if (scout) {
-      navigate("/scouts");
+    setSubmitting(true);
+    try {
+      // Sanear tipos antes de enviar
+      const payload = {
+        ...data,
+        monto:
+          data.monto === "" || data.monto === undefined || isNaN(data.monto)
+            ? null
+            : Number(data.monto),
+        es_beca: data.es_beca === true || data.es_beca === "true",
+        fecha_nacimiento: data.fecha_nacimiento ? data.fecha_nacimiento : null,
+        fecha_deposito: data.fecha_deposito ? data.fecha_deposito : null,
+      };
+      let scout;
+      if (!params.ci) {
+        scout = await createScout(payload);
+      } else {
+        scout = await updateScout(params.ci, payload);
+      }
+      if (scout) {
+        navigate("/scouts");
+      }
+    } finally {
+      setSubmitting(false);
     }
   }, () => {
     // Al fallar validación, scroll al primer error
@@ -144,7 +150,7 @@ function ScoutFormPage() {
   }, [watch]);
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-4">
+    <div className="py-8 px-4 flex justify-center">
       <Card className="w-full max-w-2xl">
         {ScoutErrors.map((error, i) => (
           <p className="text-red-500 mb-4" key={i}>
@@ -423,8 +429,8 @@ function ScoutFormPage() {
           </div>
 
           {/* Botón Submit */}
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
-            {params.ci ? "Editar Scout" : "Registrar Scout"}
+          <Button type="submit" disabled={submitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 text-base">
+            {submitting ? "Registrando..." : (params.ci ? "Editar Scout" : "Registrar Scout")}
           </Button>
         </form>
       </Card>
