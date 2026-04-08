@@ -438,7 +438,7 @@ export const sendReport = async (req, res) => {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: process.env.RESEND_FROM || "GSP <onboarding@resend.dev>",
       to: [recipient_email],
       subject: "Reporte de Inscripciones",
@@ -449,15 +449,17 @@ export const sendReport = async (req, res) => {
       attachments,
     });
 
-    return res.json({ message: "Reporte enviado correctamente" });
+    if (error) {
+      console.error("Resend error:", error);
+      return res.status(500).json({ message: "Error enviando email", error: error.message });
+    }
+
+    return res.json({ message: "Reporte enviado correctamente", emailId: data?.id });
   } catch (error) {
     console.error("ERROR sendReport:", error);
     return res.status(500).json({
       message: "Error interno",
       error: error.message,
-      detail: error.code || null,
-      smtp_user_set: !!process.env.SMTP_USER,
-      smtp_pass_set: !!process.env.SMTP_PASS,
     });
   }
 };
