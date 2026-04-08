@@ -344,7 +344,7 @@ function ScoutFormPage() {
                 type="number"
                 step="0.01"
                 placeholder="Monto (opcional)"
-                {...register("monto", { valueAsNumber: true })}
+                {...register("monto")}
               />
             </div>
           </div>
@@ -423,7 +423,7 @@ function ScoutFormPage() {
           </div>
 
           {/* Botón Submit */}
-          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
+          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
             {params.ci ? "Editar Scout" : "Registrar Scout"}
           </Button>
         </form>
