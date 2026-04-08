@@ -1,7 +1,6 @@
 import { pool } from "../db.js";
 import bcrypt from "bcrypt";
 import ExcelJS from "exceljs";
-import { Resend } from "resend";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -416,13 +415,12 @@ export const sendReport = async (req, res) => {
 
   try {
     const workbook = await buildReportWorkbook();
-
     const buffer = await workbook.xlsx.writeBuffer();
 
-    const attachments = [
+    const attachment = [
       {
-        filename: "inscripciones.xlsx",
-        content: buffer,
+        content: buffer.toString("base64"),
+        name: "inscripciones.xlsx",
       },
     ];
 
@@ -430,32 +428,47 @@ export const sendReport = async (req, res) => {
       const base64Data = imagenBase64.includes("base64,")
         ? imagenBase64.split("base64,")[1]
         : imagenBase64;
-      attachments.push({
-        filename: "comprobante.png",
-        content: Buffer.from(base64Data, "base64"),
+      attachment.push({
+        content: base64Data,
+        name: "comprobante.png",
       });
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || "pabloox73@gmail.com";
+    const senderName = process.env.BREVO_SENDER_NAME || "Grupo Scout Panda";
 
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM || "GSP <onboarding@resend.dev>",
-      to: [recipient_email],
-      subject: "Reporte de Inscripciones",
-      html: `
-                <h3>Reporte de Inscripciones</h3>
-                <p>Adjunto se encuentra el reporte en formato Excel - Grupo Scout Panda.</p>
-                ${mensaje ? `<hr><p><strong>Mensaje:</strong></p><p>${mensaje.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>` : ''}
-            `,
-      attachments,
+    const safeMsg = mensaje
+      ? mensaje.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>")
+      : null;
+
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: { name: senderName, email: senderEmail },
+        to: [{ email: recipient_email }],
+        subject: "Reporte de Inscripciones - Grupo Scout Panda",
+        htmlContent: `
+          <h3>Reporte de Inscripciones</h3>
+          <p>Adjunto se encuentra el reporte en formato Excel - Grupo Scout Panda.</p>
+          ${safeMsg ? `<hr><p><strong>Mensaje:</strong></p><p>${safeMsg}</p>` : ""}
+        `,
+        attachment,
+      }),
     });
 
-    if (error) {
-      console.error("Resend error:", error);
-      return res.status(500).json({ message: "Error enviando email", error: error.message });
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Brevo error:", data);
+      return res.status(500).json({ message: "Error enviando email", error: data.message || JSON.stringify(data) });
     }
 
-    return res.json({ message: "Reporte enviado correctamente", emailId: data?.id });
+    return res.json({ message: "Reporte enviado correctamente", messageId: data.messageId });
   } catch (error) {
     console.error("ERROR sendReport:", error);
     return res.status(500).json({
