@@ -15,9 +15,11 @@ export const createAdmin = asyncHandler(async (req, res) => {
   const { nombre, apellido, email, unidad, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
+    // Generar CI único para admin: ADM + timestamp
+    const ci = "ADM" + Date.now();
     const result = await pool.query(
-      "INSERT INTO dirigente (nombre, apellido, email, unidad, password, is_admin, admin_registrado) VALUES ($1,$2,$3,$4,$5, true, true) RETURNING *",
-      [nombre, apellido, email, unidad, hashedPassword],
+      "INSERT INTO dirigente (ci, nombre, apellido, email, unidad, password, is_admin, admin_registrado) VALUES ($1,$2,$3,$4,$5,$6, true, true) RETURNING *",
+      [ci, nombre, apellido, email || null, unidad, hashedPassword],
     );
     return res.json(result.rows[0]);
   } catch (error) {
