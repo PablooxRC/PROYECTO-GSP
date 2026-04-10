@@ -90,10 +90,6 @@ export const createDirigente = async (req, res, next) => {
     return res.status(400).json({ message: "CI es obligatorio" });
   }
 
-  if (!email) {
-    return res.status(400).json({ message: "Email es obligatorio" });
-  }
-
   if (!primer_nombre) {
     return res.status(400).json({ message: "Primer nombre es obligatorio" });
   }
@@ -109,7 +105,6 @@ export const createDirigente = async (req, res, next) => {
 
     console.log("Creando dirigente con datos:", {
       ci,
-      email,
       primer_nombre,
       primer_apellido,
       es_colaborador,
@@ -121,7 +116,7 @@ export const createDirigente = async (req, res, next) => {
         String(ci),
         `${primer_nombre || ""} ${primer_apellido || ""}`.trim(),
         `${primer_apellido || ""}`.trim(),
-        email,
+        email || null,
         primer_nombre,
         segundo_nombre,
         primer_apellido,

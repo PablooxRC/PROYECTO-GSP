@@ -185,17 +185,6 @@ function AdminDirigenteCreate() {
             </div>
           </div>
 
-          <div>
-            <Label>Email</Label>
-            <Input
-              type="email"
-              {...register("email", { required: "Email es obligatorio" })}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Fecha de Nacimiento</Label>
