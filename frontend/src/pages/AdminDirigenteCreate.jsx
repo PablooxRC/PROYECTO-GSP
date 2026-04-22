@@ -192,15 +192,14 @@ function AdminDirigenteCreate() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Correo</Label>
-              <Input type="email" {...register("email")} placeholder="correo@ejemplo.com" />
-            </div>
-            <div>
-              <Label>Profesion u Ocupacion</Label>
-              <Input {...register("profesion_ocupacion")} placeholder="Ej: Ingeniera, Docente" />
-            </div>
+          <div>
+            <Label>Correo</Label>
+            <Input type="email" {...register("email")} placeholder="correo@ejemplo.com" />
+          </div>
+
+          <div>
+            <Label>Profesión u Ocupación</Label>
+            <Input {...register("profesion_ocupacion")} placeholder="Ej: Ingeniera, Docente" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
