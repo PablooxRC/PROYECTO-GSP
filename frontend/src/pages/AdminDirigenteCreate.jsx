@@ -75,6 +75,8 @@ function AdminDirigenteCreate() {
         unidad: d.unidad ?? "",
         grupo: d.grupo,
         nivel_formacion: d.nivel_formacion,
+        cargo_1: d.cargo_1 ?? "",
+        cargo_2: d.cargo_2 ?? "",
         numero_deposito: d.numero_deposito,
         monto: d.monto,
         fecha_deposito: d.fecha_deposito
@@ -105,6 +107,8 @@ function AdminDirigenteCreate() {
         segundo_nombre: data.segundo_nombre || null,
         segundo_apellido: data.segundo_apellido || null,
         nivel_formacion: data.nivel_formacion || null,
+        cargo_1: data.cargo_1 || null,
+        cargo_2: data.cargo_2 || null,
         numero_deposito: data.numero_deposito || null,
         hora_deposito: data.hora_deposito || null,
         envio: data.envio || null,
@@ -210,6 +214,7 @@ function AdminDirigenteCreate() {
               className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Seleccionar Unidad</option>
+              <option value="Sin unidad">Sin unidad</option>
               <option value="Hathi">Hathi</option>
               <option value="Jacala">Jacala</option>
               <option value="Castores">Castores</option>
@@ -231,6 +236,17 @@ function AdminDirigenteCreate() {
           <div>
             <Label>Nivel de Formación</Label>
             <Input {...register("nivel_formacion")} />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Cargo 1</Label>
+              <Input {...register("cargo_1")} placeholder="Ej: Jefe de Unidad" />
+            </div>
+            <div>
+              <Label>Cargo 2</Label>
+              <Input {...register("cargo_2")} placeholder="Ej: Secretario" />
+            </div>
           </div>
 
           {/* Número de Depósito y Monto */}

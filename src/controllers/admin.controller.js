@@ -78,6 +78,8 @@ export const createDirigente = async (req, res, next) => {
     grupo,
     unidad,
     nivel_formacion,
+    cargo_1,
+    cargo_2,
     envio,
     password,
     numero_deposito,
@@ -113,7 +115,7 @@ export const createDirigente = async (req, res, next) => {
     });
 
     const result = await pool.query(
-      `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito, es_colaborador, admin_registrado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22) RETURNING *`,
+      `INSERT INTO dirigente (ci, nombre, apellido, email, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, grupo, unidad, nivel_formacion, cargo_1, cargo_2, envio, password, gravatar, numero_deposito, monto, fecha_deposito, hora_deposito, es_colaborador, admin_registrado) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24) RETURNING *`,
       [
         String(ci),
         `${primer_nombre || ""} ${primer_apellido || ""}`.trim(),
@@ -128,6 +130,8 @@ export const createDirigente = async (req, res, next) => {
         grupo || null,
         unidad || null,
         nivel_formacion || null,
+        cargo_1 || null,
+        cargo_2 || null,
         envio || null,
         hashedPassword,
         gravatar,
@@ -171,6 +175,8 @@ export const updateDirigente = async (req, res, next) => {
     fecha_nacimiento,
     sexo,
     nivel_formacion,
+    cargo_1,
+    cargo_2,
     numero_deposito,
     monto,
     fecha_deposito,
@@ -194,13 +200,15 @@ export const updateDirigente = async (req, res, next) => {
                 fecha_nacimiento = COALESCE($10, fecha_nacimiento),
                 sexo = COALESCE($11, sexo),
                 nivel_formacion = COALESCE($12, nivel_formacion),
-                numero_deposito = COALESCE($13, numero_deposito),
-                monto = COALESCE($14, monto),
-                fecha_deposito = COALESCE($15, fecha_deposito),
-                hora_deposito = COALESCE($16, hora_deposito),
-                envio = COALESCE($17, envio),
-                es_colaborador = COALESCE($18, es_colaborador)
-            WHERE ci = $19 RETURNING *`,
+                cargo_1 = COALESCE($13, cargo_1),
+                cargo_2 = COALESCE($14, cargo_2),
+                numero_deposito = COALESCE($15, numero_deposito),
+                monto = COALESCE($16, monto),
+                fecha_deposito = COALESCE($17, fecha_deposito),
+                hora_deposito = COALESCE($18, hora_deposito),
+                envio = COALESCE($19, envio),
+                es_colaborador = COALESCE($20, es_colaborador)
+              WHERE ci = $21 RETURNING *`,
       [
         nombre || null,
         primer_nombre || null,
@@ -214,6 +222,8 @@ export const updateDirigente = async (req, res, next) => {
         fecha_nacimiento || null,
         sexo || null,
         nivel_formacion || null,
+        cargo_1 || null,
+        cargo_2 || null,
         numero_deposito || null,
         monto || null,
         fecha_deposito || null,
