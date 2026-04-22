@@ -290,7 +290,10 @@ async function buildReportWorkbook() {
   );
 
   const workbook = new ExcelJS.Workbook();
-  const scoutsSheet = workbook.addWorksheet("Scouts");
+  const lobatosSheet = workbook.addWorksheet("Lobatos");
+  const exploradoresSheet = workbook.addWorksheet("Exploradores");
+  const pionerosSheet = workbook.addWorksheet("Pioneros");
+  const roversSheet = workbook.addWorksheet("Rovers");
   const dirigentesSheet = workbook.addWorksheet("Dirigentes");
   const colaboradoresSheet = workbook.addWorksheet("Colaboradores");
 
@@ -324,8 +327,7 @@ async function buildReportWorkbook() {
     }
   };
 
-  // Hoja Scouts
-  scoutsSheet.columns = [
+  const scoutColumns = [
     { header: "N° DE SECUENCIA", key: "secuencia", width: 15 },
     { header: "CÉDULA DE IDENTIDAD", key: "ci", width: 20 },
     { header: "PRIMER NOMBRE", key: "primer_nombre", width: 20 },
@@ -341,10 +343,25 @@ async function buildReportWorkbook() {
     { header: "CURSO", key: "curso", width: 12 },
   ];
 
-  let secuencia = 1;
-  scoutsRes.rows.forEach((row) => {
-    scoutsSheet.addRow({
-      secuencia: secuencia++,
+  lobatosSheet.columns = scoutColumns;
+  exploradoresSheet.columns = scoutColumns;
+  pionerosSheet.columns = scoutColumns;
+  roversSheet.columns = scoutColumns;
+
+  const normalizeUnidad = (unidad) =>
+    String(unidad || "")
+      .trim()
+      .toLowerCase();
+
+  const isLobatos = (u) => ["jacala", "hathi"].includes(normalizeUnidad(u));
+  const isExploradores = (u) =>
+    ["castores", "tiburones", "halcones"].includes(normalizeUnidad(u));
+  const isPioneros = (u) => normalizeUnidad(u) === "locotos";
+  const isRovers = (u) => normalizeUnidad(u) === "clan destino";
+
+  const addScoutRow = (sheet, row, seq) => {
+    sheet.addRow({
+      secuencia: seq,
       ci: row.ci?.toString().toUpperCase() || "",
       primer_nombre: row.primer_nombre?.toUpperCase() || "",
       segundo_nombre: row.segundo_nombre?.toUpperCase() || "",
@@ -360,6 +377,28 @@ async function buildReportWorkbook() {
       colegio: row.colegio?.toUpperCase() || "",
       curso: row.curso?.toUpperCase() || "",
     });
+  };
+
+  let secuencia = 1;
+  scoutsRes.rows.filter((row) => isLobatos(row.unidad)).forEach((row) => {
+    addScoutRow(lobatosSheet, row, secuencia++);
+  });
+
+  secuencia = 1;
+  scoutsRes.rows
+    .filter((row) => isExploradores(row.unidad))
+    .forEach((row) => {
+      addScoutRow(exploradoresSheet, row, secuencia++);
+    });
+
+  secuencia = 1;
+  scoutsRes.rows.filter((row) => isPioneros(row.unidad)).forEach((row) => {
+    addScoutRow(pionerosSheet, row, secuencia++);
+  });
+
+  secuencia = 1;
+  scoutsRes.rows.filter((row) => isRovers(row.unidad)).forEach((row) => {
+    addScoutRow(roversSheet, row, secuencia++);
   });
 
   // Hoja Dirigentes (no colaboradores)
@@ -373,7 +412,9 @@ async function buildReportWorkbook() {
     { header: "SEXO", key: "sexo", width: 10 },
     { header: "GRUPO", key: "grupo", width: 15 },
     { header: "FECHA NACIMIENTO", key: "fecha_nacimiento", width: 20 },
-    { header: "NIVEL DE FORMACIÓN", key: "nivel_formacion", width: 22 },
+    { header: "FORMACIÓN", key: "nivel_formacion", width: 22 },
+    { header: "CARGO 1", key: "cargo_1", width: 22 },
+    { header: "CARGO 2", key: "cargo_2", width: 22 },
   ];
 
   dirigentesSheet.columns = dirColumns;
@@ -393,6 +434,8 @@ async function buildReportWorkbook() {
         ? new Date(row.fecha_nacimiento).toLocaleDateString()
         : "",
       nivel_formacion: row.nivel_formacion?.toUpperCase() || "",
+      cargo_1: row.cargo_1?.toUpperCase() || "",
+      cargo_2: row.cargo_2?.toUpperCase() || "",
     });
   };
 
@@ -406,7 +449,10 @@ async function buildReportWorkbook() {
     .filter((d) => d.es_colaborador && !d.is_admin)
     .forEach((row) => addDirRow(colaboradoresSheet, row, secuencia++));
 
-  styleSheet(scoutsSheet);
+  styleSheet(lobatosSheet);
+  styleSheet(exploradoresSheet);
+  styleSheet(pionerosSheet);
+  styleSheet(roversSheet);
   styleSheet(dirigentesSheet);
   styleSheet(colaboradoresSheet);
 
