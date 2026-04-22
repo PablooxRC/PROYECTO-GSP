@@ -68,6 +68,7 @@ function AdminDirigenteCreate() {
         primer_apellido: d.primer_apellido,
         segundo_apellido: d.segundo_apellido,
         email: d.email,
+        profesion_ocupacion: d.profesion_ocupacion ?? "",
         fecha_nacimiento: d.fecha_nacimiento
           ? new Date(d.fecha_nacimiento).toISOString().slice(0, 10)
           : "",
@@ -106,6 +107,8 @@ function AdminDirigenteCreate() {
         fecha_nacimiento: data.fecha_nacimiento || null,
         segundo_nombre: data.segundo_nombre || null,
         segundo_apellido: data.segundo_apellido || null,
+        email: data.email || null,
+        profesion_ocupacion: data.profesion_ocupacion || null,
         nivel_formacion: data.nivel_formacion || null,
         cargo_1: data.cargo_1 || null,
         cargo_2: data.cargo_2 || null,
@@ -186,6 +189,17 @@ function AdminDirigenteCreate() {
             <div>
               <Label>Segundo Apellido</Label>
               <Input {...register("segundo_apellido")} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Correo</Label>
+              <Input type="email" {...register("email")} placeholder="correo@ejemplo.com" />
+            </div>
+            <div>
+              <Label>Profesion u Ocupacion</Label>
+              <Input {...register("profesion_ocupacion")} placeholder="Ej: Ingeniera, Docente" />
             </div>
           </div>
 
