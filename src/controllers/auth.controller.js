@@ -107,9 +107,12 @@ export const signup = asyncHandler(async (req, res, next) => {
 
     sendSuccess(res, { ...user, token }, "Cuenta creada correctamente", 201);
   } catch (error) {
-    if (error.code == "23505") {
+    const originalCode = error.originalError?.code || error.code;
+    if (originalCode == "23505") {
       throw new ConflictError("El email ya está registrado");
     }
+    // Exponer el error real para diagnóstico
+    console.error("signup error:", error.message, error.originalError?.message);
     throw error;
   }
 });
