@@ -100,7 +100,7 @@ function AdminDirigentesPage() {
             <Card key={dirigente.ci} className="px-7 py-4">
               <div>
                 <h2 className="text-2xl font-bold mb-2">
-                  {dirigente.nombre} {dirigente.apellido}
+                  {[dirigente.primer_nombre, dirigente.segundo_nombre, dirigente.primer_apellido, dirigente.segundo_apellido].filter(Boolean).join(" ") || dirigente.nombre}
                 </h2>
                 <p className="text-sm text-gray-400 mb-3">
                   C.I.: {dirigente.ci}
