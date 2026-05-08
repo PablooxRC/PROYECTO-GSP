@@ -417,5 +417,4 @@ _Si tienes dudas, consulta el documento relevante. Está todo documentado._
 
 **Generado**: 9 de febrero de 2026  
 **Proyecto**: PROYECTO-GSP  
-**Desarrollador**: GitHub Copilot  
-**Versión**: 1.0
+**Desarrollador**: Ing. Pablo Rodriguez
