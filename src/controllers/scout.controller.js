@@ -52,7 +52,7 @@ export const getScoutsAdmin = async (req, res, next) => {
 export const getScout = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT s.*, r.colegio, r.hora_deposito
+      `SELECT s.*, r.colegio, r.fecha_deposito, r.hora_deposito
        FROM scouts s
        LEFT JOIN registros r ON r.scout_ci = s.ci
        WHERE s.ci = $1
