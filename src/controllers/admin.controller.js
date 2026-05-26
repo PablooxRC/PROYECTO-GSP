@@ -282,6 +282,15 @@ export const deleteDirigente = async (req, res, next) => {
 // ===============================
 // HELPER: Construir workbook Excel de reporte
 // ===============================
+const fmtDate = (d) => {
+  if (!d) return "";
+  const date = new Date(d);
+  if (isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}/${month}/${date.getFullYear()}`;
+};
+
 async function buildReportWorkbook() {
   const scoutsRes = await pool.query(`
     SELECT DISTINCT ON (s.ci) s.*, r.colegio, r.curso
@@ -375,9 +384,7 @@ async function buildReportWorkbook() {
       grupo: row.grupo?.toUpperCase() || "",
       unidad: row.unidad?.toUpperCase() || "",
       etapa: row.etapa?.toUpperCase() || "",
-      fecha_nacimiento: row.fecha_nacimiento
-        ? new Date(row.fecha_nacimiento).toLocaleDateString()
-        : "",
+      fecha_nacimiento: fmtDate(row.fecha_nacimiento),
       sexo: row.sexo?.toUpperCase() || "",
       colegio: row.colegio?.toUpperCase() || "",
       curso: row.curso?.toUpperCase() || "",
@@ -441,9 +448,7 @@ async function buildReportWorkbook() {
       unidad: row.unidad?.toUpperCase() || "",
       sexo: row.sexo?.toUpperCase() || "",
       grupo: row.grupo?.toUpperCase() || "",
-      fecha_nacimiento: row.fecha_nacimiento
-        ? new Date(row.fecha_nacimiento).toLocaleDateString()
-        : "",
+      fecha_nacimiento: fmtDate(row.fecha_nacimiento),
       nivel_formacion: row.nivel_formacion?.toUpperCase() || "",
       cargo_1: row.cargo_1?.toUpperCase() || "",
       cargo_2: row.cargo_2?.toUpperCase() || "",

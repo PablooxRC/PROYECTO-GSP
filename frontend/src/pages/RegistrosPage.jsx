@@ -21,15 +21,31 @@ function RegistrosPage() {
   const { user } = useAuth();
   const [unidadFiltro, setUnidadFiltro] = useState("Todas");
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
 
   // unidades ahora viene del provider; mostrar 'Todas' por defecto
   const opcionesUnidades = ["Todas", ...(unidades || [])];
 
   const registrosFiltrados = useMemo(() => {
-    if (!user?.is_admin) return registros;
-    if (!unidadFiltro || unidadFiltro === "Todas") return registros;
-    return registros.filter((r) => r.unidad === unidadFiltro);
+    let lista = registros;
+    if (user?.is_admin && unidadFiltro && unidadFiltro !== "Todas") {
+      lista = lista.filter((r) => r.unidad === unidadFiltro);
+    }
+    return lista;
   }, [registros, unidadFiltro, user]);
+
+  const handleFiltrar = () => {
+    setErrors([]);
+    loadRegistros(fechaDesde || undefined, fechaHasta || undefined);
+  };
+
+  const handleLimpiar = () => {
+    setFechaDesde("");
+    setFechaHasta("");
+    setErrors([]);
+    loadRegistros();
+  };
 
   useEffect(() => {
     setErrors([]);
@@ -50,24 +66,58 @@ function RegistrosPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4">Registros</h1>
-        {user?.is_admin && (
-          <div className="mb-4">
-            <label className="mr-2 text-sm text-gray-200">
-              Filtrar unidad:
-            </label>
-            <select
-              value={unidadFiltro}
-              onChange={(e) => setUnidadFiltro(e.target.value)}
-              className="px-2 py-1 rounded bg-gray-700 text-white"
-            >
-              {opcionesUnidades.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </select>
+
+        {/* Filtros */}
+        <div className="flex flex-wrap items-end gap-3 mb-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-400">Fecha desde</label>
+            <input
+              type="date"
+              value={fechaDesde}
+              onChange={(e) => setFechaDesde(e.target.value)}
+              className="px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-sm"
+            />
           </div>
-        )}
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-400">Fecha hasta</label>
+            <input
+              type="date"
+              value={fechaHasta}
+              onChange={(e) => setFechaHasta(e.target.value)}
+              className="px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-sm"
+            />
+          </div>
+          {user?.is_admin && (
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-gray-400">Unidad</label>
+              <select
+                value={unidadFiltro}
+                onChange={(e) => setUnidadFiltro(e.target.value)}
+                className="px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-sm"
+              >
+                {opcionesUnidades.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <button
+            onClick={handleFiltrar}
+            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded"
+          >
+            Filtrar
+          </button>
+          {(fechaDesde || fechaHasta) && (
+            <button
+              onClick={handleLimpiar}
+              className="px-4 py-1.5 bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium rounded"
+            >
+              Limpiar
+            </button>
+          )}
+        </div>
         {errors.map((error, i) => (
           <p className="text-red-500 mb-4" key={i}>
             {error}

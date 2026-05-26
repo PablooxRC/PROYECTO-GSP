@@ -21,7 +21,7 @@ function ProfilePage() {
           <p className="text-white mb-2">Unidad: {user?.unidad}</p>
           <p className="text-sm text-gray-400 mt-4">
             Registrado desde:{" "}
-            {new Date(user?.create_at).toLocaleDateString("es-ES")}
+            {new Date(user?.create_at).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })}
           </p>
         </div>
       </Card>

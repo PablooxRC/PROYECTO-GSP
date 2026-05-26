@@ -16,9 +16,9 @@ export const RegistroProvider = ({ children }) => {
     const [errors, setErrors] = useState([])
     const [unidades, setUnidades] = useState([])
 
-    const loadRegistros = async () => {
+    const loadRegistros = async (from, to) => {
         try {
-            const data = await registroApi.getRegistros()
+            const data = await registroApi.getRegistros(from, to)
             setRegistros(data)
         } catch (error) {
             console.error('Error cargando registros:', error)

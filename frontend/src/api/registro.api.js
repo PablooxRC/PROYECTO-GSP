@@ -1,8 +1,12 @@
 import axios from './axios'
 
-export const getRegistros = async () => {
+export const getRegistros = async (from, to) => {
     try {
-        const res = await axios.get('/registros')
+        const params = new URLSearchParams();
+        if (from) params.append('from', from);
+        if (to) params.append('to', to);
+        const query = params.toString() ? `?${params.toString()}` : '';
+        const res = await axios.get(`/registros${query}`)
         return res.data
     } catch (error) {
         throw error
