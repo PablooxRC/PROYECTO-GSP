@@ -1,32 +1,21 @@
 # ============================================================
-# Frontend – React + Vite → Nginx (producción)
+# Frontend – Nginx sirve el dist pre-compilado (producción)
+# El dist debe subirse manualmente a ./frontend/dist antes de
+# levantar los contenedores. Ver DEPLOY.md para instrucciones.
+#
+# En producción este Dockerfile NO se usa directamente;
+# docker-compose usa la imagen nginx:1.27-alpine con el dist
+# montado como volumen. Este archivo queda como referencia
+# por si se necesita empaquetar la imagen en otro contexto.
 # ============================================================
 
-# ---- Etapa 1: build ----
-FROM node:22-alpine AS builder
-WORKDIR /app
+FROM nginx:1.27-alpine
 
-COPY package.json package-lock.json ./
-RUN npm ci
-
-COPY . .
-
-# VITE_API_URL se inyecta en tiempo de build via ARG/ENV
-ARG VITE_API_URL=/api
-ARG VITE_APP_NAME=GSP
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_APP_NAME=$VITE_APP_NAME
-
-RUN npm run build
-
-# ---- Etapa 2: Nginx sirve los estáticos ----
-FROM nginx:1.27-alpine AS runner
-
-# Eliminar la config por defecto de nginx
 RUN rm /etc/nginx/conf.d/default.conf
 
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx/nginx.conf /etc/nginx/conf.d/app.conf
+# El dist debe estar en ./frontend/dist en el momento del build
+COPY dist /usr/share/nginx/html
+COPY ../nginx/nginx.conf /etc/nginx/conf.d/app.conf
 
 EXPOSE 80
 

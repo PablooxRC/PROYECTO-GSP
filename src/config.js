@@ -18,7 +18,6 @@ const config = {
   PORT: parseInt(getEnvVariable("PORT", "3000")),
   NODE_ENV: getEnvVariable("NODE_ENV", "development"),
 
-  // Base de datos - Vercel Postgres (DATABASE_URL) o local
   DATABASE_URL: getEnvVariable("DATABASE_URL", null),
   DB_HOST: getEnvVariable("DB_HOST", "localhost"),
   DB_PORT: parseInt(getEnvVariable("DB_PORT", "5432")),
@@ -32,8 +31,10 @@ const config = {
   JWT_EXPIRATION: getEnvVariable("JWT_EXPIRATION", "24h"),
 
   // CORS
-  CORS_ORIGIN: getEnvVariable("CORS_ORIGIN", "http://localhost:5173"),
-  VERCEL_URL: getEnvVariable("VERCEL_URL", null),
+  CORS_ORIGIN: getEnvVariable(
+    "CORS_ORIGIN",
+    "https://registros-gsp.cloudnest.lat",
+  ),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: parseInt(

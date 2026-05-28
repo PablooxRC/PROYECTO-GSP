@@ -24,9 +24,9 @@ COPY --chown=appuser:appgroup package.json ./
 
 USER appuser
 
-EXPOSE 3000
+EXPOSE 3202
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-  CMD wget -qO- http://localhost:3000/health || exit 1
+  CMD wget -qO- http://localhost:3202/health || exit 1
 
 CMD ["node", "src/index.js"]
