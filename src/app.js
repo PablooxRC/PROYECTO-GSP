@@ -35,9 +35,13 @@ const app = express();
 // CORS - headers manuales para máxima compatibilidad
 app.use((req, res, next) => {
   const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:5173',
+    ...(config.CORS_ORIGIN ? config.CORS_ORIGIN.split(',').map(o => o.trim()) : []),
+  ].filter(Boolean);
   const isAllowed = origin && (
-    origin.endsWith('.vercel.app') ||
-    origin === 'http://localhost:5173'
+    allowedOrigins.includes(origin) ||
+    origin.endsWith('.vercel.app')
   );
   if (isAllowed) {
     res.setHeader('Access-Control-Allow-Origin', origin);
