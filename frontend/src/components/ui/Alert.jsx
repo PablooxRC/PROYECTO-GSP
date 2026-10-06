@@ -103,16 +103,17 @@ export function Alert({ type = "info", message, onClose, duration = 6000 }) {
 
   return (
     <div
-      className="fixed top-6 right-6 z-50"
-      style={{ minWidth: "320px", maxWidth: "480px" }}
+      className="toast-position"
+      role={type === "error" ? "alert" : "status"}
     >
       <div
-        className={`${bg} ${border} border rounded-xl shadow-2xl px-5 py-4 text-white flex items-start gap-3 transition-all duration-300 ${show ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
+        className={`ui-toast ${bg} ${border} border px-5 py-4 text-white flex items-start gap-3 transition-all duration-300 ${show ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
       >
         <span className="mt-0.5 flex-shrink-0">{icon}</span>
         <p className="flex-1 text-sm font-medium leading-snug">{message}</p>
         {onClose && (
           <button
+            aria-label="Cerrar aviso"
             onClick={() => {
               setShow(false);
               setTimeout(() => onClose(), 300);

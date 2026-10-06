@@ -33,26 +33,26 @@ export function ConfirmModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className={`fixed inset-0 bg-black transition-opacity duration-200 ${show ? "opacity-50" : "opacity-0"}`}
+        className={`dialog-overlay fixed inset-0 transition-opacity duration-200 ${show ? "opacity-100" : "opacity-0"}`}
         onClick={onCancel}
       />
       <div
-        className={`relative bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-6 max-w-md w-full mx-4 transform transition-all duration-200 ${show ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className={`dialog-panel relative p-6 sm:p-8 max-w-md w-full transform transition-all duration-200 ${show ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}
       >
         <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-        <p className="text-gray-400 mb-6">{message}</p>
+        <p className="text-gray-400 text-sm leading-relaxed mb-8">{message}</p>
         <div className="flex justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
-          >
+          <button onClick={onCancel} className="button-secondary">
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-lg text-white transition-colors ${variantClasses[variant]}`}
+            className={`button-primary ${variantClasses[variant]}`}
           >
             {confirmText}
           </button>

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
+import FormCloseButton from "../components/ui/FormCloseButton";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import usePaginatedList from "../hooks/usePaginatedList";
 import Pagination from "../components/ui/Pagination";
 
-const input =
-  "w-full rounded bg-gray-700 text-white p-2 border border-gray-600";
-const button =
-  "rounded bg-blue-600 hover:bg-blue-700 px-4 py-2 disabled:opacity-50";
+const input = "form-input mt-2 w-full";
+const button = "button-primary disabled:opacity-50";
 const emptyMaterial = {
   name: "",
   reference: "",
@@ -114,7 +113,7 @@ export default function KralPage({ requests = false }) {
   const visible = data.materials;
   const fields = (value, setter, definitions) =>
     definitions.map(([key, label, type = "text"]) => (
-      <label key={key} className="block text-sm">
+      <label key={key} className="block text-sm font-medium text-[#cbd2e1]">
         {label}
         <input
           className={input}
@@ -128,26 +127,32 @@ export default function KralPage({ requests = false }) {
       </label>
     ));
   return (
-    <main className="py-8 text-white space-y-6">
-      <div className="flex flex-wrap justify-between items-center gap-3">
-        <h1 className="text-3xl font-bold">
+    <main className="page-shell space-y-6">
+      <div className="page-header flex flex-wrap justify-between items-center gap-4">
+        <h1 className="page-title">
           {requests ? "Solicitudes de Kral" : "Inventario de grupo (Kral)"}
         </h1>
-        <Link className={button} to={requests ? "/kral" : "/kral/solicitudes"}>
+        <Link
+          className="button-secondary"
+          to={requests ? "/kral" : "/kral/solicitudes"}
+        >
           {requests ? "Ver inventario" : "Solicitudes de material"}
         </Link>
       </div>
       {message && (
-        <p role="status" className="p-4 rounded bg-gray-700">
+        <p
+          role="status"
+          className="rounded-xl border border-[#7053c8]/50 bg-[#7053c8]/10 p-4 text-[#d4c9f4]"
+        >
           {message}
         </p>
       )}
       {loading ? (
-        <p>Cargando Kral…</p>
+        <p className="empty-state">Cargando Kral…</p>
       ) : requests ? (
         <>
           <form
-            className="bg-gray-800 p-5 rounded space-y-4"
+            className="section-panel space-y-6 p-5 sm:p-7"
             onSubmit={(e) => {
               e.preventDefault();
               run(async () => {
@@ -171,8 +176,13 @@ export default function KralPage({ requests = false }) {
               }, "Solicitud enviada. Pendiente de aprobación.");
             }}
           >
-            <h2 className="text-xl font-semibold">Nueva solicitud</h2>
-            <label>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <h2 className="text-xl font-semibold tracking-tight">
+                Nueva solicitud
+              </h2>
+              <FormCloseButton to="/kral" disabled={busy} />
+            </div>
+            <label className="block text-sm font-medium text-[#cbd2e1]">
               Buscar material
               <input
                 className={input}
@@ -180,8 +190,7 @@ export default function KralPage({ requests = false }) {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </label>
-            <Pagination {...pickerPage} label="Materiales disponibles" />
-            <p className="text-gray-300">
+            <p className="rounded-lg border border-[#303b50] bg-[#0e1420]/50 p-4 text-sm leading-relaxed text-[#a5afc2]">
               El stock se descuenta al aprobar. Un administrador confirma la
               devolución completa.
             </p>
@@ -199,8 +208,11 @@ export default function KralPage({ requests = false }) {
               ])}
             </div>
             {items.map((item, index) => (
-              <div key={index} className="flex flex-wrap gap-2 items-end">
-                <label className="flex-1 min-w-48">
+              <div
+                key={index}
+                className="flex flex-wrap gap-4 items-end rounded-xl border border-[#303b50] p-4"
+              >
+                <label className="flex-1 min-w-48 text-sm font-medium text-[#cbd2e1]">
                   Material
                   <select
                     required
@@ -240,7 +252,7 @@ export default function KralPage({ requests = false }) {
                       ))}
                   </select>
                 </label>
-                <label>
+                <label className="w-full text-sm font-medium text-[#cbd2e1] sm:w-36">
                   Cantidad
                   <input
                     aria-label={`Cantidad material ${index + 1}`}
@@ -277,7 +289,8 @@ export default function KralPage({ requests = false }) {
                 )}
               </div>
             ))}
-            <div className="flex gap-3">
+            <Pagination {...pickerPage} label="Materiales disponibles" />
+            <div className="flex flex-wrap gap-3 border-t border-[#303b50] pt-5">
               <button
                 type="button"
                 className={button}
@@ -295,11 +308,12 @@ export default function KralPage({ requests = false }) {
           <h2 className="text-xl font-semibold">
             {admin ? "Todas las solicitudes" : "Mis solicitudes"}
           </h2>
-          {list.length === 0 && <p>No hay solicitudes todavía.</p>}
-          <Pagination {...requestsPage} label="Solicitudes" />
+          {list.length === 0 && (
+            <p className="empty-state">No hay solicitudes todavía.</p>
+          )}
           {list.map((r) => (
-            <article key={r.id} className="bg-gray-800 rounded p-5 space-y-3">
-              <h3 className="font-bold">
+            <article key={r.id} className="section-panel p-5 sm:p-6 space-y-4">
+              <h3 className="border-b border-[#303b50] pb-4 text-lg font-semibold text-[#c1b2f3]">
                 Solicitud #{r.id} · {r.unit} ·{" "}
                 {
                   {
@@ -320,20 +334,20 @@ export default function KralPage({ requests = false }) {
                 Date.parse(r.return_at) < Date.now() && (
                   <p className="text-amber-300">Devolución vencida</p>
                 )}
-              <ul className="list-disc pl-5">
+              <ul className="list-disc space-y-2 rounded-xl bg-[#0e1420]/60 p-4 pl-9 text-sm">
                 {r.items.map((i) => (
                   <li key={i.material_id}>
                     {i.name} · {i.location}: {i.quantity} {i.measure}
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-gray-300">
+              <p className="text-sm text-[#a5afc2]">
                 Solicitante: {r.requester_ci} · Creada: {date(r.created_at)}
               </p>
               {r.decision_note && <p>Observación: {r.decision_note}</p>}
               {r.returned_at && <p>Devuelta: {date(r.returned_at)}</p>}
               {admin && (
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3 border-t border-[#303b50] pt-4">
                   {(r.status === "pending"
                     ? [
                         ["approve", "Aprobar"],
@@ -359,15 +373,16 @@ export default function KralPage({ requests = false }) {
               )}
             </article>
           ))}
+          <Pagination {...requestsPage} label="Solicitudes" />
         </>
       ) : (
         <>
-          <p className="text-gray-300">
+          <p className="page-description">
             Consulta existencias por ubicación, cantidades disponibles y
             materiales en uso.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <label>
+          <div className="filter-bar flex flex-wrap items-end gap-4">
+            <label className="w-full text-sm font-medium text-[#cbd2e1] sm:w-auto sm:min-w-56">
               Ubicación
               <select
                 className={input}
@@ -383,7 +398,7 @@ export default function KralPage({ requests = false }) {
                 ))}
               </select>
             </label>
-            <label className="flex-1">
+            <label className="w-full min-w-0 text-sm font-medium text-[#cbd2e1] sm:w-auto sm:min-w-48 sm:flex-1">
               Buscar material, categoría o unidad
               <input
                 className={input}
@@ -406,10 +421,12 @@ export default function KralPage({ requests = false }) {
             )}
           </div>
           {admin && (
-            <details className="bg-gray-800 p-4 rounded">
-              <summary className="cursor-pointer">Crear ubicación</summary>
+            <details className="section-panel p-5">
+              <summary className="cursor-pointer font-semibold text-[#c1b2f3]">
+                Crear ubicación
+              </summary>
               <form
-                className="mt-4 space-y-3"
+                className="mt-5 grid gap-4 sm:grid-cols-2"
                 onSubmit={(e) => {
                   e.preventDefault();
                   run(async () => {
@@ -418,6 +435,16 @@ export default function KralPage({ requests = false }) {
                   }, "Ubicación creada.");
                 }}
               >
+                <div className="sm:col-span-2 flex justify-end">
+                  <FormCloseButton
+                    disabled={busy}
+                    onClick={(event) => {
+                      event.currentTarget
+                        .closest("details")
+                        .removeAttribute("open");
+                    }}
+                  />
+                </div>
                 {fields(location, setLocation, [
                   ["name", "Nombre de ubicación"],
                   ["description", "Descripción / dirección"],
@@ -438,9 +465,8 @@ export default function KralPage({ requests = false }) {
               </form>
             </details>
           )}
-          <div className="overflow-x-auto bg-gray-800 rounded">
-            <Pagination {...inventoryPage} label="Inventario" />
-            <table className="w-full text-sm text-left">
+          <div className="table-wrap">
+            <table className="w-full min-w-[920px] text-sm text-left">
               <thead>
                 <tr>
                   {[
@@ -455,7 +481,10 @@ export default function KralPage({ requests = false }) {
                     "Observaciones",
                     ...(admin ? ["Acciones"] : []),
                   ].map((h) => (
-                    <th key={h} className="p-3 whitespace-nowrap">
+                    <th
+                      key={h}
+                      className="px-4 py-4 whitespace-nowrap text-[#a5afc2] font-medium"
+                    >
                       {h}
                     </th>
                   ))}
@@ -463,11 +492,16 @@ export default function KralPage({ requests = false }) {
               </thead>
               <tbody>
                 {visible.map((m) => (
-                  <tr key={m.id} className="border-t border-gray-700">
+                  <tr
+                    key={m.id}
+                    className="border-t border-[#303b50] align-top hover:bg-[#c1b2f3]/5"
+                  >
                     <td className="p-3">{m.reference || m.id}</td>
                     <td className="p-3 font-semibold">
                       {m.name}
-                      <span className="block text-gray-400">{m.measure}</span>
+                      <span className="mt-1 block text-xs font-normal text-[#a5afc2]">
+                        {m.measure}
+                      </span>
                     </td>
                     <td className="p-3">{m.category || "—"}</td>
                     <td className="p-3">
@@ -475,11 +509,15 @@ export default function KralPage({ requests = false }) {
                       {m.external ? " (externa)" : ""}
                     </td>
                     <td className="p-3">{m.unit}</td>
-                    <td className="p-3">{Number(m.total)}</td>
-                    <td className="p-3 text-green-300">
+                    <td className="p-3 tabular-nums text-right">
+                      {Number(m.total)}
+                    </td>
+                    <td className="p-3 text-[#91d1b8] tabular-nums text-right font-semibold">
                       {Number(m.available)}
                     </td>
-                    <td className="p-3 text-amber-300">{Number(m.in_use)}</td>
+                    <td className="p-3 text-amber-300 tabular-nums text-right">
+                      {Number(m.in_use)}
+                    </td>
                     <td className="p-3">{m.notes}</td>
                     {admin && (
                       <td className="p-3">
@@ -496,17 +534,25 @@ export default function KralPage({ requests = false }) {
               </tbody>
             </table>
           </div>
-          {!visible.length && <p>No hay materiales para este filtro.</p>}
-          <section className="bg-gray-800 rounded p-5 space-y-3">
+          {!visible.length && (
+            <p className="empty-state">No hay materiales para este filtro.</p>
+          )}
+          <Pagination {...inventoryPage} label="Inventario" />
+          <section className="section-panel p-5 sm:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Materiales en uso</h2>
-            <Pagination {...inUsePage} label="Materiales en uso" />
-            {!data.inUse.length && <p>No hay materiales prestados.</p>}
+            {!data.inUse.length && (
+              <p className="empty-state">No hay materiales prestados.</p>
+            )}
             {data.inUse.map((i) => (
-              <p key={`${i.request_id}-${i.material_id}`}>
+              <p
+                key={`${i.request_id}-${i.material_id}`}
+                className="rounded-lg border border-[#303b50] p-4 text-sm leading-relaxed"
+              >
                 {i.name} · {Number(i.quantity)} · {i.unit} · {i.place} ·
                 Devolución: {date(i.return_at)} · Solicitud #{i.request_id}
               </p>
             ))}
+            <Pagination {...inUsePage} label="Materiales en uso" />
           </section>
         </>
       )}
@@ -515,10 +561,10 @@ export default function KralPage({ requests = false }) {
           role="dialog"
           aria-modal="true"
           aria-label="Material"
-          className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-4 flex items-start justify-center"
+          className="fixed inset-0 z-50 bg-[#060a13]/85 backdrop-blur-sm overflow-y-auto p-4 sm:p-8 flex items-start justify-center"
         >
           <form
-            className="bg-gray-800 rounded p-6 max-w-2xl w-full space-y-4"
+            className="section-panel p-5 sm:p-7 max-w-2xl w-full space-y-5 shadow-2xl"
             onSubmit={(e) => {
               e.preventDefault();
               run(async () => {
@@ -534,7 +580,7 @@ export default function KralPage({ requests = false }) {
               }, "Material guardado.");
             }}
           >
-            <h2 className="text-xl">
+            <h2 className="text-2xl font-semibold tracking-tight">
               {material.id ? "Editar material" : "Nuevo material"}
             </h2>
             {message && <p role="alert">{message}</p>}
@@ -548,7 +594,7 @@ export default function KralPage({ requests = false }) {
                 ["total", "Cantidad total", "number"],
                 ["notes", "Observaciones"],
               ])}
-              <label>
+              <label className="block text-sm font-medium text-[#cbd2e1]">
                 Ubicación
                 <select
                   required
@@ -571,13 +617,13 @@ export default function KralPage({ requests = false }) {
               La cantidad disponible se calcula descontando los préstamos
               activos del total.
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3 border-t border-[#303b50] pt-5">
               <button className={button} disabled={busy}>
                 Guardar
               </button>
               <button
                 type="button"
-                className={button}
+                className="button-secondary"
                 disabled={busy}
                 onClick={() => setMaterial(null)}
               >
@@ -592,10 +638,10 @@ export default function KralPage({ requests = false }) {
           role="dialog"
           aria-modal="true"
           aria-label="Confirmar acción"
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-[#060a13]/85 backdrop-blur-sm flex items-center justify-center p-4"
         >
           <form
-            className="bg-gray-800 rounded p-6 max-w-lg space-y-4"
+            className="section-panel p-5 sm:p-7 w-full max-w-lg space-y-5 shadow-2xl"
             onSubmit={(e) => {
               e.preventDefault();
               run(async () => {
@@ -607,7 +653,7 @@ export default function KralPage({ requests = false }) {
               }, "Solicitud actualizada.");
             }}
           >
-            <h2 className="text-xl">
+            <h2 className="text-xl font-semibold tracking-tight">
               {decision.label} · Solicitud #{decision.id}
             </h2>
             <p>
@@ -619,7 +665,7 @@ export default function KralPage({ requests = false }) {
             </p>
             {message && <p role="alert">{message}</p>}
             {decision.action !== "return" && (
-              <label>
+              <label className="block text-sm font-medium text-[#cbd2e1]">
                 Observación
                 <textarea
                   className={input}
@@ -628,14 +674,14 @@ export default function KralPage({ requests = false }) {
                 />
               </label>
             )}
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3 border-t border-[#303b50] pt-5">
               <button disabled={busy} className={button}>
                 Confirmar
               </button>
               <button
                 disabled={busy}
                 type="button"
-                className={button}
+                className="button-secondary"
                 onClick={() => setDecision(null)}
               >
                 Cancelar

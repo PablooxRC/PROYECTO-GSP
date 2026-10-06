@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import FormCloseButton from "../components/ui/FormCloseButton";
 import { Card, Input, Label, Button, Alert } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -36,9 +37,15 @@ function AdminCreatePage() {
   if (!user?.is_admin) return <p className="text-red-500">No autorizado</p>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">Crear Admin</h2>
+    <div className="page-shell flex justify-center">
+      <Card className="section-panel w-full max-w-xl">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+          <h2 className="page-title">Crear administrador</h2>
+          <FormCloseButton to="/admin/dirigentes" />
+        </div>
+        <p className="page-description mb-8">
+          Configura los datos de acceso y la unidad del nuevo administrador.
+        </p>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
@@ -64,10 +71,7 @@ function AdminCreatePage() {
 
           <div>
             <Label>Unidad</Label>
-            <select
-              {...register("unidad")}
-              className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <select {...register("unidad")} className="form-input">
               <option value="">Seleccionar Unidad</option>
               <option value="Hathi">Hathi</option>
               <option value="Jacala">Jacala</option>
@@ -83,7 +87,7 @@ function AdminCreatePage() {
           </div>
 
           <div>
-            <Label>Password</Label>
+            <Label>Contraseña</Label>
             <Input
               type="password"
               {...register("password", { required: true })}
@@ -93,9 +97,7 @@ function AdminCreatePage() {
             )}
           </div>
 
-          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
-            Crear Admin
-          </Button>
+          <Button className="button-primary w-full mt-6">Crear Admin</Button>
         </form>
 
         {alert && (

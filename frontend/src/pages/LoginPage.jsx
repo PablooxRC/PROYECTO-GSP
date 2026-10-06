@@ -27,11 +27,18 @@ function LoginPage() {
   });
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex justify-center items-center px-4">
-      <Card className="w-full max-w-md">
+    <div className="auth-shell">
+      <div className="auth-intro">
+        <h2 className="auth-title">El grupo, más cerca.</h2>
+        <p className="page-description">
+          Tu espacio para acompañar las actividades y la vida de nuestra
+          comunidad scout.
+        </p>
+      </div>
+      <Card className="auth-card w-full max-w-md">
         {/* ESTE ES EL BLOQUE MODIFICADO PARA MOSTRAR LOS ERRORES DEL CONTEXTO */}
         {loginErrors && loginErrors.length > 0 && (
-          <div className="bg-red-600 text-white p-3 rounded mb-4">
+          <div className="auth-error" role="alert">
             {/* Aquí iteramos sobre 'loginErrors' que es el array de mensajes de error del AuthContext */}
             {loginErrors.map((err, index) => (
               <p key={index} className="mb-1">
@@ -41,38 +48,47 @@ function LoginPage() {
           </div>
         )}
 
-        <h1 className="text-4xl font-bold my-2 text-center"> Ingresar</h1>
+        <h1 className="text-2xl font-semibold mb-2">Ingresar</h1>
+        <p className="text-sm text-[#a5afc2] mb-7">
+          Accede con el correo de tu cuenta.
+        </p>
 
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="space-y-3">
           <Label htmlFor="email">Email</Label>
           {/* Aquí se usan los errores de validación del formulario (formErrors) */}
           {formErrors.email && (
-            <p className="text-red-500">El email es requerido</p>
+            <p className="text-sm text-[#f5a5ae]">El email es requerido</p>
           )}
           <Input
             type="email"
-            placeholder="Email"
+            id="email"
+            autoComplete="email"
+            placeholder="tu@correo.com"
             {...register("email", {
               required: true,
             })}
           />
-          <Label htmlFor="contraseña">Contraseña</Label>
+          <Label htmlFor="password">Contraseña</Label>
           {/* Aquí se usan los errores de validación del formulario (formErrors) */}
           {formErrors.password && (
-            <p className="text-red-500">La contraseña es requerida</p>
+            <p className="text-sm text-[#f5a5ae]">La contraseña es requerida</p>
           )}
           <Input
             type="password"
-            placeholder="Password"
+            id="password"
+            autoComplete="current-password"
+            placeholder="Ingresa tu contraseña"
             {...register("password", {
               required: true,
             })}
           />
 
-          <Button type="submit" className="w-full mt-4">Ingresar</Button>
-          <div className="flex justify-between my-4">
-            <p>¿No tienes una cuenta?</p>
-            <Link to="/register" className="font-bold">
+          <Button type="submit" className="w-full mt-4">
+            Ingresar
+          </Button>
+          <div className="auth-footer flex flex-wrap justify-center gap-2 text-sm">
+            <p className="text-[#a5afc2]">¿No tienes una cuenta?</p>
+            <Link to="/register" className="font-semibold text-[#c1b2f3]">
               {" "}
               Registrarse
             </Link>

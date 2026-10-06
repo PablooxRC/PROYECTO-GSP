@@ -26,7 +26,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="app-loading">
         <Spinner size="lg" text="Cargando aplicación..." />
       </div>
     );
@@ -34,8 +34,11 @@ function App() {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Ir al contenido
+      </a>
       <Navbar />
-      <div className="max-w-7xl px-4 mx-auto">
+      <div id="main-content" className="app-shell" tabIndex={-1}>
         <Routes>
           <Route
             element={
@@ -97,7 +100,10 @@ function App() {
 
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/kral" element={<KralPage key="inventory" />} />
-            <Route path="/kral/solicitudes" element={<KralPage key="requests" requests />} />
+            <Route
+              path="/kral/solicitudes"
+              element={<KralPage key="requests" requests />}
+            />
           </Route>
 
           <Route path="*" element={<NotFound />} />

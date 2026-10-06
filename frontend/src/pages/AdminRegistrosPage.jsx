@@ -1,16 +1,17 @@
-import React from 'react'
-import { RegistroProvider } from '../context/registroContex'
-import RegistrosPage from './RegistrosPage'
-import { useAuth } from '../context/AuthContext'
+import React from "react";
+import { RegistroProvider } from "../context/registroContex";
+import RegistrosPage from "./RegistrosPage";
+import { useAuth } from "../context/AuthContext";
 
-function AdminRegistrosPage(){
-  const { user } = useAuth()
-  if (!user?.is_admin) return <p>No autorizado</p>
+function AdminRegistrosPage() {
+  const { user } = useAuth();
+  if (!user?.is_admin)
+    return <p className="empty-state text-red-400">No autorizado</p>;
   return (
     <RegistroProvider>
       <RegistrosPage />
     </RegistroProvider>
-  )
+  );
 }
 
-export default AdminRegistrosPage
+export default AdminRegistrosPage;

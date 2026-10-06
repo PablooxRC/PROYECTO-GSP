@@ -6,9 +6,13 @@ export function Spinner({ size = "lg", text = "Cargando..." }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-3">
+    <div
+      role="status"
+      className="flex flex-col items-center justify-center gap-4"
+    >
       <div
-        className={`${sizeClasses[size]} animate-spin rounded-full border-4 border-gray-600 border-t-indigo-500`}
+        aria-hidden="true"
+        className={`${sizeClasses[size]} animate-spin rounded-full border-2 border-gray-700 border-t-indigo-400`}
       />
       {text && <p className="text-gray-400 text-sm">{text}</p>}
     </div>

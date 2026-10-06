@@ -9,16 +9,13 @@ export default function Pagination({
 }) {
   const { page, pageSize, total, totalPages } = pagination;
   const start = total ? (page - 1) * pageSize + 1 : 0;
-  const style = "rounded bg-gray-700 text-white px-3 py-2 disabled:opacity-40";
+  const style = "pagination-button";
   return (
-    <nav
-      aria-label={label}
-      className="flex flex-wrap items-center gap-3 my-4 text-sm"
-    >
+    <nav aria-label={label} className="pagination-bar">
       {label !== "Paginación" && (
         <span className="font-semibold">{label}:</span>
       )}
-      <span role="status">
+      <span role="status" className="pagination-count">
         {loading
           ? "Cargando…"
           : `${start}–${Math.min(page * pageSize, total)} de ${total}`}
@@ -42,7 +39,7 @@ export default function Pagination({
       >
         Siguiente
       </button>
-      <label>
+      <label className="flex items-center gap-2">
         Por página{" "}
         <select
           className={style}

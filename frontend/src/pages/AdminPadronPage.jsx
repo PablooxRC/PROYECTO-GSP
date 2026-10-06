@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import FormCloseButton from "../components/ui/FormCloseButton";
 import {
   Card,
   Button,
@@ -10,13 +11,9 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../utils/getErrorMessage";
 import { useForm } from "react-hook-form";
-import usePaginatedList from '../hooks/usePaginatedList';
-import Pagination from '../components/ui/Pagination';
-import {
-  createPadron,
-  updatePadron,
-  deletePadron,
-} from "../api/padron.api";
+import usePaginatedList from "../hooks/usePaginatedList";
+import Pagination from "../components/ui/Pagination";
+import { createPadron, updatePadron, deletePadron } from "../api/padron.api";
 
 const UNIDADES = [
   "Hathi",
@@ -33,8 +30,12 @@ function AdminPadronPage() {
   const [editingCi, setEditingCi] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
-  const paging = usePaginatedList('/padron', {search}, Boolean(user?.is_admin));
-  const {items:registros,loading,error} = paging;
+  const paging = usePaginatedList(
+    "/padron",
+    { search },
+    Boolean(user?.is_admin),
+  );
+  const { items: registros, loading, error } = paging;
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [alertMsg, setAlertMsg] = useState(null);
 
@@ -123,33 +124,42 @@ function AdminPadronPage() {
   if (!user?.is_admin) return <p className="text-red-500">No autorizado</p>;
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="page-shell">
+      <div className="page-header mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold mb-1">Padrón de Personas</h1>
-          <p className="text-gray-400">Total: {paging.pagination.total} registros</p>
+          <h1 className="page-title mb-2">Padrón de Personas</h1>
+          <p className="text-[#a5afc2]">
+            Total: {paging.pagination.total} registros
+          </p>
         </div>
-        <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4"
-          onClick={handleNew}
-        >
-          ➕ Agregar Registro
+        <Button className="button-primary" onClick={handleNew}>
+          Agregar registro
         </Button>
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-400/30 text-red-300 rounded-xl">
           {error}
         </div>
       )}
 
       {/* FORMULARIO */}
       {showForm && (
-        <Card className="mb-8 p-6">
-          <h2 className="text-2xl font-bold mb-4">
-            {editingCi ? "Editar Registro" : "Nuevo Registro"}
-          </h2>
-          <form onSubmit={onSubmit} className="space-y-4">
+        <Card className="section-panel mb-8">
+          <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-semibold">
+              {editingCi ? "Editar Registro" : "Nuevo Registro"}
+            </h2>
+            <FormCloseButton
+              onClick={() => {
+                setShowForm(false);
+                setEditingCi(null);
+                reset({});
+              }}
+            />
+          </div>
+          <form onSubmit={onSubmit} className="space-y-5">
+            <h3 className="text-lg font-semibold">Datos personales</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>CI *</Label>
@@ -164,10 +174,7 @@ function AdminPadronPage() {
               </div>
               <div>
                 <Label>Sexo</Label>
-                <select
-                  {...register("sexo")}
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+                <select {...register("sexo")} className="form-input">
                   <option value="">Seleccionar</option>
                   <option value="M">Masculino</option>
                   <option value="F">Femenino</option>
@@ -216,10 +223,7 @@ function AdminPadronPage() {
               </div>
               <div>
                 <Label>Unidad</Label>
-                <select
-                  {...register("unidad")}
-                  className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+                <select {...register("unidad")} className="form-input">
                   <option value="">Seleccionar Unidad</option>
                   {UNIDADES.map((u) => (
                     <option key={u} value={u}>
@@ -247,6 +251,9 @@ function AdminPadronPage() {
               </div>
             </div>
 
+            <h3 className="text-lg font-semibold border-t border-[#303b50] pt-6">
+              Contacto de emergencia
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label>Nombre del Contacto</Label>
@@ -266,15 +273,12 @@ function AdminPadronPage() {
             </div>
 
             <div className="flex gap-3">
-              <Button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6"
-              >
+              <Button type="submit" className="button-primary">
                 {editingCi ? "Guardar Cambios" : "Crear Registro"}
               </Button>
               <Button
                 type="button"
-                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6"
+                className="button-secondary"
                 onClick={() => {
                   setShowForm(false);
                   setEditingCi(null);
@@ -289,7 +293,7 @@ function AdminPadronPage() {
       )}
 
       {/* BUSCADOR */}
-      <div className="mb-4">
+      <div className="filter-bar mb-5">
         <Input
           placeholder="Buscar por CI, nombre o apellido..."
           value={search}
@@ -298,18 +302,17 @@ function AdminPadronPage() {
       </div>
 
       {/* TABLA */}
-      <Pagination {...paging} />
       {loading ? (
-        <p className="text-gray-400 text-center py-8">Cargando...</p>
+        <p className="text-[#a5afc2] empty-state">Cargando...</p>
       ) : filtered.length === 0 ? (
-        <Card className="p-8 text-center">
-          <p className="text-gray-400">No se encontraron registros</p>
+        <Card className="empty-state">
+          <p className="text-[#a5afc2]">No se encontraron registros</p>
         </Card>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="table-wrap overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-gray-700 text-white">
+              <tr className="bg-[#171e2d] text-[#a5afc2]">
                 <th className="p-3 text-left">CI</th>
                 <th className="p-3 text-left">Nombre Completo</th>
                 <th className="p-3 text-left">Sexo</th>
@@ -324,9 +327,11 @@ function AdminPadronPage() {
               {filtered.map((r) => (
                 <tr
                   key={r.ci}
-                  className="border-b border-gray-600 hover:bg-gray-700/50"
+                  className="border-b border-[#303b50] hover:bg-[#1d2638] transition-colors"
                 >
-                  <td className="p-3 font-mono font-bold">{r.ci}</td>
+                  <td className="p-4 font-semibold tabular-nums whitespace-nowrap">
+                    {r.ci}
+                  </td>
                   <td className="p-3">
                     {[
                       r.primer_nombre,
@@ -351,20 +356,20 @@ function AdminPadronPage() {
                       </span>
                     )}
                     {r.contacto_celular && (
-                      <div className="text-gray-400">{r.contacto_celular}</div>
+                      <div className="text-[#a5afc2]">{r.contacto_celular}</div>
                     )}
                   </td>
                   <td className="p-3">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(r)}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded"
+                        className="button-secondary text-xs"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => handleDelete(r.ci)}
-                        className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
+                        className="button-danger text-xs"
                       >
                         Eliminar
                       </button>
@@ -376,6 +381,8 @@ function AdminPadronPage() {
           </table>
         </div>
       )}
+
+      <Pagination {...paging} />
 
       <ConfirmModal
         isOpen={!!confirmDelete}

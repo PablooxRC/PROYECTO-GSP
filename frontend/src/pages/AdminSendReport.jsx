@@ -1,4 +1,5 @@
 import { useState } from "react";
+import FormCloseButton from "../components/ui/FormCloseButton";
 import usePaginatedList from "../hooks/usePaginatedList";
 import Pagination from "../components/ui/Pagination";
 import { sendReport } from "../api/admin.api";
@@ -160,14 +161,23 @@ export default function AdminSendReport() {
   };
 
   return (
-    <div className="p-4 md:p-8">
-      <h1 className="text-4xl font-bold mb-8">Enviar Reporte (Excel)</h1>
+    <div className="page-shell">
+      <div className="page-header mb-7">
+        <h1 className="page-title">Reportes de registro</h1>
+        <p className="page-description mt-2">
+          Consulta un período, revisa los registros y comparte el reporte en
+          Excel.
+        </p>
+      </div>
 
-      <div className="max-w-4xl">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-gray-800 p-6 rounded-lg mb-6"
-        >
+      <div className="w-full space-y-6">
+        <form onSubmit={handleSubmit} className="section-panel p-5 sm:p-7">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <h2 className="text-xl font-semibold tracking-tight">
+              Preparar reporte
+            </h2>
+            <FormCloseButton to="/registros" />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium mb-2">Desde</label>
@@ -178,7 +188,7 @@ export default function AdminSendReport() {
                   setFrom(e.target.value);
                   setShowPreview(false);
                 }}
-                className="w-full p-2 rounded bg-gray-700 text-white"
+                className="form-input w-full"
               />
             </div>
             <div>
@@ -190,7 +200,7 @@ export default function AdminSendReport() {
                   setTo(e.target.value);
                   setShowPreview(false);
                 }}
-                className="w-full p-2 rounded bg-gray-700 text-white"
+                className="form-input w-full"
               />
             </div>
             <div>
@@ -201,30 +211,30 @@ export default function AdminSendReport() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white"
+                className="form-input w-full"
                 placeholder="destino@ejemplo.com"
               />
             </div>
           </div>
 
-          <div className="mb-4">
+          <div className="form-section my-6">
             <label className="block text-sm font-medium mb-2">
               Mensaje adjunto (opcional)
             </label>
             <textarea
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
-              className="w-full p-2 rounded bg-gray-700 text-white"
+              className="form-input w-full resize-y"
               placeholder="Escribe un mensaje para incluir en el email..."
               rows={3}
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6 rounded-xl border border-dashed border-[#303b50] p-4">
             <label className="block text-sm font-medium mb-2">
               Imagen para adjuntar (opcional)
             </label>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <input
                 type="file"
                 accept="image/*"
@@ -234,41 +244,44 @@ export default function AdminSendReport() {
               />
               <label
                 htmlFor="imagen-input"
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition cursor-pointer"
+                className="button-secondary cursor-pointer"
               >
-                🖼️ Seleccionar imagen
+                Seleccionar imagen
               </label>
-              <span className="text-sm text-gray-300">{imagenNombre}</span>
+              <span className="break-all text-sm text-[#a5afc2]">
+                {imagenNombre}
+              </span>
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3 border-t border-[#303b50] pt-5">
             <button
               type="button"
               onClick={handlePreview}
               disabled={previewLoading}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition"
+              className="button-secondary"
             >
-              {previewLoading ? "Cargando..." : "👁️ Vista Previa"}
+              {previewLoading ? "Cargando..." : "Vista previa"}
             </button>
             <button
               type="submit"
               disabled={loading || !email}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition disabled:opacity-50"
+              className="button-primary disabled:opacity-50"
             >
-              {loading ? "Enviando..." : "📧 Enviar Reporte"}
+              {loading ? "Enviando..." : "Enviar reporte"}
             </button>
           </div>
         </form>
 
         {message && (
           <div
-            className={`mb-6 p-4 rounded ${
+            role="status"
+            className={`mb-6 p-4 rounded-xl border ${
               message.type === "success"
-                ? "bg-green-100 text-green-800"
+                ? "border-[#91d1b8]/30 bg-[#91d1b8]/10 text-[#91d1b8]"
                 : message.type === "error"
-                  ? "bg-red-100 text-red-800"
-                  : "bg-blue-100 text-blue-800"
+                  ? "border-red-400/30 bg-red-400/10 text-red-300"
+                  : "border-[#c1b2f3]/30 bg-[#c1b2f3]/10 text-[#c1b2f3]"
             }`}
           >
             {message.text}
@@ -276,33 +289,27 @@ export default function AdminSendReport() {
         )}
 
         {showPreview && (
-          <div>
-            <div className="mb-4 flex gap-3">
+          <div className="space-y-5">
+            <div className="mb-4 flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={handleDownloadExcel}
                 disabled={loading}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition"
+                className="button-secondary"
               >
-                {loading ? "Descargando..." : "📥 Descargar Excel"}
+                {loading ? "Descargando..." : "Descargar Excel"}
               </button>
             </div>
-            <h2 className="text-2xl font-bold mb-4">
-              VISTA PREVIA ({registrosPage.pagination.total} registros,{" "}
+            <h2 className="text-2xl font-semibold tracking-tight mb-4">
+              Vista previa ({registrosPage.pagination.total} registros,{" "}
               {scoutsPage.pagination.total} scouts sin registro)
             </h2>
 
-            <Pagination {...registrosPage} label="Registros del reporte" />
-            <Pagination
-              {...scoutsPage}
-              label="Scouts sin registro del reporte"
-            />
-            <Pagination {...dirigentesPage} label="Dirigentes del reporte" />
             {registros.length === 0 &&
             scouts.length === 0 &&
             dirigentes.length === 0 ? (
-              <Card className="p-8 text-center">
-                <p className="text-gray-400">
+              <Card className="empty-state p-8 text-center">
+                <p className="text-[#a5afc2]">
                   No hay scouts, registros ni dirigentes en el rango de fechas
                   seleccionado
                 </p>
@@ -312,13 +319,13 @@ export default function AdminSendReport() {
                 {/* SCOUTS CON REGISTROS */}
                 {registros.length > 0 && (
                   <div>
-                    <h3 className="text-xl font-bold mb-4">
-                      ✓ Scouts con Depósito Registrado (
+                    <h3 className="text-xl font-semibold mb-4 text-[#91d1b8]">
+                      Scouts con depósito registrado (
                       {registrosPage.pagination.total})
                     </h3>
                     <div className="grid grid-cols-1 gap-4">
                       {registros.map((registro) => (
-                        <Card key={registro.id} className="px-6 py-4">
+                        <Card key={registro.id} className="p-5 sm:p-6">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
                               <p className="text-xs text-gray-400">
@@ -350,7 +357,7 @@ export default function AdminSendReport() {
                               </p>
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 pt-3 border-t border-gray-600">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5 pt-5 border-t border-[#303b50]">
                             <div>
                               <p className="text-xs text-gray-400">Etapa</p>
                               <p className="text-sm">
@@ -371,13 +378,13 @@ export default function AdminSendReport() {
                             </div>
                             <div>
                               <p className="text-xs text-gray-400">Monto</p>
-                              <p className="text-sm font-bold text-green-400">
+                              <p className="text-sm font-semibold tabular-nums text-[#91d1b8]">
                                 ${registro.monto || "-"}
                               </p>
                             </div>
                           </div>
                           {registro.envio && (
-                            <div className="mt-3 pt-3 border-t border-gray-600">
+                            <div className="mt-5 pt-5 border-t border-[#303b50]">
                               <p className="text-xs text-gray-400">Envío</p>
                               <p className="text-sm">{registro.envio}</p>
                             </div>
@@ -393,15 +400,15 @@ export default function AdminSendReport() {
                   const scoutsSinRegistro = scouts;
                   return scoutsSinRegistro.length > 0 ? (
                     <div>
-                      <h3 className="text-xl font-bold mb-4 text-yellow-400">
-                        ⚠️ Scouts Registrados SIN Depósito (
+                      <h3 className="text-xl font-semibold mb-4 text-amber-200">
+                        Scouts registrados sin depósito (
                         {scoutsPage.pagination.total})
                       </h3>
                       <div className="grid grid-cols-1 gap-4">
                         {scoutsSinRegistro.map((scout) => (
                           <Card
                             key={scout.ci}
-                            className="px-6 py-4 border-2 border-yellow-600"
+                            className="p-5 sm:p-6 border border-amber-300/30"
                           >
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                               <div>
@@ -423,14 +430,14 @@ export default function AdminSendReport() {
                                 <p className="text-sm">{scout.unidad || "-"}</p>
                               </div>
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3 pt-3 border-t border-gray-600">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-5 pt-5 border-t border-[#303b50]">
                               <div>
                                 <p className="text-xs text-gray-400">Etapa</p>
                                 <p className="text-sm">{scout.etapa || "-"}</p>
                               </div>
                               <div>
                                 <p className="text-xs text-gray-400">Monto</p>
-                                <p className="text-sm font-bold text-yellow-400">
+                                <p className="text-sm font-semibold tabular-nums text-amber-200">
                                   ${scout.monto || "-"}
                                 </p>
                               </div>
@@ -443,9 +450,9 @@ export default function AdminSendReport() {
                                 </p>
                               </div>
                             </div>
-                            <div className="mt-3 pt-3 border-t border-gray-600">
-                              <p className="text-xs text-yellow-500 font-semibold">
-                                Estado: FALTA REGISTRAR DEPÓSITO
+                            <div className="mt-5 pt-4 border-t border-[#303b50]">
+                              <p className="status-badge text-amber-200">
+                                Falta registrar depósito
                               </p>
                             </div>
                           </Card>
@@ -458,8 +465,8 @@ export default function AdminSendReport() {
                 {/* DIRIGENTES SECTION */}
                 {dirigentes.length > 0 && (
                   <div>
-                    <h3 className="text-xl font-bold mb-4">
-                      Dirigentes Registrados ({dirigentesPage.pagination.total})
+                    <h3 className="text-xl font-semibold mb-4">
+                      Dirigentes registrados ({dirigentesPage.pagination.total})
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {dirigentes.map((dirigente) => {
@@ -470,13 +477,13 @@ export default function AdminSendReport() {
                         return (
                           <Card
                             key={`dir-${dirigente.ci}`}
-                            className={`px-6 py-4 ${
+                            className={`p-5 sm:p-6 ${
                               tieneRegistros
-                                ? "border-2 border-green-600"
-                                : "border-2 border-gray-600"
+                                ? "border border-[#91d1b8]/30"
+                                : "border border-[#303b50]"
                             }`}
                           >
-                            <h3 className="text-xl font-bold mb-2">
+                            <h3 className="text-lg font-semibold mb-2">
                               {dirigente.nombre} {dirigente.apellido}
                             </h3>
 
@@ -488,7 +495,7 @@ export default function AdminSendReport() {
                             </p>
 
                             <p className="mb-2">
-                              <span className="text-blue-400">
+                              <span className="break-all text-[#c1b2f3]">
                                 {dirigente.email || "Sin email"}
                               </span>
                             </p>
@@ -504,28 +511,28 @@ export default function AdminSendReport() {
                               </p>
                             )}
 
-                            <div className="bg-gray-700 p-3 rounded mb-3">
+                            <div className="bg-[#0e1420]/60 border border-[#303b50] p-4 rounded-lg mb-4">
                               <p className="text-gray-400 text-sm">Envío</p>
                               <p className="text-white">
                                 {dirigente.envio || "Sin especificar"}
                               </p>
                             </div>
 
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap gap-3 items-center justify-between">
                               <p className="text-gray-500 text-sm">
                                 Registros en periodo:{" "}
                                 <strong
                                   className={
                                     tieneRegistros
-                                      ? "text-green-400"
-                                      : "text-gray-400"
+                                      ? "text-[#91d1b8] tabular-nums"
+                                      : "text-[#a5afc2] tabular-nums"
                                   }
                                 >
                                   {registrosCount}
                                 </strong>
                               </p>
                               {dirigente.es_colaborador && (
-                                <span className="px-2 py-1 bg-blue-600 text-white text-xs rounded">
+                                <span className="status-badge bg-[#7053c8]/15 text-[#c1b2f3]">
                                   Colaborador
                                 </span>
                               )}
@@ -538,6 +545,12 @@ export default function AdminSendReport() {
                 )}
               </div>
             )}
+            <Pagination {...registrosPage} label="Registros del reporte" />
+            <Pagination
+              {...scoutsPage}
+              label="Scouts sin registro del reporte"
+            />
+            <Pagination {...dirigentesPage} label="Dirigentes del reporte" />
           </div>
         )}
       </div>

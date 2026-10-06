@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import usePaginatedList from '../hooks/usePaginatedList';
-import Pagination from '../components/ui/Pagination';
+import usePaginatedList from "../hooks/usePaginatedList";
+import Pagination from "../components/ui/Pagination";
 import { useNavigate } from "react-router-dom";
 import { Card, Button, ConfirmModal } from "../components/ui";
 import { useRegistro } from "../context/registroContex";
@@ -11,20 +11,18 @@ import { formatDate } from "../utils/formatDate";
 
 function RegistrosPage() {
   const navigate = useNavigate();
-  const {
-    deleteRegistro,
-    errors,
-    setErrors,
-    unidades,
-    loadUnidades,
-  } = useRegistro();
+  const { deleteRegistro, errors, setErrors, unidades, loadUnidades } =
+    useRegistro();
   const { user } = useAuth();
   const [unidadFiltro, setUnidadFiltro] = useState("Todas");
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
   const [dates, setDates] = useState({});
-  const paging = usePaginatedList('/registros', {...dates, unidad: unidadFiltro});
+  const paging = usePaginatedList("/registros", {
+    ...dates,
+    unidad: unidadFiltro,
+  });
   const registros = paging.items;
 
   // unidades ahora viene del provider; mostrar 'Todas' por defecto
@@ -34,7 +32,7 @@ function RegistrosPage() {
 
   const handleFiltrar = () => {
     setErrors([]);
-    setDates({from:fechaDesde || undefined,to:fechaHasta || undefined});
+    setDates({ from: fechaDesde || undefined, to: fechaHasta || undefined });
   };
 
   const handleLimpiar = () => {
@@ -42,7 +40,7 @@ function RegistrosPage() {
     setFechaHasta("");
     setErrors([]);
     setDates({});
-    setUnidadFiltro('Todas');
+    setUnidadFiltro("Todas");
   };
 
   useEffect(() => {
@@ -61,37 +59,40 @@ function RegistrosPage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="page-shell">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Registros</h1>
+        <h1 className="page-title mb-4">Registros</h1>
+        <p className="page-description mb-6">
+          Consulta las inscripciones y filtra por fecha o unidad.
+        </p>
 
         {/* Filtros */}
-        <div className="flex flex-wrap items-end gap-3 mb-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-400">Fecha desde</label>
+        <div className="filter-bar flex flex-wrap items-end gap-4 mb-5">
+          <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:min-w-40 sm:flex-1">
+            <label className="data-label">Fecha desde</label>
             <input
               type="date"
               value={fechaDesde}
               onChange={(e) => setFechaDesde(e.target.value)}
-              className="px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-sm"
+              className="form-input"
             />
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-400">Fecha hasta</label>
+          <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:min-w-40 sm:flex-1">
+            <label className="data-label">Fecha hasta</label>
             <input
               type="date"
               value={fechaHasta}
               onChange={(e) => setFechaHasta(e.target.value)}
-              className="px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-sm"
+              className="form-input"
             />
           </div>
           {user?.is_admin && (
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-400">Unidad</label>
+            <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:min-w-40 sm:flex-1">
+              <label className="data-label">Unidad</label>
               <select
                 value={unidadFiltro}
                 onChange={(e) => setUnidadFiltro(e.target.value)}
-                className="px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-sm"
+                className="form-input"
               >
                 {opcionesUnidades.map((u) => (
                   <option key={u} value={u}>
@@ -101,17 +102,11 @@ function RegistrosPage() {
               </select>
             </div>
           )}
-          <button
-            onClick={handleFiltrar}
-            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded"
-          >
+          <button onClick={handleFiltrar} className="button-primary">
             Filtrar
           </button>
           {(fechaDesde || fechaHasta) && (
-            <button
-              onClick={handleLimpiar}
-              className="px-4 py-1.5 bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium rounded"
-            >
+            <button onClick={handleLimpiar} className="button-secondary">
               Limpiar
             </button>
           )}
@@ -123,69 +118,68 @@ function RegistrosPage() {
         ))}
         <Button
           onClick={() => navigate("/scouts/new")}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4"
+          className="button-primary"
         >
-          ➕ Nuevo Registro
+          Nuevo registro
         </Button>
       </div>
 
       {/* Lista de registros */}
-      <Pagination {...paging} />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {registrosFiltrados.map((registro) => (
-          <Card key={registro.id} className="px-7 py-4">
-            <div>
-              <h2 className="text-xl font-bold mb-2 text-white">
+          <Card key={registro.id} className="data-card flex flex-col">
+            <div className="flex-1 pb-5 space-y-2 break-words">
+              <h2 className="text-lg font-semibold mb-4 text-[#f1f3fa]">
                 Registro #{registro.id}
               </h2>
 
-              <p className="text-sm text-white mb-1">
+              <p className="text-sm text-[#a5afc2] mb-1">
                 <strong>Scout:</strong>{" "}
                 {registro.scout_nombre && registro.scout_apellido
                   ? `${registro.scout_nombre} ${registro.scout_apellido}`
                   : `CI: ${registro.scout_ci}`}
               </p>
               {registro.unidad && (
-                <p className="text-sm text-white">
+                <p className="text-sm text-[#a5afc2]">
                   <strong>Unidad:</strong> {registro.unidad}
                 </p>
               )}
               {registro.etapa_progresion && (
-                <p className="text-sm text-white">
+                <p className="text-sm text-[#a5afc2]">
                   <strong>Etapa:</strong> {registro.etapa_progresion}
                 </p>
               )}
               {registro.colegio && (
-                <p className="text-sm text-white">
+                <p className="text-sm text-[#a5afc2]">
                   <strong>Colegio:</strong> {registro.colegio}
                 </p>
               )}
               {registro.curso && (
-                <p className="text-sm text-white">
+                <p className="text-sm text-[#a5afc2]">
                   <strong>Curso:</strong> {registro.curso}
                 </p>
               )}
 
               {(registro.numero_deposito || registro.monto) && (
-                <div className="mt-2 p-2">
+                <div className="mt-4 pt-3 border-t border-[#303b50]">
                   {registro.numero_deposito && (
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-[#a5afc2]">
                       <strong>Depósito:</strong> {registro.numero_deposito}
                     </p>
                   )}
                   {registro.fecha_deposito && (
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-[#a5afc2]">
                       <strong>Fecha:</strong>{" "}
                       {formatDate(registro.fecha_deposito)}
                     </p>
                   )}
                   {registro.hora_deposito && (
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-[#a5afc2]">
                       <strong>Hora:</strong> {registro.hora_deposito}
                     </p>
                   )}
                   {registro.monto && (
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-[#a5afc2]">
                       <strong>Monto:</strong> ${registro.monto}
                     </p>
                   )}
@@ -201,20 +195,20 @@ function RegistrosPage() {
               {(registro.contacto_nombre ||
                 registro.contacto_parentesco ||
                 registro.contacto_celular) && (
-                <div className="mt-2 p-2">
+                <div className="mt-4 pt-3 border-t border-[#303b50]">
                   {registro.contacto_nombre && (
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-[#a5afc2]">
                       <strong>Nombre:</strong> {registro.contacto_nombre}
                     </p>
                   )}
                   {registro.contacto_parentesco && (
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-[#a5afc2]">
                       <strong>Parentesco:</strong>{" "}
                       {registro.contacto_parentesco}
                     </p>
                   )}
                   {registro.contacto_celular && (
-                    <p className="text-sm text-white">
+                    <p className="text-sm text-[#a5afc2]">
                       <strong>Celular:</strong> {registro.contacto_celular}
                     </p>
                   )}
@@ -222,9 +216,9 @@ function RegistrosPage() {
               )}
             </div>
 
-            <div className="my-2 flex justify-end gap-x-2">
+            <div className="mt-auto pt-5 flex flex-wrap justify-end gap-2 border-t border-[#303b50]">
               <Button
-                className="bg-red-500 hover:bg-red-600"
+                className="button-danger"
                 onClick={() => handleDelete(registro.id)}
               >
                 <PiTrashSimpleLight className="text-white" />
@@ -242,12 +236,14 @@ function RegistrosPage() {
       </div>
 
       {registros.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
+        <div className="empty-state">
+          <p className="text-[#a5afc2] text-lg">
             No hay registros. ¡Crea uno nuevo!
           </p>
         </div>
       )}
+
+      <Pagination {...paging} />
 
       <ConfirmModal
         isOpen={!!confirmDelete}

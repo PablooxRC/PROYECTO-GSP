@@ -7,16 +7,20 @@ import { BiPencil } from "react-icons/bi";
 import adminApi from "../api/admin.api";
 import { formatDate } from "../utils/formatDate";
 import { getErrorMessage } from "../utils/getErrorMessage";
-import usePaginatedList from '../hooks/usePaginatedList';
-import Pagination from '../components/ui/Pagination';
+import usePaginatedList from "../hooks/usePaginatedList";
+import Pagination from "../components/ui/Pagination";
 
 function AdminDirigentesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const paging = usePaginatedList('/admin/dirigentes-list', {}, Boolean(user?.is_admin));
-  const {items:dirigentes, loading, error} = paging;
-  const {refresh} = paging;
+  const paging = usePaginatedList(
+    "/admin/dirigentes-list",
+    {},
+    Boolean(user?.is_admin),
+  );
+  const { items: dirigentes, loading, error } = paging;
+  const { refresh } = paging;
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [alert, setAlert] = useState(null);
 
@@ -55,73 +59,79 @@ function AdminDirigentesPage() {
   }
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Dirigentes Registrados</h1>
-        <p className="text-gray-400 mb-4">
+    <div className="page-shell">
+      <div className="page-header mb-8">
+        <h1 className="page-title mb-2">Dirigentes Registrados</h1>
+        <p className="page-description mb-4">
           Total: {paging.pagination.total} dirigentes
         </p>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="mb-4 p-4 bg-red-500/10 border border-red-400/30 text-red-300 rounded-xl">
             {error}
           </div>
         )}
 
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4"
+          className="button-primary"
           onClick={() => navigate("/admin/dirigentes/create")}
         >
-          ➕ Crear Dirigente
+          Crear dirigente
         </Button>
       </div>
 
-      <Pagination {...paging} />
       {loading ? (
-        <div className="text-center py-8">
-          <p className="text-gray-500">Cargando dirigentes...</p>
+        <div className="empty-state">
+          <p className="text-[#a5afc2]">Cargando dirigentes...</p>
         </div>
       ) : dirigentes.length === 0 ? (
-        <Card className="p-8 text-center">
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
+        <Card className="empty-state">
+          <p className="page-description mb-4">
             No hay dirigentes registrados aún
           </p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {dirigentes.map((dirigente) => (
-            <Card key={dirigente.ci} className="px-7 py-4">
-              <div>
-                <h2 className="text-2xl font-bold mb-2">
-                  {[dirigente.primer_nombre, dirigente.segundo_nombre, dirigente.primer_apellido, dirigente.segundo_apellido].filter(Boolean).join(" ") || dirigente.nombre}
+            <Card key={dirigente.ci} className="data-card flex flex-col">
+              <div className="flex-1 pb-5 break-words">
+                <h2 className="text-xl font-semibold mb-3 break-words">
+                  {[
+                    dirigente.primer_nombre,
+                    dirigente.segundo_nombre,
+                    dirigente.primer_apellido,
+                    dirigente.segundo_apellido,
+                  ]
+                    .filter(Boolean)
+                    .join(" ") || dirigente.nombre}
                 </h2>
-                <p className="text-sm text-gray-400 mb-3">
+                <p className="text-sm text-[#a5afc2] mb-3">
                   C.I.: {dirigente.ci}
                 </p>
 
                 {dirigente.email && (
-                  <p className="text-sm text-blue-400 mb-1">
+                  <p className="text-sm text-[#c1b2f3] mb-1">
                     <strong>Email:</strong> {dirigente.email}
                   </p>
                 )}
 
                 {dirigente.unidad && (
-                  <p className="text-sm text-gray-300 mb-1">
+                  <p className="text-sm text-[#a5afc2] mb-1">
                     <strong>Unidad:</strong> {dirigente.unidad}
                   </p>
                 )}
 
                 {dirigente.nivel_formacion && (
-                  <p className="text-sm text-gray-300 mb-1">
+                  <p className="text-sm text-[#a5afc2] mb-1">
                     <strong>Nivel de Formación:</strong>{" "}
                     {dirigente.nivel_formacion}
                   </p>
                 )}
 
-                <div className="mt-3 p-2 bg-gray-700 rounded">
+                <div className="mt-4 py-3 border-t border-[#303b50]">
                   <p className="text-sm">
                     <strong>Envío:</strong>{" "}
-                    <span className="text-gray-300 ml-1">
+                    <span className="text-[#a5afc2] ml-1">
                       {dirigente.envio || "Sin especificar"}
                     </span>
                   </p>
@@ -132,30 +142,30 @@ function AdminDirigentesPage() {
                   <span
                     className={
                       dirigente.es_colaborador
-                        ? "text-green-400"
-                        : "text-gray-400"
+                        ? "text-[#91d1b8]"
+                        : "text-[#a5afc2]"
                     }
                   >
                     {dirigente.es_colaborador ? "✓ Sí" : "✗ No"}
                   </span>
                 </p>
 
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="data-label mt-2">
                   Registrado:{" "}
                   {formatDate(dirigente.fecha_deposito || dirigente.create_at)}
                 </p>
               </div>
 
-              <div className="my-4 flex justify-end gap-x-2">
+              <div className="mt-auto pt-5 flex flex-wrap justify-end gap-2 border-t border-[#303b50]">
                 <Button
-                  className="bg-red-500 hover:bg-red-600"
+                  className="button-danger"
                   onClick={() => handleDelete(dirigente.ci)}
                 >
                   <PiTrashSimpleLight className="text-white" />
                   Eliminar
                 </Button>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="button-secondary"
                   onClick={() =>
                     navigate(`/admin/dirigentes/${dirigente.ci}/edit`)
                   }
@@ -168,6 +178,8 @@ function AdminDirigentesPage() {
           ))}
         </div>
       )}
+
+      <Pagination {...paging} />
 
       <ConfirmModal
         isOpen={!!confirmDelete}

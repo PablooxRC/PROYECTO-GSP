@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import FormCloseButton from "../components/ui/FormCloseButton";
 import { Card, Input, Label, Button, Alert } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -144,11 +145,19 @@ function AdminDirigenteCreate() {
   const pageTitle = params.ci ? "Editar Dirigente" : "Registrar Dirigente";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-4">{pageTitle}</h2>
+    <div className="page-shell flex justify-center">
+      <Card className="section-panel w-full max-w-3xl">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+          <h2 className="page-title">{pageTitle}</h2>
+          <FormCloseButton to="/admin/dirigentes" />
+        </div>
+        <p className="page-description mb-8">
+          Actualiza los datos personales, la formación y el depósito del
+          dirigente.
+        </p>
 
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-5">
+          <h3 className="text-lg font-semibold">Datos personales</h3>
           <div>
             <Label>Cédula de Identidad</Label>
             <Input
@@ -160,7 +169,7 @@ function AdminDirigenteCreate() {
             />
             {padronMsg && (
               <p
-                className={`text-sm mt-1 ${padronMsg.type === "ok" ? "text-green-400" : "text-yellow-400"}`}
+                className={`text-sm mt-1 ${padronMsg.type === "ok" ? "text-[#91d1b8]" : "text-yellow-400"}`}
               >
                 {padronMsg.text}
               </p>
@@ -170,7 +179,7 @@ function AdminDirigenteCreate() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <Label>Primer Nombre</Label>
               <Input {...register("primer_nombre", { required: true })} />
@@ -181,7 +190,7 @@ function AdminDirigenteCreate() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <Label>Primer Apellido</Label>
               <Input {...register("primer_apellido", { required: true })} />
@@ -194,25 +203,29 @@ function AdminDirigenteCreate() {
 
           <div>
             <Label>Correo</Label>
-            <Input type="email" {...register("email")} placeholder="correo@ejemplo.com" />
+            <Input
+              type="email"
+              {...register("email")}
+              placeholder="correo@ejemplo.com"
+            />
           </div>
 
           <div>
             <Label>Profesión u Ocupación</Label>
-            <Input {...register("profesion_ocupacion")} placeholder="Ej: Ingeniera, Docente" />
+            <Input
+              {...register("profesion_ocupacion")}
+              placeholder="Ej: Ingeniera, Docente"
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <Label>Fecha de Nacimiento</Label>
               <Input type="date" {...register("fecha_nacimiento")} />
             </div>
             <div>
               <Label>Sexo</Label>
-              <select
-                className="w-full p-2 rounded bg-gray-700 text-white"
-                {...register("sexo")}
-              >
+              <select className="form-input" {...register("sexo")}>
                 <option value="">Seleccionar</option>
                 <option value="M">M</option>
                 <option value="F">F</option>
@@ -221,11 +234,11 @@ function AdminDirigenteCreate() {
           </div>
 
           <div>
+            <h3 className="text-lg font-semibold border-t border-[#303b50] pt-6 mb-5">
+              Unidad y formación
+            </h3>
             <Label>Unidad</Label>
-            <select
-              {...register("unidad")}
-              className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <select {...register("unidad")} className="form-input">
               <option value="">Seleccionar Unidad</option>
               <option value="Sin unidad">Sin unidad</option>
               <option value="Hathi">Hathi</option>
@@ -251,10 +264,13 @@ function AdminDirigenteCreate() {
             <Input {...register("nivel_formacion")} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <Label>Cargo 1</Label>
-              <Input {...register("cargo_1")} placeholder="Ej: Jefe de Unidad" />
+              <Input
+                {...register("cargo_1")}
+                placeholder="Ej: Jefe de Unidad"
+              />
             </div>
             <div>
               <Label>Cargo 2</Label>
@@ -263,7 +279,10 @@ function AdminDirigenteCreate() {
           </div>
 
           {/* Número de Depósito y Monto */}
-          <div className="grid grid-cols-2 gap-4">
+          <h3 className="text-lg font-semibold border-t border-[#303b50] pt-6">
+            Información de depósito
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <Label>Número de Depósito</Label>
               <Input {...register("numero_deposito")} />
@@ -279,7 +298,7 @@ function AdminDirigenteCreate() {
           </div>
 
           {/* Fecha y Hora de Depósito */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <Label>Fecha de Depósito</Label>
               <Input type="date" {...register("fecha_deposito")} />
@@ -306,13 +325,13 @@ function AdminDirigenteCreate() {
               <input
                 type="checkbox"
                 {...register("es_colaborador")}
-                className="w-4 h-4"
+                className="w-4 h-4 accent-[#7053c8]"
               />
               <span>Es Colaborador</span>
             </Label>
           </div>
 
-          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2">
+          <Button className="button-primary w-full mt-6">
             {params.ci ? "Guardar Cambios" : "Registrar Dirigente"}
           </Button>
         </form>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import FormCloseButton from "../components/ui/FormCloseButton";
 import { Card, Input, Label, Button } from "../components/ui";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -64,42 +65,47 @@ function ScoutFormPage() {
     setTimeout(() => setPadronMsg(null), 4000);
   };
 
-  const onSubmit = handleSubmit(async (data) => {
-    setErrors([]);
-    setSubmitting(true);
-    try {
-      // Sanear tipos antes de enviar
-      const payload = {
-        ...data,
-        monto:
-          data.monto === "" || data.monto === undefined || isNaN(data.monto)
-            ? null
-            : Number(data.monto),
-        es_beca: data.es_beca === true || data.es_beca === "true",
-        fecha_nacimiento: data.fecha_nacimiento ? data.fecha_nacimiento : null,
-        fecha_deposito: data.fecha_deposito ? data.fecha_deposito : null,
-      };
-      let scout;
-      if (!params.ci) {
-        scout = await createScout(payload);
-      } else {
-        scout = await updateScout(params.ci, payload);
+  const onSubmit = handleSubmit(
+    async (data) => {
+      setErrors([]);
+      setSubmitting(true);
+      try {
+        // Sanear tipos antes de enviar
+        const payload = {
+          ...data,
+          monto:
+            data.monto === "" || data.monto === undefined || isNaN(data.monto)
+              ? null
+              : Number(data.monto),
+          es_beca: data.es_beca === true || data.es_beca === "true",
+          fecha_nacimiento: data.fecha_nacimiento
+            ? data.fecha_nacimiento
+            : null,
+          fecha_deposito: data.fecha_deposito ? data.fecha_deposito : null,
+        };
+        let scout;
+        if (!params.ci) {
+          scout = await createScout(payload);
+        } else {
+          scout = await updateScout(params.ci, payload);
+        }
+        if (scout) {
+          navigate("/scouts");
+        }
+      } finally {
+        setSubmitting(false);
       }
-      if (scout) {
-        navigate("/scouts");
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  }, () => {
-    // Al fallar validación, scroll al primer error
-    setTimeout(() => {
-      const firstError = document.querySelector('.text-red-500');
-      if (firstError) {
-        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-  });
+    },
+    () => {
+      // Al fallar validación, scroll al primer error
+      setTimeout(() => {
+        const firstError = document.querySelector(".text-red-500");
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+    },
+  );
 
   useEffect(() => {
     setErrors([]);
@@ -150,22 +156,30 @@ function ScoutFormPage() {
   }, [watch]);
 
   return (
-    <div className="py-8 px-4 flex justify-center">
-      <Card className="w-full max-w-2xl">
+    <div className="page-shell flex justify-center">
+      <Card className="section-panel w-full max-w-3xl">
         {ScoutErrors.map((error, i) => (
           <p className="text-red-500 mb-4" key={i}>
             {error}
           </p>
         ))}
-        <h2 className="text-2xl font-bold mb-6">
-          {params.ci ? "Editar Scout" : "Registrar Scout"}
-        </h2>
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+          <h2 className="page-title">
+            {params.ci ? "Editar Scout" : "Registrar Scout"}
+          </h2>
+          <FormCloseButton to="/scouts" disabled={submitting} />
+        </div>
+        <p className="page-description mb-8">
+          Completa los datos personales, la unidad y la información del
+          registro.
+        </p>
         {Object.keys(errors).length > 0 && (
           <p className="text-red-500 bg-red-500/10 p-3 rounded mb-4 text-sm">
             Hay campos requeridos sin completar. Revisa el formulario.
           </p>
         )}
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-5">
+          <h3 className="text-lg font-semibold">Datos personales</h3>
           {/* C.I. */}
           <div>
             <Label htmlFor="ci">Carnet de identidad</Label>
@@ -177,7 +191,7 @@ function ScoutFormPage() {
             />
             {padronMsg && (
               <p
-                className={`text-sm mt-1 ${padronMsg.type === "ok" ? "text-green-400" : "text-yellow-400"}`}
+                className={`text-sm mt-1 ${padronMsg.type === "ok" ? "text-[#91d1b8]" : "text-yellow-400"}`}
               >
                 {padronMsg.text}
               </p>
@@ -251,12 +265,12 @@ function ScoutFormPage() {
               <Label htmlFor="sexo">Sexo</Label>
               <select
                 {...register("sexo", { required: "Es requerido" })}
-                className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
               >
-                <option value="M" className="text-gray-800">
+                <option value="M" className="text-[#f1f3fa]">
                   Masculino
                 </option>
-                <option value="F" className="text-gray-800">
+                <option value="F" className="text-[#f1f3fa]">
                   Femenino
                 </option>
               </select>
@@ -267,11 +281,14 @@ function ScoutFormPage() {
           </div>
 
           {/* Grupo y Rama */}
+          <h3 className="text-lg font-semibold border-t border-[#303b50] pt-6">
+            Información scout
+          </h3>
           <div>
             <Label htmlFor="rama">Rama</Label>
             <select
               {...register("rama", { required: "Es requerida" })}
-              className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             >
               <option value="">Seleccionar Rama</option>
               <option value="Lobatos">Lobatos</option>
@@ -290,7 +307,7 @@ function ScoutFormPage() {
               <Label htmlFor="unidad">Unidad</Label>
               <select
                 {...register("unidad", { required: "Es requerida" })}
-                className="w-full p-2 border border-gray-300 rounded bg-white text-gray-800 font-medium hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
               >
                 <option value="">Seleccionar Unidad</option>
                 <option value="Hathi">Hathi</option>
@@ -336,6 +353,9 @@ function ScoutFormPage() {
           </div>
 
           {/* Número de Depósito y Monto */}
+          <h3 className="text-lg font-semibold border-t border-[#303b50] pt-6">
+            Depósito y beca
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="numero_deposito">Número de Depósito</Label>
@@ -389,7 +409,7 @@ function ScoutFormPage() {
               <input
                 type="checkbox"
                 {...register("es_beca")}
-                className="w-4 h-4"
+                className="w-4 h-4 accent-[#7053c8]"
               />
               <span>¿Es beca?</span>
             </Label>
@@ -407,6 +427,9 @@ function ScoutFormPage() {
           )}
 
           {/* Contacto de Emergencia */}
+          <h3 className="text-lg font-semibold border-t border-[#303b50] pt-6">
+            Contacto de emergencia
+          </h3>
           <div>
             <Label htmlFor="contacto_emergencia_nombre_parentesco">
               Contacto de Emergencia (Nombre y Parentesco)
@@ -429,8 +452,16 @@ function ScoutFormPage() {
           </div>
 
           {/* Botón Submit */}
-          <Button type="submit" disabled={submitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 text-base">
-            {submitting ? "Registrando..." : (params.ci ? "Editar Scout" : "Registrar Scout")}
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="button-primary w-full mt-6 py-3"
+          >
+            {submitting
+              ? "Registrando..."
+              : params.ci
+                ? "Editar Scout"
+                : "Registrar Scout"}
           </Button>
         </form>
       </Card>

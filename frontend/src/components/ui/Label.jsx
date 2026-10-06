@@ -1,9 +1,6 @@
 export function Label({ children, htmlFor, className = "" }) {
   return (
-    <label
-      className={`block text-sm font-medium text-gray-300 mb-1 ${className}`}
-      htmlFor={htmlFor}
-    >
+    <label className={`ui-label ${className}`} htmlFor={htmlFor}>
       {children}
     </label>
   );

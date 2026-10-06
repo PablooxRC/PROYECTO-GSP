@@ -118,7 +118,7 @@ const assert = require("node:assert/strict");
     await page.goto(`${process.env.UI_BASE_URL || 'http://127.0.0.1:5188'}/admin/send-report`, {
       waitUntil: "domcontentloaded",
     });
-    await page.getByRole("button", { name: /Vista Previa/ }).click();
+    await page.getByRole("button", { name: /Vista previa/i }).click();
     await page
       .getByRole("navigation", { name: "Registros del reporte" })
       .waitFor();

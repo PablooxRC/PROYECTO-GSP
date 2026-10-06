@@ -4,26 +4,48 @@ import { Card } from "../components/ui";
 function ProfilePage() {
   const { user } = useAuth();
   return (
-    <div className="flex justify-center items-center h-screen">
-      <Card className="p-8 w-full max-w-md shadow-lg rounded-xl ">
-        <div className="flex flex-col items-center text-center">
+    <div className="page-shell">
+      <header className="page-header">
+        <div>
+          <h1 className="page-title">Mi perfil</h1>
+          <p className="page-description">
+            Tu información de cuenta y unidad scout.
+          </p>
+        </div>
+      </header>
+      <Card className="w-full max-w-3xl">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-[#303b50] pb-6 mb-6">
           <img
             src={user?.gravatar}
-            alt="Avatar"
-            className="w-28 h-28 rounded-full object-cover mb-4"
+            alt="Foto de perfil"
+            className="w-20 h-20 rounded-full object-cover border border-[#303b50]"
           />
           {(user?.nombre || user?.apellido) && (
-            <h2 className="text-2xl font-semibold text-white mb-2">
+            <h2 className="text-2xl font-semibold">
               {user?.nombre} {user?.apellido}
             </h2>
           )}
-          <p className="text-white mb-2">Email: {user?.email}</p>
-          <p className="text-white mb-2">Unidad: {user?.unidad}</p>
-          <p className="text-sm text-gray-400 mt-4">
-            Registrado desde:{" "}
-            {new Date(user?.create_at).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })}
-          </p>
         </div>
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <dt className="data-label">Email</dt>
+            <dd className="data-value break-all">{user?.email}</dd>
+          </div>
+          <div>
+            <dt className="data-label">Unidad</dt>
+            <dd className="data-value">{user?.unidad}</dd>
+          </div>
+          <div className="sm:col-span-2">
+            <dt className="data-label">Registrado desde</dt>
+            <dd className="data-value">
+              {new Date(user?.create_at).toLocaleDateString("es-ES", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+            </dd>
+          </div>
+        </dl>
       </Card>
     </div>
   );

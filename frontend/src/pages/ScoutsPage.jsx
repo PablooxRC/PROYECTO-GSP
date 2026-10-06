@@ -1,7 +1,7 @@
 import { useState } from "react";
-import usePaginatedList from '../hooks/usePaginatedList';
-import Pagination from '../components/ui/Pagination';
-import api from '../api/axios';
+import usePaginatedList from "../hooks/usePaginatedList";
+import Pagination from "../components/ui/Pagination";
+import api from "../api/axios";
 import { Button, Card, ConfirmModal, Alert } from "../components/ui";
 import { useScout } from "../context/scoutContex.jsx";
 import { useNavigate } from "react-router-dom";
@@ -12,13 +12,12 @@ import { getErrorMessage } from "../utils/getErrorMessage";
 
 function ScoutPage() {
   const { deleteScout } = useScout();
-  const paging = usePaginatedList('/scouts');
+  const paging = usePaginatedList("/scouts");
   const scouts = paging.items;
   const navigate = useNavigate();
   const { user } = useAuth();
   const [toDelete, setToDelete] = useState(null);
   const [alert, setAlert] = useState(null);
-
 
   const handleDeleteClick = (scout) => {
     setToDelete(scout);
@@ -48,8 +47,16 @@ function ScoutPage() {
     const printWindow = window.open("", "", "width=800,height=600");
     if (!printWindow) return;
     let allScouts;
-    try { allScouts = (await api.get('/scouts')).data; }
-    catch (error) { printWindow.close(); setAlert({type:'error',message:getErrorMessage(error,'Error cargando reporte')}); return; }
+    try {
+      allScouts = (await api.get("/scouts")).data;
+    } catch (error) {
+      printWindow.close();
+      setAlert({
+        type: "error",
+        message: getErrorMessage(error, "Error cargando reporte"),
+      });
+      return;
+    }
     const htmlContent = `
       <html>
         <head>
@@ -101,12 +108,15 @@ function ScoutPage() {
   }
 
   return (
-    <div className="relative">
+    <div className="page-shell relative">
       {/* Encabezado */}
-      <div>
-        <h1 className="text-2xl sm:text-4xl font-extrabold dark:text-white py-4">
-          Unidad: {user?.unidad || "No disponible"}
+      <div className="page-header">
+        <h1 className="page-title">
+          Scouts de {user?.unidad || "No disponible"}
         </h1>
+        <p className="page-description">
+          Consulta los resultados y administra los scouts de tu unidad.
+        </p>
       </div>
 
       {/* Confirm Modal para eliminación */}
@@ -133,41 +143,38 @@ function ScoutPage() {
       )}
 
       {/* Acciones */}
-      <div className="mb-4 flex gap-4">
-        <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-          onClick={handlePrintReport}
-        >
+      <div className="filter-bar mb-6 flex flex-wrap gap-4">
+        <Button className="button-secondary" onClick={handlePrintReport}>
           Imprimir Reporte de Scouts
         </Button>
       </div>
 
-      <Pagination {...paging} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
         {scouts.map((scout) => (
-          <Card key={scout.ci} className="px-5 py-4">
-            <div>
-              <h1 className="text-xl font-bold break-words">
+          <Card key={scout.ci} className="data-card flex flex-col">
+            <div className="space-y-3 flex-1">
+              <h2 className="text-xl font-semibold break-words">
                 {scout.nombre} {scout.apellido}
-              </h1>
-              <p>{scout.ci}</p>
-              <p>Puntaje: {scout.puntaje ?? 0}</p>
-              <p>
+              </h2>
+              <p className="data-label">C.I. {scout.ci}</p>
+              <p className="data-value">Puntaje: {scout.puntaje ?? 0}</p>
+              <p className="data-label">
                 Preguntas mal contestadas:{" "}
                 {scout.preguntas_mal_contestadas ?? 0}
               </p>
             </div>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-6 pt-4 border-t border-[#303b50] flex flex-wrap gap-2">
               <Button
-                className="bg-red-500 hover:bg-red-600 flex-1 min-w-0 justify-center"
+                className="button-danger flex-1 min-w-0 justify-center"
                 onClick={() => handleDeleteClick(scout)}
               >
                 <PiTrashSimpleLight className="text-white" />
                 Eliminar
               </Button>
               <Button
-                className="flex-1 min-w-0 justify-center"
-                onClick={() => navigate(`/scouts/${scout.ci}/edit`)}>
+                className="button-secondary flex-1 min-w-0 justify-center"
+                onClick={() => navigate(`/scouts/${scout.ci}/edit`)}
+              >
                 <BiPencil className="text-white" />
                 Editar
               </Button>
@@ -175,6 +182,7 @@ function ScoutPage() {
           </Card>
         ))}
       </div>
+      <Pagination {...paging} />
     </div>
   );
 }
