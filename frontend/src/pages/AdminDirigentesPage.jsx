@@ -7,33 +7,25 @@ import { BiPencil } from "react-icons/bi";
 import adminApi from "../api/admin.api";
 import { formatDate } from "../utils/formatDate";
 import { getErrorMessage } from "../utils/getErrorMessage";
+import usePaginatedList from '../hooks/usePaginatedList';
+import Pagination from '../components/ui/Pagination';
 
 function AdminDirigentesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [dirigentes, setDirigentes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const paging = usePaginatedList('/admin/dirigentes-list', {}, Boolean(user?.is_admin));
+  const {items:dirigentes, loading, error} = paging;
+  const {refresh} = paging;
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [alert, setAlert] = useState(null);
 
   useEffect(() => {
-    loadDirigentes();
-  }, [location]);
+    refresh();
+  }, [location, refresh]);
 
   const loadDirigentes = async () => {
-    try {
-      setLoading(true);
-      const response = await adminApi.getDirigentes();
-      setDirigentes(response.data);
-      setError(null);
-    } catch (err) {
-      setError(getErrorMessage(err, "Error cargando dirigentes"));
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    paging.refresh();
   };
 
   const handleDelete = (ci) => {
@@ -67,7 +59,7 @@ function AdminDirigentesPage() {
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">Dirigentes Registrados</h1>
         <p className="text-gray-400 mb-4">
-          Total: {dirigentes.length} dirigentes
+          Total: {paging.pagination.total} dirigentes
         </p>
 
         {error && (
@@ -84,6 +76,7 @@ function AdminDirigentesPage() {
         </Button>
       </div>
 
+      <Pagination {...paging} />
       {loading ? (
         <div className="text-center py-8">
           <p className="text-gray-500">Cargando dirigentes...</p>

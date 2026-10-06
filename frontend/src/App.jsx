@@ -19,6 +19,7 @@ import AdminCreatePage from "./pages/AdminCreatePage";
 import AdminDirigenteCreate from "./pages/AdminDirigenteCreate";
 import AdminDirigentesPage from "./pages/AdminDirigentesPage";
 import AdminSendReport from "./pages/AdminSendReport";
+import KralPage from "./pages/KralPage";
 
 function App() {
   const { isAuth, loading, user } = useAuth();
@@ -95,6 +96,8 @@ function App() {
             </Route>
 
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/kral" element={<KralPage key="inventory" />} />
+            <Route path="/kral/solicitudes" element={<KralPage key="requests" requests />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

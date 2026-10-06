@@ -15,7 +15,7 @@ const getEnvVariable = (key, defaultValue = null, isRequired = false) => {
 
 const config = {
   // Servidor
-  PORT: parseInt(getEnvVariable("PORT", "3000")),
+  PORT: parseInt(getEnvVariable("PORT", "3001")),
   NODE_ENV: getEnvVariable("NODE_ENV", "development"),
 
   DATABASE_URL: getEnvVariable("DATABASE_URL", null),
@@ -63,7 +63,7 @@ const config = {
   LOG_LEVEL: getEnvVariable("LOG_LEVEL", "info"),
 
   // URLs
-  API_BASE_URL: getEnvVariable("API_BASE_URL", "http://localhost:3000/api"),
+  API_BASE_URL: getEnvVariable("API_BASE_URL", "http://localhost:3001/api"),
   FRONTEND_URL: getEnvVariable("FRONTEND_URL", "http://localhost:5173"),
 };
 

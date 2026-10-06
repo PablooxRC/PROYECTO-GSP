@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Card,
   Button,
@@ -10,8 +10,9 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../utils/getErrorMessage";
 import { useForm } from "react-hook-form";
+import usePaginatedList from '../hooks/usePaginatedList';
+import Pagination from '../components/ui/Pagination';
 import {
-  listPadron,
   createPadron,
   updatePadron,
   deletePadron,
@@ -29,12 +30,11 @@ const UNIDADES = [
 
 function AdminPadronPage() {
   const { user } = useAuth();
-  const [registros, setRegistros] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [editingCi, setEditingCi] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
+  const paging = usePaginatedList('/padron', {search}, Boolean(user?.is_admin));
+  const {items:registros,loading,error} = paging;
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [alertMsg, setAlertMsg] = useState(null);
 
@@ -45,20 +45,8 @@ function AdminPadronPage() {
     formState: { errors },
   } = useForm();
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
-    try {
-      setLoading(true);
-      const res = await listPadron();
-      setRegistros(res.data);
-    } catch {
-      setError("Error cargando padrón");
-    } finally {
-      setLoading(false);
-    }
+    paging.refresh();
   };
 
   const handleNew = () => {
@@ -130,14 +118,7 @@ function AdminPadronPage() {
     }
   });
 
-  const filtered = registros.filter((r) => {
-    const s = search.toLowerCase();
-    return (
-      r.ci?.toLowerCase().includes(s) ||
-      r.primer_nombre?.toLowerCase().includes(s) ||
-      r.primer_apellido?.toLowerCase().includes(s)
-    );
-  });
+  const filtered = registros;
 
   if (!user?.is_admin) return <p className="text-red-500">No autorizado</p>;
 
@@ -146,7 +127,7 @@ function AdminPadronPage() {
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-4xl font-bold mb-1">Padrón de Personas</h1>
-          <p className="text-gray-400">Total: {registros.length} registros</p>
+          <p className="text-gray-400">Total: {paging.pagination.total} registros</p>
         </div>
         <Button
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4"
@@ -317,6 +298,7 @@ function AdminPadronPage() {
       </div>
 
       {/* TABLA */}
+      <Pagination {...paging} />
       {loading ? (
         <p className="text-gray-400 text-center py-8">Cargando...</p>
       ) : filtered.length === 0 ? (

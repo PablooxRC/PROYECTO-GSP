@@ -4,6 +4,7 @@ import path from "path";
 import { pool } from "../src/db.js";
 
 const migrations = [
+  "migration_create_kral.sql",
   "init.sql",
   "migration_create_registros_table.sql",
   "migration_add_envio_field.sql",

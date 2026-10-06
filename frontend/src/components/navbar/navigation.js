@@ -14,6 +14,8 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
+  { name: "Inventario Kral", path: "/kral" },
+  { name: "Solicitudes Kral", path: "/kral/solicitudes" },
   {
     name: "Scouts",
     path: "/scouts",

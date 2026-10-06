@@ -11,7 +11,7 @@ function Navbar() {
 
   return (
     <nav className="bg-white border-b-2 border-gray-100 dark:bg-gray-900 dark:border-gray-700 shadow-sm">
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto px-4 py-3">
+      <div className="max-w-screen-xl flex flex-wrap gap-3 items-center justify-between mx-auto px-4 py-3">
         {/* Logo y Brand */}
         <a href="/" className="flex items-center gap-2 flex-shrink-0">
           <img
@@ -34,7 +34,7 @@ function Navbar() {
 
         {/* Menú Desktop */}
         <div className={`hidden md:flex md:w-auto`}>
-          <ul className="font-medium flex flex-row gap-1 p-0 m-0 items-center">
+          <ul className="font-medium flex flex-row flex-wrap gap-1 p-0 m-0 items-center">
             {isAuth
               ? privateRoutes.map(({ path, name, adminOnly }) => {
                   if (adminOnly && !user?.is_admin) return null;

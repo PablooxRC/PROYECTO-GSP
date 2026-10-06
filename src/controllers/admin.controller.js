@@ -1,4 +1,5 @@
 import { pool } from "../db.js";
+import { queryPage } from '../utils/pagination.js';
 import bcrypt from "bcrypt";
 import ExcelJS from "exceljs";
 import fs from "fs";
@@ -6,6 +7,7 @@ import os from "os";
 import path from "path";
 import {
   asyncHandler,
+  AppError,
   NotFoundError,
   ConflictError,
 } from "../utils/errorHandler.js";
@@ -39,10 +41,7 @@ export const listAdmins = asyncHandler(async (req, res) => {
 
 // Listar dirigentes (para admin panel)
 export const listDirigentes = asyncHandler(async (req, res) => {
-  const result = await pool.query(
-    "SELECT * FROM dirigente WHERE admin_registrado = TRUE AND is_admin = FALSE ORDER BY create_at DESC",
-  );
-  return res.json(result.rows);
+  return res.json(await queryPage(pool, 'SELECT * FROM dirigente WHERE admin_registrado = TRUE AND is_admin = FALSE ORDER BY create_at DESC, ci', [], req.query));
 });
 
 // Obtener un dirigente por CI
@@ -62,6 +61,21 @@ export const getDirigentesForReport = asyncHandler(async (req, res) => {
     "SELECT * FROM dirigente WHERE admin_registrado = TRUE AND is_admin = FALSE ORDER BY nombre",
   );
   return res.json(result.rows);
+});
+
+export const reportPreview = asyncHandler(async (req, res) => {
+  const {from, to, section = 'registros'} = req.query;
+  if ([from,to].some(v => v !== undefined && (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(v) || Number.isNaN(Date.parse(v)))) || (from && to && from > to)) {
+    throw new AppError('Rango de fechas inválido.',400);
+  }
+  const deposit = alias => `($1::date IS NULL OR ${alias}.fecha_deposito >= $1::date) AND ($2::date IS NULL OR ${alias}.fecha_deposito < $2::date + INTERVAL '1 day')`;
+  const queries = {
+    registros: `SELECT r.*,s.nombre AS scout_nombre,s.apellido AS scout_apellido FROM registros r JOIN scouts s ON s.ci=r.scout_ci WHERE ${deposit('r')} ORDER BY r.fecha_deposito DESC NULLS LAST,r.id DESC`,
+    scouts: `SELECT s.* FROM scouts s WHERE ($1::date IS NULL OR s.create_at >= $1::date) AND ($2::date IS NULL OR s.create_at < $2::date + INTERVAL '1 day') AND NOT EXISTS (SELECT 1 FROM registros r WHERE r.scout_ci=s.ci AND ${deposit('r')}) ORDER BY s.create_at DESC NULLS LAST,s.ci`,
+    dirigentes: `SELECT d.*,(SELECT COUNT(*)::int FROM registros r WHERE r.dirigente_ci=d.ci AND ${deposit('r')}) AS registros_count FROM dirigente d WHERE d.admin_registrado=TRUE AND d.is_admin=FALSE AND ${deposit('d')} ORDER BY d.nombre,d.ci`
+  };
+  if (!Object.hasOwn(queries,section)) throw new AppError('Sección inválida.',400);
+  res.json(await queryPage(pool,queries[section],[from || null,to || null],{page:'1',...req.query}));
 });
 
 // Crear dirigente (solo admins pueden crear dirigentes desde el panel)
@@ -291,17 +305,51 @@ const fmtDate = (d) => {
   return `${day}/${month}/${date.getFullYear()}`;
 };
 
-async function buildReportWorkbook() {
-  const scoutsRes = await pool.query(`
+export async function buildReportWorkbook(from = null, to = null) {
+  let scoutsQuery = `
     SELECT DISTINCT ON (s.ci) s.*, r.colegio, r.curso
     FROM scouts s
     LEFT JOIN registros r ON s.ci = r.scout_ci
-    ORDER BY s.ci, r.id DESC
-  `);
+  `;
+  let scoutsParams = [];
 
-  const dirigentesRes = await pool.query(
-    "SELECT * FROM dirigente WHERE admin_registrado = TRUE AND is_admin = FALSE",
-  );
+  // Filtrar por fecha de depósito de registros
+  if (from || to) {
+    let dateConditions = [];
+    if (from) {
+      dateConditions.push(`r.fecha_deposito >= $${scoutsParams.length + 1}`);
+      scoutsParams.push(from);
+    }
+    if (to) {
+      dateConditions.push(`r.fecha_deposito <= $${scoutsParams.length + 1}`);
+      scoutsParams.push(to);
+    }
+    scoutsQuery += ` WHERE ${dateConditions.join(" AND ")}`;
+  }
+
+  scoutsQuery += ` ORDER BY s.ci, r.id DESC`;
+
+  const scoutsRes = await pool.query(scoutsQuery, scoutsParams);
+
+  let dirigentesQuery =
+    "SELECT * FROM dirigente WHERE admin_registrado = TRUE AND is_admin = FALSE";
+  let dirigentesParams = [];
+
+  // Filtrar dirigentes por fecha de depósito
+  if (from || to) {
+    let dateConditions = [];
+    if (from) {
+      dateConditions.push(`fecha_deposito >= $${dirigentesParams.length + 1}`);
+      dirigentesParams.push(from);
+    }
+    if (to) {
+      dateConditions.push(`fecha_deposito <= $${dirigentesParams.length + 1}`);
+      dirigentesParams.push(to);
+    }
+    dirigentesQuery += ` AND (${dateConditions.join(" AND ")})`;
+  }
+
+  const dirigentesRes = await pool.query(dirigentesQuery, dirigentesParams);
 
   const workbook = new ExcelJS.Workbook();
   const lobatosSheet = workbook.addWorksheet("Lobatos");
@@ -392,9 +440,11 @@ async function buildReportWorkbook() {
   };
 
   let secuencia = 1;
-  scoutsRes.rows.filter((row) => isLobatos(row.unidad)).forEach((row) => {
-    addScoutRow(lobatosSheet, row, secuencia++);
-  });
+  scoutsRes.rows
+    .filter((row) => isLobatos(row.unidad))
+    .forEach((row) => {
+      addScoutRow(lobatosSheet, row, secuencia++);
+    });
 
   secuencia = 1;
   scoutsRes.rows
@@ -404,14 +454,18 @@ async function buildReportWorkbook() {
     });
 
   secuencia = 1;
-  scoutsRes.rows.filter((row) => isPioneros(row.unidad)).forEach((row) => {
-    addScoutRow(pionerosSheet, row, secuencia++);
-  });
+  scoutsRes.rows
+    .filter((row) => isPioneros(row.unidad))
+    .forEach((row) => {
+      addScoutRow(pionerosSheet, row, secuencia++);
+    });
 
   secuencia = 1;
-  scoutsRes.rows.filter((row) => isRovers(row.unidad)).forEach((row) => {
-    addScoutRow(roversSheet, row, secuencia++);
-  });
+  scoutsRes.rows
+    .filter((row) => isRovers(row.unidad))
+    .forEach((row) => {
+      addScoutRow(roversSheet, row, secuencia++);
+    });
 
   // Hoja Dirigentes (no colaboradores)
   const dirColumns = [
@@ -441,7 +495,11 @@ async function buildReportWorkbook() {
       ci: row.ci?.toString().toUpperCase() || "",
       primer_nombre: (row.primer_nombre || row.nombre || "").toUpperCase(),
       segundo_nombre: row.segundo_nombre?.toUpperCase() || "",
-      primer_apellido: (row.primer_apellido || row.apellido || "").toUpperCase(),
+      primer_apellido: (
+        row.primer_apellido ||
+        row.apellido ||
+        ""
+      ).toUpperCase(),
       segundo_apellido: row.segundo_apellido?.toUpperCase() || "",
       email: row.email || "",
       profesion_ocupacion: row.profesion_ocupacion?.toUpperCase() || "",
@@ -483,7 +541,7 @@ export const sendReport = async (req, res) => {
     return res.status(400).json({ message: "El email es requerido" });
 
   try {
-    const workbook = await buildReportWorkbook();
+    const workbook = await buildReportWorkbook(from, to);
     const buffer = await workbook.xlsx.writeBuffer();
 
     const attachment = [
@@ -507,7 +565,10 @@ export const sendReport = async (req, res) => {
     const senderName = process.env.BREVO_SENDER_NAME || "Grupo Scout Panda";
 
     const safeMsg = mensaje
-      ? mensaje.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>")
+      ? mensaje
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\n/g, "<br>")
       : null;
 
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -534,10 +595,16 @@ export const sendReport = async (req, res) => {
 
     if (!response.ok) {
       console.error("Brevo error:", data);
-      return res.status(500).json({ message: "Error enviando email", error: data.message || JSON.stringify(data) });
+      return res.status(500).json({
+        message: "Error enviando email",
+        error: data.message || JSON.stringify(data),
+      });
     }
 
-    return res.json({ message: "Reporte enviado correctamente", messageId: data.messageId });
+    return res.json({
+      message: "Reporte enviado correctamente",
+      messageId: data.messageId,
+    });
   } catch (error) {
     console.error("ERROR sendReport:", error);
     return res.status(500).json({
@@ -550,7 +617,8 @@ export const sendReport = async (req, res) => {
 // Descargar reporte en Excel
 export const downloadReport = async (req, res) => {
   try {
-    const workbook = await buildReportWorkbook();
+    const { from, to } = req.query;
+    const workbook = await buildReportWorkbook(from, to);
     const buffer = await workbook.xlsx.writeBuffer();
 
     res.setHeader(

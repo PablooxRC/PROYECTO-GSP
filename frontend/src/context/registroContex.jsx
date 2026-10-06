@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import * as registroApi from '../api/registro.api'
 
 const RegistroContext = createContext()
@@ -26,7 +26,7 @@ export const RegistroProvider = ({ children }) => {
         }
     }
 
-    const loadUnidades = async () => {
+    const loadUnidades = useCallback(async () => {
         try {
             const data = await registroApi.getUnidades()
             setUnidades(data)
@@ -34,7 +34,7 @@ export const RegistroProvider = ({ children }) => {
             console.error('Error cargando unidades:', error)
             setErrors([error.response?.data?.message || 'Error al cargar unidades'])
         }
-    }
+    }, [])
 
     const loadRegistro = async (id) => {
         try {

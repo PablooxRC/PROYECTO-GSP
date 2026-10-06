@@ -21,6 +21,8 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --chown=appuser:appgroup --from=deps /app/node_modules ./node_modules
 COPY --chown=appuser:appgroup src ./src
 COPY --chown=appuser:appgroup package.json ./
+COPY --chown=appuser:appgroup scripts/setup_kral.js ./scripts/setup_kral.js
+COPY --chown=appuser:appgroup database/migration_create_kral.sql ./database/migration_create_kral.sql
 
 USER appuser
 

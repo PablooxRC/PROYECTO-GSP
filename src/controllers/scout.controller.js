@@ -1,13 +1,10 @@
 import { pool } from "../db.js";
+import { queryPage } from '../utils/pagination.js';
 
 // Seleccionar todos los scouts
 export const getScouts = async (req, res, next) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM scouts WHERE dirigente_ci = $1",
-      [req.userCI],
-    );
-    return res.json(result.rows);
+    return res.json(await queryPage(pool, 'SELECT * FROM scouts WHERE dirigente_ci = $1 ORDER BY ci', [req.userCI], req.query));
   } catch (error) {
     next(error);
   }
@@ -39,10 +36,9 @@ export const getScoutsAdmin = async (req, res, next) => {
       query += ` WHERE ${whereConditions.join(" AND ")}`;
     }
 
-    query += ` ORDER BY create_at DESC NULLS LAST`;
+    query += ` ORDER BY create_at DESC NULLS LAST, ci`;
 
-    const result = await pool.query(query, params);
-    return res.json(result.rows);
+    return res.json(await queryPage(pool, query, params, req.query));
   } catch (error) {
     next(error);
   }

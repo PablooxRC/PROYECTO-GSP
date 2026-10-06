@@ -1,4 +1,5 @@
 import { pool } from "../db.js";
+import { queryPage } from '../utils/pagination.js';
 import {
   asyncHandler,
   AuthorizationError,
@@ -17,10 +18,9 @@ export const getPadronByCi = asyncHandler(async (req, res) => {
 // Listar todo el padrón (solo admin)
 export const listPadron = asyncHandler(async (req, res) => {
   if (!req.isAdmin) throw new AuthorizationError();
-  const result = await pool.query(
-    "SELECT * FROM padron ORDER BY primer_apellido, primer_nombre",
-  );
-  return res.json(result.rows);
+  return res.json(await queryPage(pool,
+    "SELECT * FROM padron WHERE concat_ws(' ',ci,primer_nombre,primer_apellido) ILIKE $1 ORDER BY primer_apellido, primer_nombre, ci",
+    [`%${String(req.query.search || '')}%`], req.query));
 });
 
 // Crear entrada en el padrón (solo admin)

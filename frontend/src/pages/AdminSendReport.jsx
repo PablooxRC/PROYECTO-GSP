@@ -1,9 +1,7 @@
 import { useState } from "react";
-import {
-  sendReport,
-  getScoutsAdmin,
-  getDirigentesForReport,
-} from "../api/admin.api";
+import usePaginatedList from "../hooks/usePaginatedList";
+import Pagination from "../components/ui/Pagination";
+import { sendReport } from "../api/admin.api";
 import axios from "../api/axios";
 import { Card } from "../components/ui";
 import { formatDate } from "../utils/formatDate";
@@ -14,11 +12,28 @@ export default function AdminSendReport() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const [registros, setRegistros] = useState([]);
-  const [scouts, setScouts] = useState([]);
-  const [dirigentes, setDirigentes] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewFilters, setPreviewFilters] = useState({});
+  const registrosPage = usePaginatedList(
+    "/admin/report-preview",
+    { ...previewFilters, section: "registros" },
+    showPreview,
+  );
+  const scoutsPage = usePaginatedList(
+    "/admin/report-preview",
+    { ...previewFilters, section: "scouts" },
+    showPreview,
+  );
+  const dirigentesPage = usePaginatedList(
+    "/admin/report-preview",
+    { ...previewFilters, section: "dirigentes" },
+    showPreview,
+  );
+  const registros = registrosPage.items,
+    scouts = scoutsPage.items,
+    dirigentes = dirigentesPage.items;
+  const previewLoading =
+    registrosPage.loading || scoutsPage.loading || dirigentesPage.loading;
   const [imagenBase64, setImagenBase64] = useState(null);
   const [imagenNombre, setImagenNombre] = useState("Sin imagen seleccionada");
   const [mensaje, setMensaje] = useState("");
@@ -35,64 +50,20 @@ export default function AdminSendReport() {
     }
   };
 
-  const handlePreview = async () => {
-    setPreviewLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (from) params.append("from", from);
-      if (to) params.append("to", to);
-
-      const url = `/registros${params.toString() ? "?" + params.toString() : ""}`;
-      const registrosResponse = await axios.get(url);
-
-      // Obtener todos los scouts
-      const scoutsResponse = await getScoutsAdmin(from, to);
-
-      // Obtener todos los dirigentes
-      const dirigentesResponse = await getDirigentesForReport();
-
-      // Filtrar dirigentes por fecha de depósito
-      let dirigentesFiltrados = dirigentesResponse.data;
-      if (from || to) {
-        dirigentesFiltrados = dirigentesResponse.data.filter((d) => {
-          if (!d.fecha_deposito) return false;
-
-          // Convertir fechas a formato YYYY-MM-DD para comparación
-          const fechaDirigente = d.fecha_deposito.slice(0, 10);
-
-          if (from && fechaDirigente < from) return false;
-          if (to && fechaDirigente > to) return false;
-          return true;
-        });
-      }
-
-      setRegistros(registrosResponse.data);
-      setScouts(scoutsResponse.data);
-      setDirigentes(dirigentesFiltrados);
-      setShowPreview(true);
-
-      const scoutsConRegistro = new Set(
-        registrosResponse.data.map((r) => r.scout_ci),
-      );
-      const scoutsSinRegistro = scoutsResponse.data.filter(
-        (s) => !scoutsConRegistro.has(s.ci),
-      );
-
-      setMessage({
-        type: "info",
-        text: `Se encontraron ${registrosResponse.data.length} registros, ${scoutsSinRegistro.length} scouts sin registro, ${dirigentesFiltrados.length} dirigentes`,
-      });
-    } catch (err) {
-      console.error("Error:", err);
+  const handlePreview = () => {
+    if (from && to && from > to) {
       setMessage({
         type: "error",
-        text:
-          "Error cargando registros: " +
-          (err?.response?.data?.message || err.message),
+        text: "La fecha inicial debe ser anterior a la final.",
       });
-    } finally {
-      setPreviewLoading(false);
+      return;
     }
+    setPreviewFilters({ from: from || undefined, to: to || undefined });
+    setShowPreview(true);
+    setMessage(null);
+    registrosPage.refresh();
+    scoutsPage.refresh();
+    dirigentesPage.refresh();
   };
 
   const handleDownloadExcel = async () => {
@@ -180,7 +151,8 @@ export default function AdminSendReport() {
       setMessage({
         type: "error",
         text:
-          (errData?.message || err.message || "Error enviando reporte") + detail,
+          (errData?.message || err.message || "Error enviando reporte") +
+          detail,
       });
     } finally {
       setLoading(false);
@@ -202,7 +174,10 @@ export default function AdminSendReport() {
               <input
                 type="date"
                 value={from}
-                onChange={(e) => setFrom(e.target.value)}
+                onChange={(e) => {
+                  setFrom(e.target.value);
+                  setShowPreview(false);
+                }}
                 className="w-full p-2 rounded bg-gray-700 text-white"
               />
             </div>
@@ -211,7 +186,10 @@ export default function AdminSendReport() {
               <input
                 type="date"
                 value={to}
-                onChange={(e) => setTo(e.target.value)}
+                onChange={(e) => {
+                  setTo(e.target.value);
+                  setShowPreview(false);
+                }}
                 className="w-full p-2 rounded bg-gray-700 text-white"
               />
             </div>
@@ -310,15 +288,16 @@ export default function AdminSendReport() {
               </button>
             </div>
             <h2 className="text-2xl font-bold mb-4">
-              VISTA PREVIA ({registros.length} registros,{" "}
-              {
-                scouts.filter(
-                  (s) => !registros.map((r) => r.scout_ci).includes(s.ci),
-                ).length
-              }{" "}
-              scouts sin registro)
+              VISTA PREVIA ({registrosPage.pagination.total} registros,{" "}
+              {scoutsPage.pagination.total} scouts sin registro)
             </h2>
 
+            <Pagination {...registrosPage} label="Registros del reporte" />
+            <Pagination
+              {...scoutsPage}
+              label="Scouts sin registro del reporte"
+            />
+            <Pagination {...dirigentesPage} label="Dirigentes del reporte" />
             {registros.length === 0 &&
             scouts.length === 0 &&
             dirigentes.length === 0 ? (
@@ -334,7 +313,8 @@ export default function AdminSendReport() {
                 {registros.length > 0 && (
                   <div>
                     <h3 className="text-xl font-bold mb-4">
-                      ✓ Scouts con Depósito Registrado ({registros.length})
+                      ✓ Scouts con Depósito Registrado (
+                      {registrosPage.pagination.total})
                     </h3>
                     <div className="grid grid-cols-1 gap-4">
                       {registros.map((registro) => (
@@ -410,17 +390,12 @@ export default function AdminSendReport() {
 
                 {/* SCOUTS SIN REGISTROS */}
                 {(() => {
-                  const scoutsConRegistro = new Set(
-                    registros.map((r) => r.scout_ci),
-                  );
-                  const scoutsSinRegistro = scouts.filter(
-                    (s) => !scoutsConRegistro.has(s.ci),
-                  );
+                  const scoutsSinRegistro = scouts;
                   return scoutsSinRegistro.length > 0 ? (
                     <div>
                       <h3 className="text-xl font-bold mb-4 text-yellow-400">
                         ⚠️ Scouts Registrados SIN Depósito (
-                        {scoutsSinRegistro.length})
+                        {scoutsPage.pagination.total})
                       </h3>
                       <div className="grid grid-cols-1 gap-4">
                         {scoutsSinRegistro.map((scout) => (
@@ -484,15 +459,13 @@ export default function AdminSendReport() {
                 {dirigentes.length > 0 && (
                   <div>
                     <h3 className="text-xl font-bold mb-4">
-                      Dirigentes Registrados ({dirigentes.length})
+                      Dirigentes Registrados ({dirigentesPage.pagination.total})
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {dirigentes.map((dirigente) => {
                         // Obtener registros para este dirigente en el período
-                        const registrosDirigente = registros.filter(
-                          (r) => r.dirigente_ci === dirigente.ci,
-                        );
-                        const tieneRegistros = registrosDirigente.length > 0;
+                        const registrosCount = dirigente.registros_count;
+                        const tieneRegistros = registrosCount > 0;
 
                         return (
                           <Card
@@ -548,7 +521,7 @@ export default function AdminSendReport() {
                                       : "text-gray-400"
                                   }
                                 >
-                                  {registrosDirigente.length}
+                                  {registrosCount}
                                 </strong>
                               </p>
                               {dirigente.es_colaborador && (

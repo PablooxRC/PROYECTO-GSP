@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
+import usePaginatedList from '../hooks/usePaginatedList';
+import Pagination from '../components/ui/Pagination';
 import { useNavigate } from "react-router-dom";
 import { Card, Button, ConfirmModal } from "../components/ui";
 import { useRegistro } from "../context/registroContex";
@@ -10,8 +12,6 @@ import { formatDate } from "../utils/formatDate";
 function RegistrosPage() {
   const navigate = useNavigate();
   const {
-    registros,
-    loadRegistros,
     deleteRegistro,
     errors,
     setErrors,
@@ -23,35 +23,32 @@ function RegistrosPage() {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
+  const [dates, setDates] = useState({});
+  const paging = usePaginatedList('/registros', {...dates, unidad: unidadFiltro});
+  const registros = paging.items;
 
   // unidades ahora viene del provider; mostrar 'Todas' por defecto
   const opcionesUnidades = ["Todas", ...(unidades || [])];
 
-  const registrosFiltrados = useMemo(() => {
-    let lista = registros;
-    if (user?.is_admin && unidadFiltro && unidadFiltro !== "Todas") {
-      lista = lista.filter((r) => r.unidad === unidadFiltro);
-    }
-    return lista;
-  }, [registros, unidadFiltro, user]);
+  const registrosFiltrados = registros;
 
   const handleFiltrar = () => {
     setErrors([]);
-    loadRegistros(fechaDesde || undefined, fechaHasta || undefined);
+    setDates({from:fechaDesde || undefined,to:fechaHasta || undefined});
   };
 
   const handleLimpiar = () => {
     setFechaDesde("");
     setFechaHasta("");
     setErrors([]);
-    loadRegistros();
+    setDates({});
+    setUnidadFiltro('Todas');
   };
 
   useEffect(() => {
     setErrors([]);
-    loadRegistros();
     if (user?.is_admin && typeof loadUnidades === "function") loadUnidades();
-  }, []);
+  }, [setErrors, loadUnidades, user?.is_admin]);
 
   const handleDelete = (id) => {
     setConfirmDelete(id);
@@ -59,6 +56,7 @@ function RegistrosPage() {
 
   const executeDelete = async () => {
     await deleteRegistro(confirmDelete);
+    paging.refresh();
     setConfirmDelete(null);
   };
 
@@ -132,12 +130,13 @@ function RegistrosPage() {
       </div>
 
       {/* Lista de registros */}
+      <Pagination {...paging} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {registrosFiltrados.map((registro, index) => (
+        {registrosFiltrados.map((registro) => (
           <Card key={registro.id} className="px-7 py-4">
             <div>
               <h2 className="text-xl font-bold mb-2 text-white">
-                Registro #{index + 1}
+                Registro #{registro.id}
               </h2>
 
               <p className="text-sm text-white mb-1">

@@ -18,6 +18,7 @@ import taskRoutes from "./routes/scout.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import registroRoutes from "./routes/registro.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import kralRoutes from "./routes/kral.routes.js";
 import padronRoutes from "./routes/padron.routes.js";
 import {
   signin,
@@ -135,6 +136,7 @@ app.use("/api/registros", registroRoutes);
 
 // Admin
 app.use("/api/admin", adminRoutes);
+app.use("/api/kral", kralRoutes);
 
 // Padrón
 app.use("/api/padron", padronRoutes);

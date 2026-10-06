@@ -1,4 +1,5 @@
 import { pool } from "../db.js";
+import { queryPage } from '../utils/pagination.js';
 
 // Obtener todos los registros del dirigente
 export const getRegistros = async (req, res, next) => {
@@ -32,14 +33,17 @@ export const getRegistros = async (req, res, next) => {
       params.push(to);
     }
 
+    if (req.query.unidad && req.query.unidad !== 'Todas') {
+      params.push(req.query.unidad);
+      whereConditions.push(`r.unidad = $${params.length}`);
+    }
     if (whereConditions.length > 0) {
       query += ` WHERE ${whereConditions.join(" AND ")}`;
     }
 
-    query += ` ORDER BY r.fecha_deposito DESC NULLS LAST`;
+    query += ` ORDER BY r.fecha_deposito DESC NULLS LAST, r.id DESC`;
 
-    const result = await pool.query(query, params);
-    return res.json(result.rows);
+    return res.json(await queryPage(pool, query, params, req.query));
   } catch (error) {
     next(error);
   }

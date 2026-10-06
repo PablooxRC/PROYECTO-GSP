@@ -1,0 +1,21 @@
+import fs from 'node:fs/promises';
+import {SpreadsheetFile,FileBlob} from '@oai/artifact-tool';
+const dir='D:/PROYECTO DE GRADO 2025/Software/outputs/scout-depositos-01a08e1b';
+const wb=await SpreadsheetFile.importXlsx(await FileBlob.load(dir+'/Depositos - Grupo Scout Panda.xlsx'));
+const s=wb.worksheets.getItem('Depósitos');
+const old=s.tables.items[0],style=old.style,name=old.name,total=s.getRange('B8').formulas;
+old.delete();
+s.getRange('D10:D110').copyFrom(s.getRange('B10:B110'),'all');
+s.getRange('D11:D110').clear({applyTo:'contents'});
+s.getRange('D10').values=[['Fecha del depósito']];
+s.getRange('D1:D110').format.columnWidth=23;
+s.getRange('D11:D110').setNumberFormat('dd/mm/yyyy');
+s.getRange('D11:D110').format.horizontalAlignment='center';
+const table=s.tables.add('A10:D110',true,name);table.style=style;table.showFilterButton=true;
+s.getRange('B8').formulas=total;
+s.getRange("D10").format={fill:"#3063B0",font:{name:"Arial",size:11,bold:true,color:"#FFFFFF"},horizontalAlignment:"center",verticalAlignment:"center"}; wb.recalculate();
+console.log((await wb.inspect({kind:'table',range:'Depósitos!A8:D11',include:'values,formulas',tableMaxRows:4,tableMaxCols:4})).ndjson);
+const preview=await wb.render({sheetName:'Depósitos',range:'A1:D15',scale:1,format:'png'});
+await fs.writeFile('C:/Users/Pablo R/.codex/visualizations/2026/09/11/01a08e1b-29e1-7a41-9477-862da1b1802e/scout-date.png',new Uint8Array(await preview.arrayBuffer()));
+await (await SpreadsheetFile.exportXlsx(wb)).save(dir+'/Depositos - Grupo Scout Panda con fecha.xlsx');
+

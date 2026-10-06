@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "nodemon .",
     "start": "node src/index.js",
+    "test": "node --test",
+    "kral:setup": "node scripts/setup_kral.js",
     "seed": "node scripts/seed_admin.js",
     "clean": "node scripts/clean_database.js",
     "vercel:pull": "vercel env pull .env.vercel",

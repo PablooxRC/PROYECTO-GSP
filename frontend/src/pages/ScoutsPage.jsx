@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import usePaginatedList from '../hooks/usePaginatedList';
+import Pagination from '../components/ui/Pagination';
+import api from '../api/axios';
 import { Button, Card, ConfirmModal, Alert } from "../components/ui";
 import { useScout } from "../context/scoutContex.jsx";
 import { useNavigate } from "react-router-dom";
@@ -8,15 +11,14 @@ import { BiPencil } from "react-icons/bi";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
 function ScoutPage() {
-  const { scouts, loadscouts, deleteScout } = useScout();
+  const { deleteScout } = useScout();
+  const paging = usePaginatedList('/scouts');
+  const scouts = paging.items;
   const navigate = useNavigate();
   const { user } = useAuth();
   const [toDelete, setToDelete] = useState(null);
   const [alert, setAlert] = useState(null);
 
-  useEffect(() => {
-    loadscouts();
-  }, []);
 
   const handleDeleteClick = (scout) => {
     setToDelete(scout);
@@ -24,9 +26,10 @@ function ScoutPage() {
 
   const confirmDeleteAction = async () => {
     try {
-      await deleteScout(toDelete.ci);
+      const result = await deleteScout(toDelete.ci);
+      if (!result.success) throw new Error(result.message);
       setToDelete(null);
-      await loadscouts();
+      paging.refresh();
       setAlert({ type: "success", message: "Scout eliminado correctamente" });
     } catch (err) {
       setToDelete(null);
@@ -41,8 +44,12 @@ function ScoutPage() {
     setToDelete(null);
   };
 
-  function handlePrintReport() {
+  async function handlePrintReport() {
     const printWindow = window.open("", "", "width=800,height=600");
+    if (!printWindow) return;
+    let allScouts;
+    try { allScouts = (await api.get('/scouts')).data; }
+    catch (error) { printWindow.close(); setAlert({type:'error',message:getErrorMessage(error,'Error cargando reporte')}); return; }
     const htmlContent = `
       <html>
         <head>
@@ -68,7 +75,7 @@ function ScoutPage() {
               </tr>
             </thead>
             <tbody>
-              ${scouts
+              ${allScouts
                 .map(
                   (scout) => `
                 <tr>
@@ -135,6 +142,7 @@ function ScoutPage() {
         </Button>
       </div>
 
+      <Pagination {...paging} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {scouts.map((scout) => (
           <Card key={scout.ci} className="px-5 py-4">
